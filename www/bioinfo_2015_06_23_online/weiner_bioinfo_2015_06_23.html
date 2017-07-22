@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="author" content="January Weiner january@mpiib-berlin.mpg.de" />
+  <meta name="dcterms.date" content="2015-06-24" />
+  <title>Functional Multivariate analysis with the tmod package</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link rel="stylesheet" href="reveal.js/css/reveal.css"/>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <link rel="stylesheet" href="reveal.js/css/theme/blood.css" id="theme">
+  <link rel="stylesheet" href="css/mytheme.css"/>
+  <!-- If the query includes 'print-pdf', include the PDF print sheet -->
+  <script>
+    if( window.location.search.match( /print-pdf/gi ) ) {
+      var link = document.createElement( 'link' );
+      link.rel = 'stylesheet';
+      link.type = 'text/css';
+      link.href = 'reveal.js/css/print/pdf.css';
+      document.getElementsByTagName( 'head' )[0].appendChild( link );
+    }
+  </script>
+  <!--[if lt IE 9]>
+  <script src="reveal.js/lib/js/html5shiv.js"></script>
+  <![endif]-->
+  <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+<section>
+    <h1 class="title">Functional Multivariate analysis with the tmod package</h1>
+  <h1 class="subtitle">Tips and tricks</h1>
+    <h2 class="author">January Weiner <script type="text/javascript">
+<!--
+h='&#x6d;&#112;&#x69;&#x69;&#98;&#x2d;&#98;&#x65;&#114;&#108;&#x69;&#110;&#46;&#x6d;&#112;&#x67;&#46;&#100;&#x65;';a='&#64;';n='&#106;&#x61;&#110;&#x75;&#x61;&#114;&#x79;';e=n+a+h;
+document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'" clas'+'s="em' + 'ail">'+e+'<\/'+'a'+'>');
+// -->
+</script><noscript>&#106;&#x61;&#110;&#x75;&#x61;&#114;&#x79;&#32;&#x61;&#116;&#32;&#x6d;&#112;&#x69;&#x69;&#98;&#x2d;&#98;&#x65;&#114;&#108;&#x69;&#110;&#32;&#100;&#x6f;&#116;&#32;&#x6d;&#112;&#x67;&#32;&#100;&#x6f;&#116;&#32;&#100;&#x65;</noscript></h2>
+    <h3 class="date">2015-06-24</h3>
+</section>
+
+<section><section id="overview" class="titleslide slide level1"><h1>Overview</h1></section><section id="about-this-presentation" class="slide level2">
+<h1>About this presentation</h1>
+<p>This is an <a href="http://rmarkdown.rstudio.com/">Rmarkdown</a> document; it includes all code necessary to run <em>every</em> plot shown in this presentation. You can recreate all the plots or extract all code from the presentation.</p>
+</section><section id="enrichment-tests" class="slide level2">
+<h1>Enrichment tests</h1>
+<p>are an important tool in functional analysis of gene expression data – it turns unreadable lists of genes into something useful</p>
+<pre><code>## Loading required package: methods</code></pre>
+<pre><code>## Error in is.data.frame(x): object &#39;E&#39; not found</code></pre>
+</section><section id="section" class="slide level2">
+<h1></h1>
+<pre><code>##                                                                                              GENE_NAME     logFC      P.Value
+## 4178                                                     family with sequence similarity 20, member A&quot;  2.955829 3.423267e-07
+## 20799                                           Fc fragment of IgG, high affinity Ib, receptor (CD64)&quot;  2.391490 7.552423e-07
+## 4122                                             basic leucine zipper transcription factor, ATF-like 2  2.680837 1.198442e-06
+## 23567                                                                         ankyrin repeat domain 22  2.763908 2.057601e-06
+## 20498                                                                                         septin 4  3.286528 3.215558e-06
+## 20360                                                                                   CD274 molecule  2.377399 3.394453e-06
+## 2513                                                                              absent in melanoma 2  1.966342 3.397298e-06
+## 24032                                                                          Golgi-localized protein -2.534812 4.639596e-06
+## 1337                                                                                     ets variant 7  2.844012 4.897651e-06
+## 467                                      serpin peptidase inhibitor, clade G (C1 inhibitor), member 1&quot;  2.639069 8.958000e-06
+## 18119                                                                          BEN domain containing 7  2.892565 1.037826e-05
+## 14168                                                                      guanylate binding protein 5  1.855145 1.089721e-05
+## 19820                                                    dehydrogenase/reductase (SDR family) member 9  1.440288 1.404789e-05
+## 19404                                                          growth factor receptor-bound protein 10  1.781298 1.410679e-05
+## 36635                                                     family with sequence similarity 20, member A  1.859346 1.780390e-05
+## 23807                                                       kringle containing transmembrane protein 1  2.003210 1.797352e-05
+## 44719                                                                                     neuregulin 1  2.342024 1.802794e-05
+## 17853                                         guanylate binding protein 1, interferon-inducible, 67kDa  1.821479 1.911848e-05
+## 9007                                          guanylate binding protein 1, interferon-inducible, 67kDa  1.755501 2.512025e-05
+## 25055                                                                activating transcription factor 3  2.733576 2.582143e-05
+## 12637                                                       kringle containing transmembrane protein 1  2.174376 2.803767e-05
+## 33573                                                   macrophage receptor with collagenous structure  1.734084 3.910398e-05
+## 12754                                                                                     neuromedin U  2.355568 4.056782e-05
+## 1641                                        proline-serine-threonine phosphatase interacting protein 2  1.485052 5.409838e-05
+## 12108                                                                                     neuregulin 1  1.528504 8.228218e-05
+## 9513                                                                         tudor domain containing 9  1.361850 9.836098e-05
+## 37026                                                                    LY6/PLAUR domain containing 5  2.089879 1.090027e-04
+## 7847                                                    complement component 4 binding protein, alpha&quot;  2.531020 1.101020e-04
+## 1535                                                                           BEN domain containing 7  2.006808 1.120490e-04
+## 42553                                                                 programmed cell death 1 ligand 2  1.972626 1.133649e-04
+## 15936                                                                   S100 calcium binding protein B -2.804256 1.262757e-04
+## 37793                                                                                  glycerol kinase  1.298944 1.269174e-04
+## 36637                                                               solute carrier family 26, member 8  2.469080 1.458551e-04
+## 28197                                      interferon-induced protein with tetratricopeptide repeats 3  1.639321 1.713990e-04
+## 4822                                                         NLR family, apoptosis inhibitory protein&quot;  1.325390 1.789807e-04
+## 3812                                                          C-type lectin domain family 4, member D&quot;  1.443165 1.881219e-04
+## 9339                                                                Fc fragment of IgG binding protein -1.497617 1.965503e-04
+## 41475                                                                activating transcription factor 3  1.292809 2.278809e-04
+## 35256                                                        NLR family, apoptosis inhibitory protein&quot;  1.289213 2.463443e-04
+## 9916                                                                            complement component 2  1.588409 2.541058e-04
+## 22921                                                                Fc fragment of IgA, receptor for&quot;  1.421002 2.580743e-04
+## 12368                                                        NLR family, apoptosis inhibitory protein&quot;  1.235571 2.664533e-04
+## 34313                                                 complement component 1, q subcomponent, A chain&quot;  1.689358 3.179771e-04
+## 15093                                                 complement component 1, q subcomponent, B chain&quot;  1.914181 3.453423e-04
+## 23200                                                                  S100 calcium binding protein A9  1.134258 3.521553e-04
+## 34454                                                                         leucine aminopeptidase 3  1.294228 3.546872e-04
+## 10816                                                                                       annexin A3  1.542290 3.628957e-04
+## 27483                                                               RAB6B, member RAS oncogene family&quot;  2.446498 3.650282e-04
+## 43831                                                                                    CD8b molecule -1.506415 3.704257e-04
+## 8681                                                                  S100 calcium binding protein A12  1.402222 3.809130e-04
+## 38902                                                    caspase recruitment domain family, member 17&quot;  1.321843 4.119067e-04
+## 36                                                                                            RTFV9368  1.524166 4.167632e-04
+## 40884                                                                                     neuregulin 1  1.635002 4.210134e-04
+## 23894                                                               lipoma HMGIC fusion partner-like 2  1.175724 4.276739e-04
+## 37657                                                                           hypothetical LOC389634  1.515841 4.610667e-04
+## 6554                    solute carrier family 1 (glial high affinity glutamate transporter), member 3&quot;  1.374037 4.952088e-04
+## 4529                                                                  BMX non-receptor tyrosine kinase  2.049635 5.249860e-04
+## 34757                                                  tumor necrosis factor, alpha-induced protein 6&quot;  1.463675 5.405936e-04
+## 2919                                                                            complement component 2  1.616347 5.524452e-04
+## 33942                                                                                   tetraspanin 16  1.521351 5.880051e-04
+## 41326                                                                                   CD177 molecule  3.152941 6.749779e-04
+## 32086                                 membrane protein, palmitoylated 3 (MAGUK p55 subfamily member 3)  2.265374 7.035819e-04
+## 12567 UDP-N-acetyl-alpha-D-galactosamine:polypeptide N-acetylgalactosaminyltransferase 14 (GalNAc-T14)  1.497465 7.122777e-04
+## 36718                                                                       heat shock 27kDa protein 3  1.911839 7.424662e-04
+## 7914                                                                         BAI1-associated protein 3 -1.182446 7.479728e-04
+## 2994                                                                                    adrenomedullin  1.238999 7.766845e-04
+## 3619                                                     caspase recruitment domain family, member 16&quot;  1.204079 8.767929e-04
+## 28674                                                                  S100 calcium binding protein A8  1.257401 8.840350e-04
+## 3475                                              matrix metallopeptidase 1 (interstitial collagenase)  1.799501 9.116345e-04
+## 41777                                                                              complement factor B  1.808881 9.759058e-04
+## 41836                                                                           histone cluster 1, H1t  1.340157 9.772487e-04
+## 19074                                                                                  hemochromatosis  1.564537 1.004557e-03
+## 34944                                                                    tripartite motif-containing 6  1.459915 1.035214e-03
+## 19167                                                                       dedicator of cytokinesis 1  1.708299 1.055642e-03
+## 8564                                                      discoidin, CUB and LCCL domain containing 2&quot; -1.508520 1.071607e-03
+## 28805                                                                                  glycerol kinase  1.136333 1.114479e-03
+## 28786                                      interferon-induced protein with tetratricopeptide repeats 2  1.270064 1.148411e-03
+## 2531                                                         epithelial stromal interaction 1 (breast)  1.409939 1.168748e-03
+## 42736                                                                  G protein-coupled receptor 109B  1.136573 1.200312e-03
+## 43103                                                    PAS domain containing serine/threonine kinase -1.142910 1.221078e-03
+## 21612                                                                    G protein-coupled receptor 68 -1.130227 1.355236e-03
+## 23284                                                                 EF-hand calcium binding domain 2  1.298419 1.390797e-03
+## 39304                                                                         transmembrane protein 22 -1.404549 1.433556e-03
+## 24623                                       ventricular zone expressed PH domain homolog 1 (zebrafish)  1.882873 1.553723e-03
+## 30839                                                               chromosome 2 open reading frame 40 -1.941628 1.594039e-03
+## 2331                                                  peroxisome proliferator-activated receptor gamma  1.389907 1.698014e-03
+## 40645                                                radical S-adenosyl methionine domain containing 2  1.664523 1.779688e-03
+## 31923                  solute carrier family 6 (neurotransmitter transporter, betaine/GABA), member 12  2.033837 1.868272e-03
+## 11997                                                              chromosome 19 open reading frame 59  1.267190 1.982857e-03
+## 24709                                                                          zinc finger protein 683 -1.808078 2.028917e-03
+## 6887                                                                    membrane metallo-endopeptidase  1.000946 2.038779e-03
+## 41757                                             POM121 membrane glycoprotein-like 1 (rat) pseudogene  1.717477 2.052620e-03
+## 43081                                                            myosin, heavy chain 11, smooth muscle  1.498281 2.086703e-03
+## 41304                                                         pregnancy specific beta-1-glycoprotein 1  1.497057 2.120199e-03
+## 41425                                                            peptidyl arginine deiminase, type II&quot;  1.198475 2.129770e-03
+## 43165                                                             RAS (RAD and GEM)-like GTP binding 2  1.202758 2.189990e-03
+## 8119                  carcinoembryonic antigen-related cell adhesion molecule 1 (biliary glycoprotein)  1.132789 2.247078e-03
+## 37418                                                                 BMX non-receptor tyrosine kinase  1.249389 2.354429e-03
+## 229                                     potassium inwardly-rectifying channel, subfamily J, member 15&quot;  1.094012 2.358897e-03
+## 14423                                                               RAB6B, member RAS oncogene family&quot;  1.265003 2.408802e-03
+## 43564                                                                                          vanin 1  1.180127 2.520182e-03
+## 20217                                                                     leucine-rich repeat kinase 2  1.087264 2.542639e-03
+## 42787                                                                                           kazrin  1.760187 2.690470e-03
+## 33679                                                                  frizzled homolog 3 (Drosophila) -1.606776 2.728652e-03
+## 38927                                                             chromosome 20 open reading frame 132 -1.220533 2.810575e-03
+## 20292                                                                                  glycerol kinase  1.273850 2.967126e-03
+## 32643                                                        cAMP responsive element binding protein 5  1.065052 3.008689e-03
+## 539                                                         Janus kinase 2 (a protein tyrosine kinase)  1.032359 3.021110e-03
+## 28424                                                                    tripartite motif-containing 6  2.526312 3.052967e-03
+## 27526                                                                   G protein-coupled receptor 125 -1.838869 3.078548e-03
+## 32867                                                                            carbonic anhydrase IV  1.081607 3.173508e-03
+## 22355                                                                                          vanin 1  1.066994 3.187062e-03
+## 10217                                                                 chemokine (C-C motif) receptor 1  1.393774 3.292090e-03
+## 28975                                                                                   CD177 molecule  1.877379 3.322084e-03
+## 17329                                                radical S-adenosyl methionine domain containing 2  2.077111 3.480239e-03
+## 8805                                                                zinc finger, BED-type containing 2 -1.523029 3.566449e-03
+## 29036                                              procollagen-lysine, 2-oxoglutarate 5-dioxygenase 2&quot;  2.003193 3.604674e-03
+## 6181                                                                           HtrA serine peptidase 1  1.410760 3.630910e-03
+## 21542                                                     family with sequence similarity 26, member F  1.162710 3.642167e-03
+## 16664                                                                                   CD177 molecule  2.038547 3.665403e-03
+## 4736                                                                                           fukutin -1.039012 3.714621e-03
+## 26795                                                                                       neuritin 1  1.626943 3.791529e-03
+## 810                                        interferon-induced protein with tetratricopeptide repeats 2  1.116897 3.807142e-03
+## 32773                                                                        phospholipid scramblase 1  1.023323 3.819121e-03
+## 30466                                                                            early B-cell factor 1 -1.588792 3.883751e-03
+## 27197                                                                     activin A receptor, type IC&quot; -1.909292 3.988702e-03
+## 3384                                                                       fibroblast growth factor 13  1.954276 4.089285e-03
+## 2201                                       phospholipase A2, group IVA (cytosolic, calcium-dependent)&quot;  1.185707 4.109061e-03
+## 18285                                                              chromosome 22 open reading frame 41  1.029386 4.209791e-03
+## 35755                                                              contactin associated protein-like 2 -1.480370 4.257860e-03</code></pre>
+</section><section id="section-1" class="slide level2">
+<h1></h1>
+<figure>
+<img src="figure/tagcloud-1.png" alt="plot of chunk tagcloud" /><figcaption>plot of chunk tagcloud</figcaption>
+</figure>
+</section><section id="two-new-approaches-will-be-presented" class="slide level2">
+<h1>Two new approaches will be presented:</h1>
+<ul>
+<li>a new statistical test for continuous enrichments</li>
+<li>a method for ordering genes</li>
+</ul>
+</section><section id="multivariate-analysis-enrichment-functional-multivariate-analysis-fma" class="slide level2">
+<h1>Multivariate analysis + enrichment = Functional multivariate analysis (FMA)</h1>
+<p>Combination of multivariate techniques such as PCA and functional enrichment analysis can circumvent the need for analysis of differential expression. A primer on FMA will be presented here.</p>
+</section><section id="tmod" class="slide level2">
+<h1>tmod</h1>
+<p>We introduce <em>tmod</em>, an R package which implements several of the shown approaches, and more.</p>
+<!-- ===================================================================== -->
+</section></section>
+<section><section id="cerno-test-a-variant-of-fishers-exact-test" class="titleslide slide level1"><h1>CERNO test: a variant of Fisher’s exact test</h1></section><section id="section-2" class="slide level2">
+<h1></h1>
+<p>Some enrichment tests (such as the hypergeometric test) rely on arbirtrary tresholds to divide the genes into “differentially expressed” and “background” (or equivalent sets). It is easy to run a statistical test on such a setup, however it is problematic: the number of significantly regulated genes depends on the statistical power, i.e. for example on the number of samples.</p>
+</section><section id="section-3" class="slide level2">
+<h1></h1>
+<p>Better tests yet are independent of arbitrary thresholds. Examples include</p>
+<ul>
+<li>Randomization approaches (such as GSEA)</li>
+<li>ANOVA-like approaches</li>
+<li>Mann-Whitney U statistic</li>
+</ul>
+<p>How does this work?</p>
+</section><section id="section-4" class="slide level2">
+<h1></h1>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">evidencePlot</span>(<span class="dt">l=</span>tt$GENE_SYMBOL, <span class="dt">m=</span><span class="st">&quot;LI.M11.0&quot;</span>)</code></pre></div>
+<figure>
+<img src="figure/evidenceplot-1.png" alt="plot of chunk evidenceplot" /><figcaption>plot of chunk evidenceplot</figcaption>
+</figure>
+</section><section id="section-5" class="slide level2">
+<h1></h1>
+<p>In an U-test, the U statistic is (almost) the same as the Area Under Curve:</p>
+<p><span class="math display">\[r=1-\frac{2\cdot U}{n_1\cdot n_2} = 1 - 2\cdot\text{AUC}\]</span></p>
+<p>(r is the effect size for an U-test)</p>
+</section><section id="cerno-ranks-can-be-treated-as-probabilities" class="slide level2">
+<h1>CERNO: Ranks can be treated as probabilities</h1>
+<p><span class="math display">\[P(rank(g_j) &lt; rank(g_i)) = \frac{rank(g_i)}{N}\]</span></p>
+<p>Where <span class="math inline">\(N\)</span> is the total number of genes.</p>
+</section><section id="we-apply-fishers-method-to-ranks" class="slide level2">
+<h1>We apply Fisher’s method to ranks</h1>
+<p><span class="math display">\[\mathbf{CERNO} = -2\cdot \sum_{i=1}^{N}\ln(\frac{rank(g_i)}{N})\]</span></p>
+<p>The statistics has a <span class="math inline">\(\chi^2\)</span> distribution with <span class="math inline">\(2\cdot N\)</span> degrees of freedom.</p>
+</section><section id="section-6" class="slide level2">
+<h1></h1>
+<p>First, second and third quartiles of number of modules recovered by the different statistical tests in dependence of the sample size in 100 random sample replicates.</p>
+<figure>
+<img src="figure/simula0b-1.png" alt="plot of chunk simula0b" /><figcaption>plot of chunk simula0b</figcaption>
+</figure>
+<!-- ===================================================================== -->
+</section></section>
+<section><section id="how-to-order-genes" class="titleslide slide level1"><h1>How to order genes?</h1></section><section id="section-7" class="slide level2">
+<h1></h1>
+<ul>
+<li>Order by p-values (common approach).
+<ul>
+<li>Genes with strong expression tend to have lower p-values even if log-fold changes are small</li>
+</ul></li>
+<li>Order by (absolute) log fold change
+<ul>
+<li>Genes with weak expression (near background) can have huge log fold changes despite lack of significance</li>
+</ul></li>
+</ul>
+</section><section id="section-8" class="slide level2">
+<h1></h1>
+<figure>
+<img src="figure/limma2-1.png" alt="plot of chunk limma2" /><figcaption>plot of chunk limma2</figcaption>
+</figure>
+</section><section id="msd-minimal-significant-difference" class="slide level2">
+<h1>MSD – Minimal Significant Difference</h1>
+<p><span class="math display">\[
+\text{MSD} = \begin{cases}
+CI.L &amp; \text{if logFC} &gt; 0\\
+-CI.R &amp; \text{if logFC} &lt; 0\\
+\end{cases}
+\]</span></p>
+<figure>
+<img src="figure/msd2-1.png" alt="plot of chunk msd2" /><figcaption>plot of chunk msd2</figcaption>
+</figure>
+</section><section id="section-9" class="slide level2">
+<h1></h1>
+<p>First, second and third quartiles of number of modules recovered by the different approaches in dependence of the sample size in 100 random sample replicates.</p>
+<figure>
+<img src="figure/simula2-1.png" alt="plot of chunk simula2" /><figcaption>plot of chunk simula2</figcaption>
+</figure>
+<!-- ===================================================================== -->
+</section></section>
+<section><section id="functional-multivariate-analysis-a-primer" class="titleslide slide level1"><h1>Functional multivariate analysis (a primer)</h1></section><section id="functional-principal-component-analysis-pca" class="slide level2">
+<h1>Functional Principal Component Analysis (PCA)</h1>
+<p>In PCA, the <span class="math inline">\(N \times K\)</span> matrix <span class="math inline">\(\mathbf{X}\)</span> of <span class="math inline">\(N\)</span> samples and <span class="math inline">\(K\)</span> variables (e.g. genes) is rotated, which results in a new matrix, <span class="math inline">\(\mathbf{Y}\)</span>, with <span class="math inline">\(N\)</span> samples and <span class="math inline">\(J\)</span> principal components (PCs).</p>
+<p>Effectively, a <span class="math inline">\(K \times J\)</span> matrix <span class="math inline">\(\mathbf{W}\)</span> is calculated, such that</p>
+<p><span class="math display">\[ \mathbf{X}\times \mathbf{W} = \mathbf{Y} \]</span></p>
+</section><section id="section-10" class="slide level2">
+<h1></h1>
+<figure>
+<img src="figure/pca1-1.png" alt="plot of chunk pca1" /><figcaption>plot of chunk pca1</figcaption>
+</figure>
+<p>Question in MFA: <em>What do these components mean?</em></p>
+</section><section id="section-11" class="slide level2">
+<h1></h1>
+<p><span class="math display">\[ \mathbf{X}\times \mathbf{W} = \mathbf{Y} \]</span></p>
+<p>Each column of <span class="math inline">\(\mathbf{X}\)</span> is a principal component. Each row corresponds to one sample.</p>
+<p>A value for a given PC <span class="math inline">\(j\)</span> and a given sample <span class="math inline">\(n\)</span> is calculated as</p>
+<p><span class="math display">\[ y_{n,j} = \sum_{k=1}^{K} w_{j,k}\cdot x_{k,n} \]</span></p>
+<p>The terms <span class="math inline">\(w_{j,k}\)</span> are variable- (or: gene-) specific <em>weights</em> or <em>loadings</em> for each component <span class="math inline">\(j\)</span>.</p>
+</section><section id="section-12" class="slide level2">
+<h1></h1>
+<p><span class="math display">\[ y_{(n,j)} = \sum_{k=1}^{K} w_{k,j}\cdot x_{k,n} \]</span></p>
+<p>The larger the absolute value of <span class="math inline">\(w_{k,j}\)</span>, the more impact this gene has on the <span class="math inline">\(j\)</span>-th principal component.</p>
+<p>We can sort the genes by their weight in a component. Since as a result we get a sorted list of genes, we can apply a continuous enrichment algorithm.</p>
+</section><section id="enrichment-in-component-4" class="slide level2">
+<h1>Enrichment in component 4</h1>
+<figure>
+<img src="figure/tmodPCA1-1.png" alt="plot of chunk tmodPCA1" /><figcaption>plot of chunk tmodPCA1</figcaption>
+</figure>
+</section><section id="section-13" class="slide level2">
+<h1></h1>
+<figure>
+<img src="figure/tmodPCA-1.png" alt="plot of chunk tmodPCA" /><figcaption>plot of chunk tmodPCA</figcaption>
+</figure>
+</section><section id="section-14" class="slide level2">
+<h1></h1>
+<p>This approach works well also with other multivariate analyses such as independent component analysis (ICA), partial least squares (PLS) or correspondance analysis (CA).</p>
+<p>Directly combining multivariate analyses with gene set enrichment allows us to achieve the same results without involving a direct group - to - group comparison. This makes it especially suitable for exploratory analyses.</p>
+<!-- ===================================================================== -->
+</section></section>
+<section><section id="serial-analysis-of-enrichment-with-tmod" class="titleslide slide level1"><h1>Serial analysis of enrichment with <em><a href="http://bioinfo.mpiib-berlin.mpg.de/tmod/">tmod</a></em></h1></section><section id="section-15" class="slide level2">
+<h1></h1>
+<p><em>tmod</em> has been designed as a package for testing the enrichment of blood transcriptional modules. Therefore, <em>tmod</em> contains two sets of blood transcriptional module definitions; however, it can be used with any arbitrary gene set definition (e.g. GSEA/MSigDB) or high throughput data type (e.g. metabolomics)</p>
+<p><em>tmod</em> implements HG / U / CERNO tests, functional multivariate analyses, serial analysis / visualization and more.</p>
+<p>Availability: <a href="http://bioinfo.mpiib-berlin.mpg.de/tmod/" class="uri">http://bioinfo.mpiib-berlin.mpg.de/tmod/</a></p>
+</section><section id="example-mfa-with-r-and-tmod" class="slide level2">
+<h1>Example: MFA with R and tmod</h1>
+<p>Data set Egambia: GEO <a href="http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE28623">GSE28623</a>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(tmod)
+<span class="kw">data</span>(Egambia)
+<span class="kw">head</span>(Egambia)</code></pre></div>
+<pre><code>##    GENE_SYMBOL                                      GENE_NAME     EG        NID       NID       NID        NID       NID       NID        NID       NID
+## 34    C19orf15            chromosome 19 open reading frame 15  57828  3.2618218  1.339813  2.462880  3.9795714  4.626591  4.253879  2.6972224  3.804575
+## 36     UNQ9368                                       RTFV9368 643036  1.5671748  4.952589  4.065492  4.6410409  3.207639  5.552805  4.1901659  3.257324
+## 41      ADORA3                          adenosine A3 receptor    140  6.2246027  5.078945  3.862936  6.1976618  5.410801  5.794503  5.0215809  8.017599
+## 44        CDH6 cadherin 6, type 2, K-cadherin (fetal kidney)&quot;   1004  0.8328559  3.585615  2.975072  0.6475284  1.222587  0.143559 -0.7720002  0.615626
+## 52       VASH1                                    vasohibin 1  22846 11.3952226 12.098981 13.057666 13.0795387 11.182162 10.747176 12.9036129 12.261216
+## 62     MAB21L2                     mab-21-like 2 (C. elegans)  10586  5.7530317  7.517327  6.777747  7.0907261  6.614020 10.917492  8.9160131  5.323171
+##          NID       NID        NID        NID       NID       NID       NID        TB        TB        TB         TB        TB        TB        TB         TB
+## 34  4.617986  3.033595  3.1866326  3.6506719  3.787375  3.019342  2.795293  3.020139  2.269359  3.325500  4.0871459  4.723224  3.599277  1.571850  3.6313736
+## 36  4.786995  3.091925  2.2736422  4.1327518  3.934754  3.077131  6.428547  4.655419  6.460367  4.607918  4.7004430  5.967757  5.641816  5.006141  5.2302712
+## 41  6.878103  4.702415  7.6848512  5.2048066  4.836591  4.965997  8.234983  5.072141  4.356401  7.043360  7.3670729  5.805350  6.862796  4.134708  5.5752895
+## 44  2.589377  3.307486  0.7026353  0.8349973  3.951534  2.112500  1.223633  1.477250  5.159376  1.517965  0.4115781  1.584342  1.148472  1.710048  0.8883513
+## 52 11.376962 13.061029 13.0915988 12.0304966 11.980200 12.323327 11.076847 13.187186 13.122720 12.188427 10.4137276 11.128346 10.889193 11.062450 12.9295464
+## 62  7.167419  6.299295  5.8910289  5.4252899  5.265659  6.367774  6.691451  6.351070  6.124325  5.434126  5.5917154  7.298053  6.607853  5.594411  5.2920568
+##           TB        TB        TB        TB        TB        TB        TB
+## 34  3.962293  2.080173  3.750405  2.248475  4.148280  4.203384  4.319223
+## 36  5.551801  5.021816  5.338259  6.258222  6.383069  5.995486  5.203686
+## 41  7.689227  6.004437  5.928957  5.178725  5.661376  6.611350  6.008429
+## 44  0.977040  1.174805  1.764985  3.400484  2.486234  1.115761  1.454525
+## 52 11.921874 10.830077 11.106051 13.062118 10.608390 12.421606 13.269083
+## 62 11.736111  5.887298  5.672741  6.621244  4.729986  5.288187  8.995319</code></pre>
+</section><section id="section-16" class="slide level2">
+<h1></h1>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pca &lt;-<span class="st"> </span><span class="kw">prcomp</span>(<span class="kw">t</span>(Egambia[,-<span class="kw">c</span>(<span class="dv">1</span>:<span class="dv">3</span>)]), <span class="dt">scale.=</span><span class="ot">TRUE</span>)
+<span class="kw">names</span>(pca)</code></pre></div>
+<pre><code>## [1] &quot;sdev&quot;     &quot;rotation&quot; &quot;center&quot;   &quot;scale&quot;    &quot;x&quot;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(pca$x[,<span class="dv">1</span>:<span class="dv">5</span>])</code></pre></div>
+<pre><code>##             PC1        PC2        PC3          PC4        PC5
+## NID   -27.40722 -13.745073  21.755484  -7.09238147   3.427730
+## NID.1  60.44502 -10.323684 -20.091148 -16.49059391  28.610291
+## NID.2  67.86063  -2.049866  -5.840748   0.03206066  -4.409519
+## NID.3  -5.69328  41.378405 -16.466891 -18.00896080  -5.135397
+## NID.4 -25.59922 -22.852422  22.133902 -18.13982412 -13.619485
+## NID.5 -39.83765  -8.461881 -50.897837   9.51198824   3.981510</code></pre>
+</section><section id="section-17" class="slide level2">
+<h1></h1>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(pca$rotation[,<span class="dv">1</span>:<span class="dv">5</span>])</code></pre></div>
+<pre><code>##             PC1           PC2          PC3          PC4          PC5
+## 34 -0.018481790  0.0024852364 -0.005385593  0.002711500 -0.025291642
+## 36  0.003759772 -0.0010608658 -0.018658252  0.041998920  0.006653159
+## 41 -0.016103961  0.0002934259 -0.009930961 -0.008813419 -0.011689654
+## 44  0.021992983 -0.0073125000  0.005115505  0.015148515  0.001656177
+## 52  0.014524608  0.0258657287  0.015226449 -0.009626087 -0.001871263
+## 62 -0.001791174  0.0081258050 -0.016757250  0.001834450 -0.009573289</code></pre>
+</section><section id="enrichment-for-each-component" class="slide level2">
+<h1>Enrichment for each component</h1>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">l &lt;-<span class="st"> </span>Egambia$GENE_SYMBOL
+encfunc &lt;-<span class="st"> </span>function(r) {
+  o &lt;-<span class="st"> </span><span class="kw">order</span>(<span class="kw">abs</span>(r), <span class="dt">decreasing=</span><span class="ot">TRUE</span>)
+  <span class="kw">tmodCERNOtest</span>(l[o])
+}
+res &lt;-<span class="st"> </span><span class="kw">apply</span>(pca$rotation[,<span class="dv">1</span>:<span class="dv">10</span>], <span class="dv">2</span>, encfunc)
+<span class="kw">head</span>(res[[<span class="dv">4</span>]])</code></pre></div>
+<pre><code>##                ID                                      Title     cerno  N1       AUC      cES      P.Value    adj.P.Val
+## LI.M37.0 LI.M37.0        immune activation - generic cluster 454.88172 100 0.7188785 2.274409 6.749965e-22 2.335488e-19
+## LI.M11.0 LI.M11.0                 enriched in monocytes (II) 118.06755  20 0.7734395 2.951689 1.234985e-09 2.136524e-07
+## LI.M165   LI.M165 enriched in activated dendritic cells (II) 101.09999  19 0.7562436 2.660526 1.234533e-07 1.423828e-05
+## LI.M37.1 LI.M37.1                enriched in neutrophils (I)  77.04015  12 0.8671929 3.210006 1.789217e-07 1.547673e-05
+## LI.M16     LI.M16             TLR and inflammatory signaling  50.11235   5 0.9923252 5.011235 2.545057e-07 1.761180e-05
+## LI.M75     LI.M75                    antiviral IFN signature  67.61164  10 0.9007267 3.380582 4.448287e-07 2.565179e-05</code></pre>
+</section><section id="visualization" class="slide level2">
+<h1>Visualization</h1>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">tmodPanelPlot</span>(res, <span class="dt">filter.empty.rows=</span><span class="ot">TRUE</span>)</code></pre></div>
+<figure>
+<img src="figure/tmodEx40-1.png" alt="plot of chunk tmodEx40" /><figcaption>plot of chunk tmodEx40</figcaption>
+</figure>
+</section><section id="genes-with-positive-negative-weights" class="slide level2">
+<h1>Genes with positive / negative weights?</h1>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">qfnc &lt;-<span class="st"> </span>function(r) <span class="kw">quantile</span>(r, <span class="fl">0.75</span>)
+qqs &lt;-<span class="st"> </span><span class="kw">apply</span>(pca$rotation[,<span class="dv">1</span>:<span class="dv">10</span>], <span class="dv">2</span>, qfnc)
+pie &lt;-<span class="st"> </span><span class="kw">tmodDecideTests</span>(l, <span class="dt">lfc=</span>pca$rotation[,<span class="dv">1</span>:<span class="dv">10</span>], <span class="dt">lfc.thr=</span>qqs)
+<span class="kw">tmodPanelPlot</span>(res, <span class="dt">pie=</span>pie, <span class="dt">pie.style=</span><span class="st">&quot;rug&quot;</span>, <span class="dt">grid=</span><span class="st">&quot;between&quot;</span>)</code></pre></div>
+<figure>
+<img src="figure/tmodEx50-1.png" alt="plot of chunk tmodEx50" /><figcaption>plot of chunk tmodEx50</figcaption>
+</figure>
+</section><section id="tmod-web-interface" class="slide level2">
+<h1>tmod Web Interface</h1>
+<p><a href="http://bioinfo.mpiib-berlin.mpg.de/tmod/" class="uri">http://bioinfo.mpiib-berlin.mpg.de/tmod/</a>.</p>
+<figure>
+<img src="img/tmod_website.png" alt="tmod" /><figcaption>tmod</figcaption>
+</figure>
+<!-- ===================================================================== -->
+</section></section>
+<section><section id="concluding-remarks" class="titleslide slide level1"><h1>Concluding remarks</h1></section><section id="section-18" class="slide level2">
+<h1></h1>
+<ul>
+<li>Gene set enrichment analysis is a versatile tool for functional annotation</li>
+<li>Functional multivariate analysis can replace differential expression analysis</li>
+<li><em>tmod</em>: R package for BTM and GS enrichment analysis, available from <a href="http://bioinfo.mpiib-berlin.mpg.de/tmod/" class="uri">http://bioinfo.mpiib-berlin.mpg.de/tmod/</a> and CRAN</li>
+<li><em>tmod</em> allows functional multivariate analysis and serial enrichment analyiss</li>
+<li>features several visualization tools</li>
+<li>you know where to find me: <script type="text/javascript">
+<!--
+h='&#x6d;&#112;&#x69;&#x69;&#98;&#x2d;&#98;&#x65;&#114;&#108;&#x69;&#110;&#46;&#x6d;&#112;&#x67;&#46;&#100;&#x65;';a='&#64;';n='&#x2f;&#x2f;&#106;&#x61;&#110;&#x75;&#x61;&#114;&#x79;';e=n+a+h;
+document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'" clas'+'s="em' + 'ail">'+'january@mpiib-berlin.mpg.de'+'<\/'+'a'+'>');
+// -->
+</script><noscript>&#106;&#x61;&#110;&#x75;&#x61;&#114;&#x79;&#64;&#x6d;&#112;&#x69;&#x69;&#98;&#x2d;&#98;&#x65;&#114;&#108;&#x69;&#110;&#46;&#x6d;&#112;&#x67;&#46;&#100;&#x65;&#32;&#40;&#x2f;&#x2f;&#106;&#x61;&#110;&#x75;&#x61;&#114;&#x79;&#32;&#x61;&#116;&#32;&#x6d;&#112;&#x69;&#x69;&#98;&#x2d;&#98;&#x65;&#114;&#108;&#x69;&#110;&#32;&#100;&#x6f;&#116;&#32;&#x6d;&#112;&#x67;&#32;&#100;&#x6f;&#116;&#32;&#100;&#x65;&#x29;</noscript></li>
+</ul>
+</section><section id="conributors" class="slide level2">
+<h1>Conributors</h1>
+<ul>
+<li>Teresa Domaszewska</li>
+<li>Emilio Siena</li>
+</ul>
+<!-- ===================================================================== -->
+</section></section>
+<section><section id="appendix" class="titleslide slide level1"><h1>Appendix</h1></section><section id="section-19" class="slide level2">
+<h1></h1>
+<p>You can download the source code of this presentation on the tmod web page, <a href="http://bioinfo.mpiib-berlin.mpg.de/tmod/" class="uri">http://bioinfo.mpiib-berlin.mpg.de/tmod/</a>.</p>
+<p>To recreate this presentation, download the full presentation package and unzip it. Install the required packages (knitr for R and pandoc). Run the following command from inside the package archive.</p>
+<p>Commands:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">Rscript</span> -e <span class="st">&#39;knitr::knit(&quot;weiner_bioinfo_2015_06_23.Rmd&quot;)&#39;</span>
+<span class="kw">pandoc</span> -s -S -t revealjs weiner_bioinfo_2015_06_23.md -o weiner_bioinfo_2015_06_23.html \
+  --mathjax=<span class="st">&#39;http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&#39;</span> \
+  --css css/mytheme.css \
+  --slide-level 2 -V theme=blood</code></pre></div>
+<p>(Note: for an offline version, download MathJax and modify the –mathjax option)</p>
+</section><section id="section-20" class="slide level2">
+<h1></h1>
+<p>To extract the code from this presentation, save it as “test.Rmd” and run</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">Rscript</span> -e <span class="st">&#39;knitr::purl(&quot;tmod.Rmd&quot;)&#39;</span></code></pre></div>
+</section><section id="printing" class="slide level2">
+<h1>Printing:</h1>
+<p>This only works properly in Google Chromium; see <a href="https://github.com/hakimel/reveal.js#pdf-export">reveal.js documentation</a></p>
+<p>To print, follow the link below and press Ctrl-P; don’t worry if the slides appear to overlap – they will look fine on the print preview.</p>
+<p><a href="?print-pdf">Print</a></p>
+</section></section>
+    </div>
+  </div>
+
+
+  <script src="reveal.js/lib/js/head.min.js"></script>
+  <script src="reveal.js/js/reveal.js"></script>
+
+  <script>
+
+      // Full list of configuration options available here:
+      // https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+        controls: true,         // Display controls in the bottom right corner
+        progress: true,         // Display a presentation progress bar
+        history: true,          // Push each slide change to the browser history
+        center: true,                       // Vertical centering of slides
+        maxScale: 1.5,                  // Bounds for smallest/largest possible content scale
+        slideNumber: false,                // Display the page number of the current slide
+        theme: 'blood', // available themes are in /css/theme
+        transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
+
+        // Optional libraries used to extend on reveal.js
+        dependencies: [
+          { src: 'reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+          { src: 'reveal.js/plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+          { src: 'reveal.js/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } },
+//          { src: 'reveal.js/plugin/search/search.js', async: true, condition: function() { return !!document.body.classList; }, }
+//          { src: 'reveal.js/plugin/remotes/remotes.js', async: true, condition: function() { return !!document.body.classList; } }
+]});
+    </script>
+    </body>
+</html>

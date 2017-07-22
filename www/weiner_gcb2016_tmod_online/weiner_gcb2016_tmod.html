@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="author" content="January Weiner and Teresa Domaszewska">
+  <meta name="dcterms.date" content="2016-09-14">
+  <title>tmod:</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="reveal.js/css/reveal.css">
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <link rel="stylesheet" href="reveal.js/css/theme/blood.css" id="theme">
+  <link rel="stylesheet" href="css/mytheme.css"/>
+  <!-- Printing and PDF exports -->
+  <script>
+    var link = document.createElement( 'link' );
+    link.rel = 'stylesheet';
+    link.type = 'text/css';
+    link.href = window.location.search.match( /print-pdf/gi ) ? 'reveal.js/css/print/pdf.css' : 'reveal.js/css/print/paper.css';
+    document.getElementsByTagName( 'head' )[0].appendChild( link );
+  </script>
+  <!--[if lt IE 9]>
+  <script src="reveal.js/lib/js/html5shiv.js"></script>
+  <![endif]-->
+  <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+<section>
+  <h1 class="title">tmod:</h1>
+  <h1 class="subtitle">An R Package for General and Multivariate Enrichment Analysis&quot;</h1>
+  <h2 class="author">January Weiner and Teresa Domaszewska</h2>
+  <h3 class="date">2016-09-14</h3>
+</section>
+
+<section><section id="what-do-we-work-on" class="titleslide slide level1"><h1>What do we work on</h1></section><section id="impact-of-tuberculosis" class="slide level2">
+<h1>Impact of tuberculosis</h1>
+<figure>
+<img src="img/tb.png" alt="Tuberculosis" /><figcaption>Tuberculosis</figcaption>
+</figure>
+<p>Worldwide 9.6 million new cases and 1.4 million deaths annualy; almost 1/3 of the worlds population may be infected.</p>
+</section><section id="we-needed-a-package-for-enrichment-analysis" class="slide level2">
+<h1>We needed a package for enrichment analysis</h1>
+<ul>
+<li>Custom variable sets (expression modules, metabolic profiling)</li>
+<li>Statistical test(s):
+<ul>
+<li>not relying on arbitrary thresholds</li>
+<li>preferably no bootstrapping</li>
+<li>detached from differential analysis</li>
+<li>pluggable into ML and MDS (e.g. PCA)</li>
+</ul></li>
+<li>Integrating in our R pipelines</li>
+<li>Highly flexible – diverse projects with different problem settings</li>
+<li>“Bird’s eye” visualizations for multiple analyses</li>
+</ul>
+</section><section id="section" class="slide level2">
+<h1></h1>
+<figure>
+<img src="img/standards.png" alt="tmod" /><figcaption>tmod</figcaption>
+</figure>
+<p>(xkcd.com/927)</p>
+</section><section id="introducing-tmod" class="slide level2">
+<h1>Introducing tmod</h1>
+<blockquote>
+<p>“Although there is no particular novelty in the methods, the package addresses the right questions and appears to do a good job on real biological analysis.” (Anonymous reviewer)</p>
+</blockquote>
+<p>– Perfect!</p>
+</section><section id="tmod-features" class="slide level2">
+<h1>tmod features</h1>
+<ul>
+<li>CERNO: a new(-ish) statistical test for continuous enrichments (Yamaguchi et al. 2008, not implemented elsewhere)</li>
+<li>MSD: a new method for ordering genes</li>
+<li>“panel plots” – visualisation of (serial) gene set enrichment results</li>
+<li>prepackaged gene sets from Chaussabel et al. (2008) and Li et al. (2014) and metabolic profiling clustering from Weiner et al. (2012)</li>
+<li>facilities for combining multivariate techniques / dimensionality reduction techniques / correlation analysis / machine learning with enrichment analysis</li>
+</ul>
+<!-- ===================================================================== -->
+</section></section>
+<section><section id="cerno-test-a-variant-of-fishers-exact-test" class="titleslide slide level1"><h1>CERNO test: a variant of Fisher’s exact test</h1></section><section id="section-1" class="slide level2">
+<h1></h1>
+<p>Some enrichment tests (such as the hypergeometric test) rely on arbirtrary tresholds to divide the genes into “differentially expressed” and “background” (or equivalent sets). It is easy to run a statistical test on such a setup, however it is problematic: the number of significantly regulated genes depends on the statistical power, i.e. for example on the number of samples.</p>
+</section><section id="section-2" class="slide level2">
+<h1></h1>
+<p>Better tests yet are independent of arbitrary thresholds. Examples include</p>
+<ul>
+<li>Randomization approaches (such as GSEA)</li>
+<li>ANOVA-like approaches</li>
+<li>Mann-Whitney U statistic</li>
+</ul>
+<p>However, all methods that we have tested were problematic (eg. too conservative; too lax). Most importantly, while results were robust for large sample sets, they were not “down-scalable”: results for small sample sizes rarely reflected the results for large sample sizes.</p>
+</section><section id="cerno-ranks-can-be-treated-as-probabilities" class="slide level2">
+<h1>CERNO: Ranks can be treated as probabilities</h1>
+<p><span class="math display">\[P(rank(g_j) &lt; rank(g_i)) = \frac{rank(g_i)}{N}\]</span></p>
+<p>Where <span class="math inline">\(N\)</span> is the total number of genes.</p>
+</section><section id="we-apply-fishers-method-to-ranks" class="slide level2">
+<h1>We apply Fisher’s method to ranks</h1>
+<p><span class="math display">\[\mathbf{CERNO} = -2\cdot \sum_{i=1}^{N}\ln(\frac{rank(g_i)}{N})\]</span></p>
+<p>The statistics has a <span class="math inline">\(\chi^2\)</span> distribution with <span class="math inline">\(2\cdot N\)</span> degrees of freedom.</p>
+</section><section id="section-3" class="slide level2">
+<h1></h1>
+<p>First, second and third quartiles of number of modules recovered by the different statistical tests in dependence of the sample size in 100 random sample replicates.</p>
+<figure>
+<img src="figure/simula0b-1.png" alt="plot of chunk simula0b" /><figcaption>plot of chunk simula0b</figcaption>
+</figure>
+<!-- ===================================================================== -->
+</section><section id="sample-size-dependent-recovery-of-results-for-tmodcerno-and-gsea" class="slide level2">
+<h1>Sample size dependent recovery of results for tmod/CERNO and GSEA</h1>
+<figure>
+<img src="img/gsea_tmod.png" alt="tmod vs GSEA" /><figcaption>tmod vs GSEA</figcaption>
+</figure>
+<!-- ===================================================================== -->
+</section></section>
+<section><section id="how-to-order-genes" class="titleslide slide level1"><h1>How to order genes?</h1></section><section id="section-4" class="slide level2">
+<h1></h1>
+<ul>
+<li>Order by p-values (common approach).
+<ul>
+<li>Genes with strong expression tend to have lower p-values even if log-fold changes are small</li>
+</ul></li>
+<li>Order by (absolute) log fold change
+<ul>
+<li>Genes with weak expression (near background) can have huge log fold changes despite lack of significance</li>
+</ul></li>
+</ul>
+</section><section id="section-5" class="slide level2">
+<h1></h1>
+<figure>
+<img src="figure/limma2-1.png" alt="plot of chunk limma2" /><figcaption>plot of chunk limma2</figcaption>
+</figure>
+</section><section id="msd-minimal-significant-difference" class="slide level2">
+<h1>MSD – Minimal Significant Difference</h1>
+<p><span class="math display">\[
+\text{MSD} = \begin{cases}
+CI.L &amp; \text{if logFC} &gt; 0\\
+-CI.R &amp; \text{if logFC} &lt; 0\\
+\end{cases}
+\]</span></p>
+<figure>
+<img src="figure/msd2-1.png" alt="plot of chunk msd2" /><figcaption>plot of chunk msd2</figcaption>
+</figure>
+</section><section id="section-6" class="slide level2">
+<h1></h1>
+<p>First, second and third quartiles of number of modules recovered by the different approaches in dependence of the sample size in 100 random sample replicates.</p>
+<figure>
+<img src="figure/simula2-1.png" alt="plot of chunk simula2" /><figcaption>plot of chunk simula2</figcaption>
+</figure>
+<p>In comparisons with other ordering techniques, MSD has an exceptional specificity, while maintaining good sensitivity (Joanna Żyła, personal communication).</p>
+<!-- ===================================================================== -->
+</section></section>
+<section><section id="visualisations-in-tmod" class="titleslide slide level1"><h1>Visualisations in tmod</h1></section><section id="basic-visualization-of-enrichment" class="slide level2">
+<h1>Basic visualization of enrichment</h1>
+<p>In an U-test, the U statistic is (almost) the same as the Area Under Curve:</p>
+<p><span class="math display">\[r=1-\frac{2\cdot U}{n_1\cdot n_2} = 1 - 2\cdot\text{AUC}\]</span></p>
+<p>(r is the effect size for an U-test)</p>
+</section><section id="basic-visualization-of-enrichment-1" class="slide level2">
+<h1>Basic visualization of enrichment</h1>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">evidencePlot</span>(<span class="dt">l=</span>tt$GENE_SYMBOL, <span class="dt">m=</span><span class="st">&quot;LI.M11.0&quot;</span>)</code></pre></div>
+<figure>
+<img src="figure/evidenceplot-1.png" alt="plot of chunk evidenceplot" /><figcaption>plot of chunk evidenceplot</figcaption>
+</figure>
+</section><section id="panel-plots-showing-effect-sizes-p-values-and-direction-of-change" class="slide level2">
+<h1>Panel plots showing effect sizes, p-values and direction of change</h1>
+<figure>
+<img src="figure/visual-1.png" alt="plot of chunk visual" /><figcaption>plot of chunk visual</figcaption>
+</figure>
+</section><section id="a-more-complex-example" class="slide level2">
+<h1>A more complex example</h1>
+<figure>
+<img src="img/figure_roc_time_series_A_small.png" alt="tmod" /><figcaption>tmod</figcaption>
+</figure>
+</section></section>
+<section><section id="functional-multivariate-analysis" class="titleslide slide level1"><h1>Functional multivariate analysis</h1></section><section id="multivariate-analysis-enrichment-functional-multivariate-analysis-fma" class="slide level2">
+<h1>Multivariate analysis + enrichment = Functional multivariate analysis (FMA)</h1>
+<p>Combination of multivariate techniques such as PCA and functional enrichment analysis can circumvent the need for analysis of differential expression. A primer on FMA will be presented here.</p>
+</section><section id="section-7" class="slide level2">
+<h1></h1>
+<figure>
+<img src="figure/pca1-1.png" alt="plot of chunk pca1" /><figcaption>plot of chunk pca1</figcaption>
+</figure>
+<p>Question in FMA: <em>What do these components mean?</em></p>
+</section><section id="enrichment-in-component-4" class="slide level2">
+<h1>Enrichment in component 4</h1>
+<figure>
+<img src="figure/tmodPCA1-1.png" alt="plot of chunk tmodPCA1" /><figcaption>plot of chunk tmodPCA1</figcaption>
+</figure>
+</section><section id="section-8" class="slide level2">
+<h1></h1>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">tmodPCA</span>(pca, 
+  <span class="dt">genes=</span>Egambia$GENE_SYMBOL, <span class="dt">tmodfunc=</span><span class="st">&quot;tmodCERNOtest&quot;</span>,
+  <span class="dt">components=</span><span class="kw">c</span>(<span class="dv">4</span>,<span class="dv">3</span>), 
+  <span class="dt">plot.params=</span><span class="kw">list</span>(<span class="dt">group=</span>group, <span class="dt">palette=</span><span class="kw">mypalette</span>(), <span class="dt">radius=</span><span class="dv">2</span>))</code></pre></div>
+<figure>
+<img src="figure/tmodPCA-1.png" alt="plot of chunk tmodPCA" /><figcaption>plot of chunk tmodPCA</figcaption>
+</figure>
+</section><section id="section-9" class="slide level2">
+<h1></h1>
+<p>This approach works well also with other multivariate analyses such as independent component analysis (ICA), partial least squares (PLS) or correspondance analysis (CA).</p>
+<p>Directly combining multivariate analyses with gene set enrichment allows us to achieve the same results without involving a direct group - to - group comparison. This makes it especially suitable for exploratory analyses.</p>
+</section><section id="tmod-web-interface" class="slide level2">
+<h1>tmod Web Interface</h1>
+<p><a href="http://bioinfo.mpiib-berlin.mpg.de/tmod/" class="uri">http://bioinfo.mpiib-berlin.mpg.de/tmod/</a>.</p>
+<figure>
+<img src="img/tmod_website.png" alt="tmod" /><figcaption>tmod</figcaption>
+</figure>
+<!-- ===================================================================== -->
+</section></section>
+<section><section id="concluding-remarks" class="titleslide slide level1"><h1>Concluding remarks</h1></section><section id="section-10" class="slide level2">
+<h1></h1>
+<ul>
+<li>Gene set enrichment analysis is a versatile tool for functional annotation</li>
+<li>Functional multivariate analysis can replace differential expression analysis</li>
+<li><em>tmod</em>: R package for BTM and GS enrichment analysis, available from <a href="http://bioinfo.mpiib-berlin.mpg.de/tmod/" class="uri">http://bioinfo.mpiib-berlin.mpg.de/tmod/</a> and CRAN</li>
+<li><em>tmod</em> allows functional multivariate analysis and serial enrichment analyiss</li>
+<li>features several visualization tools</li>
+<li>Where to find me: MPIIB <a href="mailto://january@mpiib-berlin.mpg.de">january@mpiib-berlin.mpg.de</a></li>
+</ul>
+</section><section id="conributors" class="slide level2">
+<h1>Conributors</h1>
+<ul>
+<li>Teresa Domaszewska (MPIIB) – co-author (see our poster)</li>
+</ul>
+<p>We would like to thank Emilio Siena (GSK Vaccines) for new ideas, as well Joanna Żyła, Michał Marczyk and Joanna Polańska (Politechnika Śląska) for helpful discussions and the BMBF / InfectControl2020 for supporting Teresa Domaszewska.</p>
+<figure>
+<img src="img/logos.png" alt="logos" /><figcaption>logos</figcaption>
+</figure>
+<!-- ===================================================================== -->
+</section></section>
+<section><section id="appendix-1-about-this-presentation" class="titleslide slide level1"><h1>Appendix 1: About this presentation</h1></section><section id="about-this-presentation" class="slide level2">
+<h1>About this presentation</h1>
+<p>This is an <a href="http://rmarkdown.rstudio.com/">Rmarkdown</a> document; you can view the code on <a href="http://bioinfo.mpiib-berlin.mpg.de/tmod/" class="uri">http://bioinfo.mpiib-berlin.mpg.de/tmod/</a></p>
+</section><section id="section-11" class="slide level2">
+<h1></h1>
+<p>You can download the source code of this presentation on the tmod web page, <a href="http://bioinfo.mpiib-berlin.mpg.de/tmod/" class="uri">http://bioinfo.mpiib-berlin.mpg.de/tmod/</a>.</p>
+<p>To recreate this presentation, download the full presentation package and unzip it. Install the required packages (knitr for R and pandoc). Run the following command from inside the package archive.</p>
+<p>Commands:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">Rscript</span> -e <span class="st">&#39;knitr::knit(&quot;weiner_bioinfo_2015_06_23.Rmd&quot;)&#39;</span>
+<span class="kw">pandoc</span> -s -S -t revealjs weiner_bioinfo_2015_06_23.md -o weiner_bioinfo_2015_06_23.html \
+  --mathjax=<span class="st">&#39;http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&#39;</span> \
+  --css css/mytheme.css \
+  --slide-level 2 -V theme=blood</code></pre></div>
+<p>(Note: for an offline version, download MathJax and modify the –mathjax option)</p>
+</section><section id="section-12" class="slide level2">
+<h1></h1>
+<p>To extract the code from this presentation, save it as “test.Rmd” and run</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">Rscript</span> -e <span class="st">&#39;knitr::purl(&quot;tmod.Rmd&quot;)&#39;</span></code></pre></div>
+</section><section id="printing" class="slide level2">
+<h1>Printing:</h1>
+<p>This only works properly in Google Chromium; see <a href="https://github.com/hakimel/reveal.js#pdf-export">reveal.js documentation</a></p>
+<p>To print, follow the link below and press Ctrl-P; don’t worry if the slides appear to overlap – they will look fine on the print preview.</p>
+<p><a href="?print-pdf">Print</a></p>
+<!-- ===================================================================== -->
+</section></section>
+<section><section id="appendix-2-serial-analysis-of-enrichment-with-tmod" class="titleslide slide level1"><h1>Appendix 2: Serial analysis of enrichment with <em><a href="http://bioinfo.mpiib-berlin.mpg.de/tmod/">tmod</a></em></h1></section><section id="section-13" class="slide level2">
+<h1></h1>
+<p><em>tmod</em> has been designed as a package for testing the enrichment of blood transcriptional modules. Therefore, <em>tmod</em> contains two sets of blood transcriptional module definitions; however, it can be used with any arbitrary gene set definition (e.g. GSEA/MSigDB) or high throughput data type (e.g. metabolomics)</p>
+<p><em>tmod</em> implements HG / U / CERNO tests, functional multivariate analyses, serial analysis / visualization and more.</p>
+<p>Availability: <a href="http://bioinfo.mpiib-berlin.mpg.de/tmod/" class="uri">http://bioinfo.mpiib-berlin.mpg.de/tmod/</a></p>
+</section><section id="example-mfa-with-r-and-tmod" class="slide level2">
+<h1>Example: MFA with R and tmod</h1>
+<p>Data set Egambia: GEO <a href="http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE28623">GSE28623</a>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(tmod)
+<span class="kw">data</span>(Egambia)
+<span class="kw">head</span>(Egambia)</code></pre></div>
+<pre><code>##    GENE_SYMBOL                                      GENE_NAME     EG        NID       NID       NID        NID       NID       NID        NID       NID
+## 34    C19orf15            chromosome 19 open reading frame 15  57828  3.2618218  1.339813  2.462880  3.9795714  4.626591  4.253879  2.6972224  3.804575
+## 36     UNQ9368                                       RTFV9368 643036  1.5671748  4.952589  4.065492  4.6410409  3.207639  5.552805  4.1901659  3.257324
+## 41      ADORA3                          adenosine A3 receptor    140  6.2246027  5.078945  3.862936  6.1976618  5.410801  5.794503  5.0215809  8.017599
+## 44        CDH6 cadherin 6, type 2, K-cadherin (fetal kidney)&quot;   1004  0.8328559  3.585615  2.975072  0.6475284  1.222587  0.143559 -0.7720002  0.615626
+## 52       VASH1                                    vasohibin 1  22846 11.3952226 12.098981 13.057666 13.0795387 11.182162 10.747176 12.9036129 12.261216
+## 62     MAB21L2                     mab-21-like 2 (C. elegans)  10586  5.7530317  7.517327  6.777747  7.0907261  6.614020 10.917492  8.9160131  5.323171
+##          NID       NID        NID        NID       NID       NID       NID        TB        TB        TB         TB        TB        TB        TB         TB
+## 34  4.617986  3.033595  3.1866326  3.6506719  3.787375  3.019342  2.795293  3.020139  2.269359  3.325500  4.0871459  4.723224  3.599277  1.571850  3.6313736
+## 36  4.786995  3.091925  2.2736422  4.1327518  3.934754  3.077131  6.428547  4.655419  6.460367  4.607918  4.7004430  5.967757  5.641816  5.006141  5.2302712
+## 41  6.878103  4.702415  7.6848512  5.2048066  4.836591  4.965997  8.234983  5.072141  4.356401  7.043360  7.3670729  5.805350  6.862796  4.134708  5.5752895
+## 44  2.589377  3.307486  0.7026353  0.8349973  3.951534  2.112500  1.223633  1.477250  5.159376  1.517965  0.4115781  1.584342  1.148472  1.710048  0.8883513
+## 52 11.376962 13.061029 13.0915988 12.0304966 11.980200 12.323327 11.076847 13.187186 13.122720 12.188427 10.4137276 11.128346 10.889193 11.062450 12.9295464
+## 62  7.167419  6.299295  5.8910289  5.4252899  5.265659  6.367774  6.691451  6.351070  6.124325  5.434126  5.5917154  7.298053  6.607853  5.594411  5.2920568
+##           TB        TB        TB        TB        TB        TB        TB
+## 34  3.962293  2.080173  3.750405  2.248475  4.148280  4.203384  4.319223
+## 36  5.551801  5.021816  5.338259  6.258222  6.383069  5.995486  5.203686
+## 41  7.689227  6.004437  5.928957  5.178725  5.661376  6.611350  6.008429
+## 44  0.977040  1.174805  1.764985  3.400484  2.486234  1.115761  1.454525
+## 52 11.921874 10.830077 11.106051 13.062118 10.608390 12.421606 13.269083
+## 62 11.736111  5.887298  5.672741  6.621244  4.729986  5.288187  8.995319</code></pre>
+</section><section id="section-14" class="slide level2">
+<h1></h1>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pca &lt;-<span class="st"> </span><span class="kw">prcomp</span>(<span class="kw">t</span>(Egambia[,-<span class="kw">c</span>(<span class="dv">1</span>:<span class="dv">3</span>)]), <span class="dt">scale.=</span><span class="ot">TRUE</span>)
+<span class="kw">names</span>(pca)</code></pre></div>
+<pre><code>## [1] &quot;sdev&quot;     &quot;rotation&quot; &quot;center&quot;   &quot;scale&quot;    &quot;x&quot;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(pca$x[,<span class="dv">1</span>:<span class="dv">5</span>])</code></pre></div>
+<pre><code>##             PC1        PC2        PC3          PC4        PC5
+## NID   -27.40722 -13.745073  21.755484  -7.09238147   3.427730
+## NID.1  60.44502 -10.323684 -20.091148 -16.49059391  28.610291
+## NID.2  67.86063  -2.049866  -5.840748   0.03206066  -4.409519
+## NID.3  -5.69328  41.378405 -16.466891 -18.00896080  -5.135397
+## NID.4 -25.59922 -22.852422  22.133902 -18.13982412 -13.619485
+## NID.5 -39.83765  -8.461881 -50.897837   9.51198824   3.981510</code></pre>
+</section><section id="section-15" class="slide level2">
+<h1></h1>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(pca$rotation[,<span class="dv">1</span>:<span class="dv">5</span>])</code></pre></div>
+<pre><code>##             PC1           PC2          PC3          PC4          PC5
+## 34 -0.018481790  0.0024852364 -0.005385593  0.002711500 -0.025291642
+## 36  0.003759772 -0.0010608658 -0.018658252  0.041998920  0.006653159
+## 41 -0.016103961  0.0002934259 -0.009930961 -0.008813419 -0.011689654
+## 44  0.021992983 -0.0073125000  0.005115505  0.015148515  0.001656177
+## 52  0.014524608  0.0258657287  0.015226449 -0.009626087 -0.001871263
+## 62 -0.001791174  0.0081258050 -0.016757250  0.001834450 -0.009573289</code></pre>
+</section><section id="enrichment-for-each-component" class="slide level2">
+<h1>Enrichment for each component</h1>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">l &lt;-<span class="st"> </span>Egambia$GENE_SYMBOL
+encfunc &lt;-<span class="st"> </span>function(r) {
+  o &lt;-<span class="st"> </span><span class="kw">order</span>(<span class="kw">abs</span>(r), <span class="dt">decreasing=</span><span class="ot">TRUE</span>)
+  <span class="kw">tmodCERNOtest</span>(l[o])
+}
+res &lt;-<span class="st"> </span><span class="kw">apply</span>(pca$rotation[,<span class="dv">1</span>:<span class="dv">10</span>], <span class="dv">2</span>, encfunc)</code></pre></div>
+<pre><code>## [1] ID        Title     cerno     N1        AUC       cES       P.Value   adj.P.Val
+## &lt;0 rows&gt; (or 0-length row.names)
+## [1] ID        Title     cerno     N1        AUC       cES       P.Value   adj.P.Val
+## &lt;0 rows&gt; (or 0-length row.names)
+##                ID                                              Title    cerno N1       AUC      cES      P.Value    adj.P.Val
+## LI.M211   LI.M211                                                TBA 44.31673  4 0.9945562 5.539591 4.956894e-07 0.0001058492
+## LI.M72.0 LI.M72.0                                                TBA 52.03233  6 0.9030775 4.336028 6.118449e-07 0.0001058492
+## LI.M72.1 LI.M72.1                                                TBA 41.63972  4 0.9940377 5.204965 1.582215e-06 0.0001824821
+## LI.M213   LI.M213 regulation of transcription, transcription factors 47.79604  6 0.9610996 3.983003 3.391716e-06 0.0002933835
+## LI.M203   LI.M203                                                TBA 41.23238  5 0.9838208 4.123238 1.026375e-05 0.0007102516
+## LI.M72.2 LI.M72.2                                                TBA 32.10332  3 0.9946092 5.350553 1.559006e-05 0.0008990266
+## LI.M144   LI.M144                            cell cycle, ATP binding 27.18170  3 0.9894257 4.530283 1.338861e-04 0.0060518476
+## LI.M137   LI.M137                                                TBA 27.07946  3 0.9873523 4.513244 1.399271e-04 0.0060518476
+## LI.M101   LI.M101              phosphatidylinositol signaling system 27.36697  4 0.9015968 3.420871 6.108669e-04 0.0228021270
+## LI.M174   LI.M174                                                TBA 19.23507  2 0.9919154 4.808768 7.066117e-04 0.0228021270
+## LI.M201   LI.M201                                                TBA 46.33497 10 0.8140365 2.316748 7.249231e-04 0.0228021270
+## LI.M147   LI.M147                            intracellular transport 22.84744  3 0.8791900 3.807906 8.492191e-04 0.0244858177
+## LI.M148   LI.M148                                                TBA 17.35103  2 0.9871476 4.337757 1.651756e-03 0.0409685631
+## LI.M53     LI.M53               inflammasome receptors and signaling 12.80466  1 0.9985492 6.402332 1.657688e-03 0.0409685631
+## LI.M167   LI.M167                             enriched in cell cycle 20.91041  3 0.9578409 3.485068 1.903861e-03 0.0416244897
+## LI.M168   LI.M168                        enriched in dendritic cells 31.06606  6 0.8430498 2.588838 1.924832e-03 0.0416244897
+## LI.M171   LI.M171                              heme biosynthesis (I) 24.25813  4 0.9458731 3.032266 2.074126e-03 0.0422145601
+##                  ID                                                  Title     cerno  N1       AUC      cES      P.Value    adj.P.Val
+## LI.M37.0   LI.M37.0                    immune activation - generic cluster 454.88172 100 0.7188785 2.274409 6.749965e-22 2.335488e-19
+## LI.M11.0   LI.M11.0                             enriched in monocytes (II) 118.06755  20 0.7734395 2.951689 1.234985e-09 2.136524e-07
+## LI.M165     LI.M165             enriched in activated dendritic cells (II) 101.09999  19 0.7562436 2.660526 1.234533e-07 1.423828e-05
+## LI.M37.1   LI.M37.1                            enriched in neutrophils (I)  77.04015  12 0.8671929 3.210006 1.789217e-07 1.547673e-05
+## LI.M16       LI.M16                         TLR and inflammatory signaling  50.11235   5 0.9923252 5.011235 2.545057e-07 1.761180e-05
+## LI.M75       LI.M75                                antiviral IFN signature  67.61164  10 0.9007267 3.380582 4.448287e-07 2.565179e-05
+## LI.M112.0 LI.M112.0                              complement activation (I)  68.84171  11 0.7509865 3.129169 1.005074e-06 4.910746e-05
+## LI.M67       LI.M67                              activated dendritic cells  50.51216   6 0.9782503 4.209347 1.135433e-06 4.910746e-05
+## LI.M118.0 LI.M118.0                             enriched in monocytes (IV)  61.19892   9 0.8528591 3.399940 1.307827e-06 5.027869e-05
+## LI.S4         LI.S4                             Monocyte surface signature  63.20663  10 0.8090947 3.160332 2.246127e-06 7.771600e-05
+## LI.S5         LI.S5                                   DC surface signature 127.10736  34 0.7058762 1.869226 1.855891e-05 5.837620e-04
+## LI.M150     LI.M150                              innate antiviral response  35.65582   5 0.9644887 3.565582 9.644193e-05 2.780742e-03
+## LI.M40       LI.M40                  complement and other receptors in DCs  45.23827   8 0.7935087 2.827392 1.275841e-04 3.395701e-03
+## LI.M127     LI.M127                             type I interferon response  34.53318   5 0.9593030 3.453318 1.499576e-04 3.706095e-03
+## LI.M47.0   LI.M47.0                                enriched in B cells (I)  47.80939   9 0.8564113 2.656077 1.607039e-04 3.706902e-03
+## LI.M81       LI.M81                enriched in myeloid cells and monocytes  59.71615  13 0.7524813 2.296775 1.830774e-04 3.959048e-03
+## LI.M196     LI.M196                    platelet activation - actin binding  50.70641  11 0.8375720 2.304837 4.703277e-04 9.572552e-03
+## LI.M105     LI.M105                                                    TBA  39.17905   8 0.8249014 2.448691 1.024723e-03 1.894336e-02
+## LI.M4.3     LI.M4.3       myeloid cell enriched receptors and transporters  29.48305   5 0.9067828 2.948305 1.040242e-03 1.894336e-02
+## LI.M47.1   LI.M47.1                               enriched in B cells (II)  32.24545   6 0.8518326 2.687121 1.268060e-03 2.193744e-02
+## LI.M86.0   LI.M86.0 chemokines and inflammatory molecules in myeloid cells  28.21722   5 0.6229413 2.821722 1.666162e-03 2.745201e-02
+## LI.M20       LI.M20                      AP-1 transcription factor network  28.08105   5 0.7008919 2.808105 1.752081e-03 2.755546e-02
+## LI.M132     LI.M132                             recruitment of neutrophils  24.16771   4 0.7925653 3.020963 2.147983e-03 3.231313e-02
+## LI.M13       LI.M13             innate activation by cytosolic DNA sensing  15.85679   2 0.8753109 3.964197 3.217480e-03 4.638534e-02
+## [1] ID        Title     cerno     N1        AUC       cES       P.Value   adj.P.Val
+## &lt;0 rows&gt; (or 0-length row.names)
+## [1] ID        Title     cerno     N1        AUC       cES       P.Value   adj.P.Val
+## &lt;0 rows&gt; (or 0-length row.names)
+## [1] ID        Title     cerno     N1        AUC       cES       P.Value   adj.P.Val
+## &lt;0 rows&gt; (or 0-length row.names)
+##              ID               Title    cerno N1       AUC      cES      P.Value  adj.P.Val
+## LI.M240 LI.M240 chromosome Y linked 47.18945  8 0.8186748 2.949341 6.362119e-05 0.02201293
+##                ID                                         Title     cerno  N1       AUC      cES      P.Value   adj.P.Val
+## LI.M30     LI.M30 cell movement, Adhesion &amp; Platelet activation  52.81411   9 0.8690748 2.934117 2.803145e-05 0.004728079
+## LI.M188   LI.M188                                           TBA  41.80114   6 0.8177040 3.483428 3.597087e-05 0.004728079
+## LI.M2.1   LI.M2.1                     extracellular matrix (II)  79.43525  18 0.6937974 2.206535 4.099491e-05 0.004728079
+## LI.M110   LI.M110                                 axon guidance  30.95514   5 0.8678283 3.095514 5.968190e-04 0.043499317
+## LI.M37.0 LI.M37.0           immune activation - generic cluster 270.83311 100 0.5854020 1.354166 6.286029e-04 0.043499317
+## [1] ID        Title     cerno     N1        AUC       cES       P.Value   adj.P.Val
+## &lt;0 rows&gt; (or 0-length row.names)</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(res[[<span class="dv">4</span>]])</code></pre></div>
+<pre><code>##                ID                                      Title     cerno  N1       AUC      cES      P.Value    adj.P.Val
+## LI.M37.0 LI.M37.0        immune activation - generic cluster 454.88172 100 0.7188785 2.274409 6.749965e-22 2.335488e-19
+## LI.M11.0 LI.M11.0                 enriched in monocytes (II) 118.06755  20 0.7734395 2.951689 1.234985e-09 2.136524e-07
+## LI.M165   LI.M165 enriched in activated dendritic cells (II) 101.09999  19 0.7562436 2.660526 1.234533e-07 1.423828e-05
+## LI.M37.1 LI.M37.1                enriched in neutrophils (I)  77.04015  12 0.8671929 3.210006 1.789217e-07 1.547673e-05
+## LI.M16     LI.M16             TLR and inflammatory signaling  50.11235   5 0.9923252 5.011235 2.545057e-07 1.761180e-05
+## LI.M75     LI.M75                    antiviral IFN signature  67.61164  10 0.9007267 3.380582 4.448287e-07 2.565179e-05</code></pre>
+</section><section id="visualization" class="slide level2">
+<h1>Visualization</h1>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">tmodPanelPlot</span>(res, <span class="dt">filter.empty.rows=</span><span class="ot">TRUE</span>)</code></pre></div>
+<figure>
+<img src="figure/tmodEx40-1.png" alt="plot of chunk tmodEx40" /><figcaption>plot of chunk tmodEx40</figcaption>
+</figure>
+</section><section id="genes-with-positive-negative-weights" class="slide level2">
+<h1>Genes with positive / negative weights?</h1>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">qfnc &lt;-<span class="st"> </span>function(r) <span class="kw">quantile</span>(r, <span class="fl">0.75</span>)
+qqs &lt;-<span class="st"> </span><span class="kw">apply</span>(pca$rotation[,<span class="dv">1</span>:<span class="dv">10</span>], <span class="dv">2</span>, qfnc)
+pie &lt;-<span class="st"> </span><span class="kw">tmodDecideTests</span>(l, <span class="dt">lfc=</span>pca$rotation[,<span class="dv">1</span>:<span class="dv">10</span>], <span class="dt">lfc.thr=</span>qqs)
+<span class="kw">tmodPanelPlot</span>(res, <span class="dt">pie=</span>pie, <span class="dt">pie.style=</span><span class="st">&quot;rug&quot;</span>, <span class="dt">grid=</span><span class="st">&quot;between&quot;</span>)</code></pre></div>
+<figure>
+<img src="figure/tmodEx50-1.png" alt="plot of chunk tmodEx50" /><figcaption>plot of chunk tmodEx50</figcaption>
+</figure>
+</section></section>
+<section><section id="appendix-3-mfa" class="titleslide slide level1"><h1>Appendix 3: MFA</h1></section><section id="functional-principal-component-analysis-pca" class="slide level2">
+<h1>Functional Principal Component Analysis (PCA)</h1>
+<p>In PCA, the <span class="math inline">\(N \times K\)</span> matrix <span class="math inline">\(\mathbf{X}\)</span> of <span class="math inline">\(N\)</span> samples and <span class="math inline">\(K\)</span> variables (e.g. genes) is rotated, which results in a new matrix, <span class="math inline">\(\mathbf{Y}\)</span>, with <span class="math inline">\(N\)</span> samples and <span class="math inline">\(J\)</span> principal components (PCs).</p>
+<p>Effectively, a <span class="math inline">\(K \times J\)</span> matrix <span class="math inline">\(\mathbf{W}\)</span> is calculated, such that</p>
+<p><span class="math display">\[ \mathbf{X}\times \mathbf{W} = \mathbf{Y} \]</span></p>
+</section><section id="section-16" class="slide level2">
+<h1></h1>
+<p><span class="math display">\[ \mathbf{X}\times \mathbf{W} = \mathbf{Y} \]</span></p>
+<p>Each column of <span class="math inline">\(\mathbf{X}\)</span> is a principal component. Each row corresponds to one sample.</p>
+<p>A value for a given PC <span class="math inline">\(j\)</span> and a given sample <span class="math inline">\(n\)</span> is calculated as</p>
+<p><span class="math display">\[ y_{n,j} = \sum_{k=1}^{K} w_{j,k}\cdot x_{k,n} \]</span></p>
+<p>The terms <span class="math inline">\(w_{j,k}\)</span> are variable- (or: gene-) specific <em>weights</em> or <em>loadings</em> for each component <span class="math inline">\(j\)</span>.</p>
+</section><section id="section-17" class="slide level2">
+<h1></h1>
+<p><span class="math display">\[ y_{(n,j)} = \sum_{k=1}^{K} w_{k,j}\cdot x_{k,n} \]</span></p>
+<p>The larger the absolute value of <span class="math inline">\(w_{k,j}\)</span>, the more impact this gene has on the <span class="math inline">\(j\)</span>-th principal component.</p>
+<p>We can sort the genes by their weight in a component. Since as a result we get a sorted list of genes, we can apply a continuous enrichment algorithm.</p>
+</section></section>
+    </div>
+  </div>
+
+  <script src="reveal.js/lib/js/head.min.js"></script>
+  <script src="reveal.js/js/reveal.js"></script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+
+        // Optional reveal.js plugins
+        dependencies: [
+          { src: 'reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+          { src: 'reveal.js/plugin/zoom-js/zoom.js', async: true },
+          { src: 'reveal.js/plugin/notes/notes.js', async: true }
+        ]
+      });
+    </script>
+    </body>
+</html>

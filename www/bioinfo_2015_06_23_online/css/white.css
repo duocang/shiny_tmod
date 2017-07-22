@@ -1,0 +1,14 @@
+body {
+  background: #FFFFFF;
+  background-color: #FFFFFF; }
+
+.reveal {
+  font-family: "Helvetica", 'sans-serif';
+}
+
+.reveal h1, .reveal h2, .reveal h3, .reveal h4, .reveal h5, .reveal h6 {
+  font-family: "Times New Roman", 'serif'; }
+
+.reveal pre code { color: #839496; 
+  background-color: #F6F6F6 } /* use #FDF6E3 for light background */
+
