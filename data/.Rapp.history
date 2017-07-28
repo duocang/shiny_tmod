@@ -1,0 +1,8 @@
+load("/Users/song/code/shiny/data/msig.rda")
+a <- load("/Users/song/code/shiny/data/msig.rda")
+a
+dim(a)
+div(m)
+len(a)
+length(a)
+size(a)

@@ -124,12 +124,12 @@ function(input, output, session) {
             tmodCERNOtest(genes[ord], mset=mset, qval=1)
         }, simplify=FALSE
         )
-        if(is.null(names(res))) names(res) <- paste0("N.", 1:length(res))
+        #if(is.null(names(res))) names(res) <- paste0("N.", 1:length(res))
+        if(is.null(names(res))) names(res) <- input$files$name
         return(res)
     })
     
     stat_test1 <- reactive({
-        input$run1
         dat <- isolate(loaded_data())
 
         if(is.null(dat) || length(dat)==0) {
@@ -147,36 +147,18 @@ function(input, output, session) {
         
         lfcs <- sapply(dat, function(x) {
             as.matrix(x[, "logFC", with=FALSE])
-        }
-        )
+        })
         
         pvals <- sapply(dat, function(x){
             as.matrix(x[, "qval", with=FALSE])
-        }
+        })
         
-        )
-        
-        print("aaaa 查看lfcs的类型")
-        print(class(lfcs))
-        print(dim(lfcs))
-        print("bbbb 查看pvals的类型")
-        print(class(pvals))
-        print(dim(pvals))
-       
         geneName <- isolate(input$which_col_genename)
         gene <- dat[[1]][, geneName, with=FALSE]
-        print(head(gene))
-        print(dim(gene))
-        
-        print(class(dat))
-        print(class(data.frame(dat[[1]])))
-        print(dat[[1]][, geneName, with=FALSE])
         
         
         ddd <- data.frame(dat[[1]])
         gg <- ddd[[geneName]]
-        print(head(gg))
-        print(class(ddd))
         pie <- tmodDecideTests(g=gg,
                                lfc=lfcs,
                                pval=pvals,
@@ -210,18 +192,17 @@ function(input, output, session) {
         input$run1
         
         print("making the plot1")
-        res <- stat_test()
-        pie <- stat_test1()
+        res <- isolate(stat_test())
+        pie <- isolate(stat_test1())
+        names(pie) <- names(res)
+        print(names(res))
         print("方程运行到此处1")
         
-        print(head(pie, 6))
         if(!is.null(res))
             tmodPanelPlot(res, pie=pie, pie.style="r", grid="b", filter.rows.pval=0.001)
-            # tmodPanelPlot(res, text.cex = 0.9, legend.style = "auto")
-
-    })
+        print("方程运行到此处2")
+    }, bg="transparent")
     
-
     addLog("Running tmod in version %s", si$otherPkgs$tmod$Version)
     
     
