@@ -89,7 +89,8 @@ sidebar <- dashboardSidebar(
         menuItem("Gallery", tabName = "gallery", icon = icon("file-picture-o"),startExpanded = FALSE
         ),
         menuItem("Logs", tabName = "logs", icon = icon("info"), startExpanded = FALSE
-        )
+        ),
+        menuItem("Message", tabName = "messagee")
     )
 )
 
@@ -287,7 +288,10 @@ body <- dashboardBody(
                     column(10, htmlOutput( "messageLog"), br()
                     ) 
                 )
-        )
+        ),
+        tabItem(tabName = "messagee",
+                fluidRow( column(10, offset=0, htmlOutput( "message" ), class="tmodMsg" ))
+                )
     )
 )
 
