@@ -7,13 +7,15 @@ library(markdown)
 library(tagcloud)
 
 
+source("R/all_sessions.R")
 data(tmod)
 mset <- tmod
+load("data/annotObject.RData")
+load("data/msig.rda")
+
 
 # below allows file bigger than 25M to be uploaded
 options(shiny.maxRequestSize=30*1024^2)
-
-si <- sessionInfo()
 
 function(input, output, session) {
     source("R/helpers.R", local = TRUE)
@@ -203,8 +205,27 @@ function(input, output, session) {
         print("方程运行到此处2")
     }, bg="transparent")
     
-    addLog("Running tmod in version %s", si$otherPkgs$tmod$Version)
     
+    
+    # 以下的内容将会实现january此前tmod enrichment tool 中的功能
+    # global variables holding the state of the statistical tests
+    fg           <- NULL
+    bg           <- NULL
+    Utest        <- "hg"
+    example      <- FALSE
+    log          <- ""
+    
+    # reactive values
+    rv <- reactiveValues()
+    rv$results <- NULL
+    
+    # load the code
+    source("R/helpers.R", local=TRUE)
+    source("R/data_loading.R", local=TRUE)
+    source("R/visualizations.R", local=TRUE)
+    
+    si <- sessionInfo()
+    addLog("Running tmod in version %s", si$otherPkgs$tmod$Version)
     
     # output$plot1 <- renderText({
     #     pval.col <- "qval"
