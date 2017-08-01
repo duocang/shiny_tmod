@@ -77,7 +77,7 @@ sidebar <- dashboardSidebar(
     sidebarMenu(
         menuItem("Test", tabName = "file", icon = icon("file-o"),
                  menuSubItem("Upload File(s)", tabName = "file_preview"),
-                 menuSubItem("Test)", tabName = "tests"),
+                 menuSubItem("Test", tabName = "tests"),
                  menuSubItem("Test1", tabName = "test1"),
                  menuSubItem("Test2", tabName = "test2"),
                  startExpanded = TRUE
@@ -89,8 +89,7 @@ sidebar <- dashboardSidebar(
         menuItem("Gallery", tabName = "gallery", icon = icon("file-picture-o"),startExpanded = FALSE
         ),
         menuItem("Logs", tabName = "logs", icon = icon("info"), startExpanded = FALSE
-        ),
-        menuItem("Message", tabName = "messagee")
+        )
     )
 )
 
@@ -117,7 +116,32 @@ body <- dashboardBody(
         ),
         tabItem(tabName = "tests",
                 fluidRow(
-                    column(4, selectInput("sort_by", "which column to use for sorting genes?",
+                    column(3, "  Gene module"),
+                    column(2, "  Gene sort:" ),
+                    column(2, "  Trend:" ),
+                    column(1, "  Abs:" ),
+                    column(2, "  Test type:" ),
+                    column(2, "  test:" ),
+                    class="paramHeader"
+                ),
+                fluidRow(
+                    column(3, 
+                           selectInput( "mset", NULL,
+                                        list( ""
+                                              ,"Li et al. and B. Pulendran (LI)"="LI"
+                                              ,"Damien Chaussabel et al. (DC)"="DC"
+                                              ,"LI + DC"="all"
+                                              ,"MSigDB Hallmark gene sets"="msigH"
+                                              ,"MSigDB Positional gene sets (C1)"="msigC1"
+                                              ,"MSigDB Curated gene sets (C2)"="msigC2"
+                                              ,"MSigDB Motif gene sets (C3)"="msigC3"
+                                              ,"MSigDB Computational signatures (C4)"="msigC4"
+                                              ,"MSigDB GO gene sets (C5)"="msigC5"
+                                              ,"MSigDB Oncogenic signatures (C6)"="msigC6"
+                                              ,"MSigDB Immunologic signatures (C7)"="msigC7"
+                                        ))
+                           ),
+                    column(2, selectInput("sort_by", NULL,
                                           choices = c("",
                                                       "logFC" = "logFC",
                                                       "t" = "t",
@@ -126,41 +150,29 @@ body <- dashboardBody(
                                                       "d" = "d",
                                                       "qval" = "qval")
                     )) ,
-                    column(2, selectInput("inc_dec", "Trend",
-                                          choices = c("Increasing" = "False",
-                                                      "Decreasing" = "TRUE"),
-                                          selected = "Decreasing"
+                    column(2, selectInput("inc_dec", NULL,
+                                          choices = c("",
+                                                      "Increasing" = "False",
+                                                      "Decreasing" = "TRUE")
                     )),
-                    column(2, selectInput("abs", "Abs",
-                                          choices = c("YES", "NO"),
-                                          selected = "YES")),
-                    column(2, selectInput("test_type", "test",
-                                          choices = c("NO SELECT",
+                    column(1, selectInput("abs", NULL,
+                                          choices = c("", 
+                                                      "YES",
+                                                      "NO")
+                                          )
+                    ),
+                    column(2, selectInput("test_type", NULL,
+                                          choices = c("" ,
+                                                      "NO SELECT",
                                                       "tmodCERNOtest" = "tmodCERNOtest",
                                                       "tmodUtest" = "tmodUtest")
-                    )),
-                    column(2, actionButton("run", "Polt it")
+                                          )
+                    ),
+                    column(2, actionButton("run", "Plot it")
                     )
                 ),
+                fluidRow( column(12, offset=0, htmlOutput("message", inline=TRUE), class="tmodMsg" )),
                 plotOutput("plot", height = "1200px")
-                # fluidRow(
-                #     column(2,  
-                #            numericInput("pie.pval", 
-                #                         "pie.pval", 
-                #                         0.05, min = 0, max = 0.1, step = 0.01)
-                #     ),
-                #     column(2,
-                #            numericInput("pie.lfc",
-                #                         "pie.lfc",
-                #                         1, min = 0, max = 5, step = 0.5)
-                #     ),
-                #     column(2, actionButton("run1", "Polt it")
-                #     ),
-                # plotOutput("plot", height = "1200px"),
-                # plotOutput("plot1" )
-                # 
-                # 
-                # )
         ),
         tabItem(tabName = "test1",
                 fluidRow(
@@ -182,7 +194,6 @@ body <- dashboardBody(
             
         ),
         tabItem(tabName = "test2",
-                
                 # ----------------------------------------------------------------------
                 # HTML code for the parameters header of the Tests tab
                 # ----------------------------------------------------------------------
@@ -240,9 +251,7 @@ body <- dashboardBody(
                 
                 
                 # 这个函数是一个临时替代函数。
-                fluidRow( column(12, offset=0, htmlOutput("message", inline=TRUE), class="tmodMsg" )),
-                
-                #fluidRow(sliderInput("slider", "fluidRow( column(10, offset=0, htmlOutput( ...))", 1, 100, 50)),
+                # fluidRow( column(12, offset=0, htmlOutput("message", inline=TRUE), class="tmodMsg" )),
                 
                 # these are required for button to be reactive
                 div(id="glist", class="shiny-input-radiogroup", 
