@@ -22,6 +22,8 @@ function(input, output, session) {
     # this variable will be used for keeping file data
     loaded_data <- reactiveVal(value=NULL)
     
+    output$message <- renderText({sprintf("what the heck foo foo")})
+    
 
     
     print("I was called")
@@ -226,109 +228,7 @@ function(input, output, session) {
     
     si <- sessionInfo()
     addLog("Running tmod in version %s", si$otherPkgs$tmod$Version)
-    
-    # output$plot1 <- renderText({
-    #     pval.col <- "qval"
-    #     
-    #     ## 13. which column contains the log fold changes
-    #     lfc.col <- "logFC"
-    #     input$run1
-    #     dat <- isolate(loaded_data())
-    #     if(is.null(dat) || length(dat)==0) {
-    #         print("no data yet")
-    #         return(NULL)
-    #     }
-    #     print("run1也开始运行了")
-    #     lfcs <- sapply(dat, function(x) {
-    #         x <- data.frame(x)
-    #         x[, "logFC"]
-    #         },simplify=FALSE
-    #     )
-    #     pvals <- sapply(dat, function(x){
-    #         x <- data.frame(x)
-    #         x[, "qval"]
-    #         }
-    #         ,simplify=FALSE
-    #         )
-    #     
-    #     geneName <- isolate(input$which_col_genename)
-    #     pie.pval <- 0.05
-    #     pie.lfc <- 1
-    # 
-    #     pie <- tmodDecideTests(g=dat[[1]][ , geneName ],
-    #                            lfc=lfcs,
-    #                            pval=pvals,
-    #                            lfc.thr=pie.lfc,
-    #                            pval.thr=pie.pval,
-    #                            mset=mset
-    #     )
-    # 
-    #     tmodPanelPlot(res, pie=pie, pie.style="r", grid="b", filter.rows.pval=0.001)
-    #     
-    # })
 
-    
-    # # 实现参数弹窗
-    # dropdown <- function(){
-    #     sort_col <- isolate(input$sort_by)# isolate() is used, we donot want to rerun this code block every time, 
-    #     sort_abs <- isolate(input$abs)    # when we change sorting column or othre choices
-    #     sort_decr <- isolate(input$inc_dec)
-    #     geneName <- isolate(input$which_col_genename)
-    #     isolate(input$test_type)
-    #     isolate(input$drowdownTest)
-    #     isolate(input$files)
-    #     isolate(input$run1)
-    #     modalDialog(
-    #         title = "Notice",
-    #         #uiOutput("choose_test_file"),
-    #         selectInput("sort_by", "which column to use for sorting genes?",
-    #                     choices = c("logFC" = "logFC",
-    #                                 "t" = "t",
-    #                                 "msd" = "msd",
-    #                                 "SE" = "SE",
-    #                                 "d" = "d",
-    #                                 "qval" = "qval"),
-    #                     selected = "qval"
-    #         ),
-    #         selectInput("inc_dec", "Trend",
-    #                     choices = c("Increasing" = "False",
-    #                                 "Decreasing" = "TRUE"),
-    #                     selected = "Decreasing"
-    #         ),
-    #         selectInput("abs", "Abs",
-    #                     choices = c("YES", "NO"),
-    #                     selected = "YES"),
-    #         selectInput("test_type", "test",
-    #                     choices = c("NO SELECT",
-    #                                 "tmodCERNOtest" = "tmodCERNOtest",
-    #                                 "tmodUtest" = "tmodUtest")
-    #         ),
-    #         actionButton("run", "Polt it"),
-    #         easyClose = TRUE, footer = NULL
-    #     )
-    # }
-    
-    # # 显示参数弹窗
-    # observeEvent(no_gene_col_selected, {
-    #     showModal(dropdown())
-    # })
-    # # remove modal after clicking "plot it"
-    # observeEvent(input$run, {
-    #     removeModal()
-    # })
-    # 
-    # # when you click "plot it", it will hide preview talbe
-    # observeEvent(input$run, {
-    #     hide("table")
-    # })
-    # # when you select file to preview, it will update and show file content in web page
-    # observeEvent(input$which_preview_file,{
-    #     show("table")
-    # })
-    # 
-    # observeEvent(input$download,{
-    #     hide("table")
-    # })
 }
 
 # 松 Print version information about R, the OS and attached or loaded packages.

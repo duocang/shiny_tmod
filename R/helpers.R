@@ -3,7 +3,8 @@
 addMsg <- function(message, ...) {
     message <- sprintf( message, ... )
     output$message <- renderUI({ HTML(paste0( "💡 <b>Message:</b> ", message )) })
-    log <<- paste0( Sys.time(), ": ", message, "\n", log )
+    time <- as.character(Sys.time())
+    log <<- paste0( time, ": ", message, "\n", log )
     output$messageLog <- renderUI({ HTML(paste0("<pre>", log, "</pre>")) })
     catf( "MESSAGE: %s\n", message )
 }

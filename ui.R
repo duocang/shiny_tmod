@@ -76,8 +76,8 @@ popupWindow <- function(varname, contents) {
 sidebar <- dashboardSidebar(
     sidebarMenu(
         menuItem("Test", tabName = "file", icon = icon("file-o"),
-                 menuSubItem("Upload File", tabName = "file_preview"),
-                 menuSubItem("Tests", tabName = "tests"),
+                 menuSubItem("Upload File(s)", tabName = "file_preview"),
+                 menuSubItem("Test)", tabName = "tests"),
                  menuSubItem("Test1", tabName = "test1"),
                  menuSubItem("Test2", tabName = "test2"),
                  startExpanded = TRUE
@@ -109,9 +109,9 @@ body <- dashboardBody(
                     column(3, 
                            uiOutput("genename_col"))
                 ),
-                fluidRow(
-                    column(10, offset=0, htmlOutput( "message" ), class="tmodMsg" )
-                ),
+                #fluidRow(
+                #   column(10, offset=0, htmlOutput( "message" ), class="tmodMsg" )
+                #),
                 class="params",
                 DT::dataTableOutput("table")
         ),
@@ -240,8 +240,9 @@ body <- dashboardBody(
                 
                 
                 # 这个函数是一个临时替代函数。
-                # fluidRow( column(10, offset=0, htmlOutput( "message" ), class="tmodMsg" )),
-                fluidRow(sliderInput("slider", "fluidRow( column(10, offset=0, htmlOutput( ...))", 1, 100, 50)),
+                fluidRow( column(12, offset=0, htmlOutput("message", inline=TRUE), class="tmodMsg" )),
+                
+                #fluidRow(sliderInput("slider", "fluidRow( column(10, offset=0, htmlOutput( ...))", 1, 100, 50)),
                 
                 # these are required for button to be reactive
                 div(id="glist", class="shiny-input-radiogroup", 
@@ -252,7 +253,8 @@ body <- dashboardBody(
                             HTML('<input type="radio" name="row" value="0" id="r0" /><label for="r0">Plot</label>'),
                             HTML('<input type="radio" name="glist" value="0" id="r0" /><label for="r0">Plot</label>')
                         ), hr(),
-                        dataTableOutput( "results" )) 
+                        dataTableOutput( "results" )
+                    ) 
                 ),
                 
                 # plot popup panel
@@ -288,10 +290,7 @@ body <- dashboardBody(
                     column(10, htmlOutput( "messageLog"), br()
                     ) 
                 )
-        ),
-        tabItem(tabName = "messagee",
-                fluidRow( column(10, offset=0, htmlOutput( "message" ), class="tmodMsg" ))
-                )
+        )
     )
 )
 
