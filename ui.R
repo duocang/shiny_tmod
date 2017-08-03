@@ -94,6 +94,8 @@ sidebar <- dashboardSidebar(
 )
 
 body <- dashboardBody(
+    # This will call message-handler.js
+    tags$head(tags$script(src = "message-handler.js")),
     tabItems(
         tabItem(tabName = "file_preview",
                 fluidRow(
@@ -108,9 +110,6 @@ body <- dashboardBody(
                     column(3, 
                            uiOutput("genename_col"))
                 ),
-                #fluidRow(
-                #   column(10, offset=0, htmlOutput( "message" ), class="tmodMsg" )
-                #),
                 class="params",
                 DT::dataTableOutput("table")
         ),

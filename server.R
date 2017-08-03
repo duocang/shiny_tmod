@@ -21,11 +21,7 @@ function(input, output, session) {
     source("R/helpers.R", local = TRUE)
     # this variable will be used for keeping file data
     loaded_data <- reactiveVal(value=NULL)
-    
-    output$message <- renderText({sprintf("what the heck foo foo")})
-    
 
-    
     print("I was called")
     
     # dispaly choosebox for which file to preview
@@ -49,27 +45,30 @@ function(input, output, session) {
         if(is.null(loaded_data())) 
             return(NULL)
         selectInput("which_col_genename", "Select genename column", 
-                    choices = c("", common_columns()))
+                    choices = c("-----------------", common_columns()))
     })
-    
  
     # this will show the table of file in page
     output$table = DT::renderDataTable( preview_8_lines(),
                                         options=list(scrollX=TRUE))
-
-    
  
     # this function will show first 8 rows of selected file to preview
     preview_8_lines <- reactive({
-        n <- 1
-        file_typein <- input$which_preview_file# which file selected for preview
-        infile <- input$files
-        if(is.null(infile)) return(NULL)# user has not uploaded a file yet
-        for(i in 1:file_num())
-            if(infile$name[i] == file_typein)
-                n <- i
-        a <- loaded_data()[[n]]
-        head(a, n=8)
+        tryCatch({
+            n <- 1
+            file_typein <- input$which_preview_file# which file selected for preview
+            infile <- input$files
+            if(is.null(infile)) return(NULL)# user has not uploaded a file yet
+            for(i in 1:file_num())
+                if(infile$name[i] == file_typein)
+                    n <- i
+            a <- loaded_data()[[n]]
+            head(a, n=8)
+        },
+        error = function(e){
+            print("gene_column_selection alert needs to be showed and confirmed first")
+            return(NULL)
+        })
     })
     
     # this function will get the number of files uploaded
@@ -115,7 +114,6 @@ function(input, output, session) {
         }
         print("running test")
         sort_col <- isolate(input$sort_by)# isolate() is used, we donot want to rerun this code block every time, 
-        
         sort_abs <- isolate(input$abs)    # when we change sorting column or othre choices
         sort_decr <- isolate(input$inc_dec)
         geneName <- isolate(input$which_col_genename)
@@ -207,7 +205,21 @@ function(input, output, session) {
         print("方程运行到此处2")
     }, bg="transparent")
     
+    # This will show an allert, if the user trys to run without selecting gene column
+    observeEvent(input$run,{
+        if(input$which_col_genename == "-----------------"){
+            session$sendCustomMessage(type = "alert_message",
+                                      message = 'Please select gene cloumn!')
+        }
+    })
     
+    observeEvent(input$which_preview_file,{
+        Sys.sleep(1)
+        if(file_num() != 0){
+            session$sendCustomMessage(type = "alert_message",
+                                      message = "Please select gene cloumn!")
+        }
+    })
     
     # 以下的内容将会实现january此前tmod enrichment tool 中的功能
     # global variables holding the state of the statistical tests

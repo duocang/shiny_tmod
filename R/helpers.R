@@ -18,3 +18,15 @@ addLog <- function(message, ...) {
     output$messageLog <- renderText({ paste0("<pre>", log, "</pre>") })
     catf( "MESSAGE: %s\n", message )
 }
+
+## create the mset parameter for the tmod test functions
+## depends on: input$mset
+getMset <- reactive({
+    mset <- input$mset
+    foo <- substr(mset, 1, 4)
+    if(foo == "msig"){
+        cat <- gsub("msig", "", mset) # gsub() function reeplaces all matches of a string..
+        mset <- filterModulesByCategory(msig, cat)
+    }
+    return(mset)
+})
