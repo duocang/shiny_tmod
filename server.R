@@ -164,24 +164,39 @@ function(input, output, session) {
         )
         return(pie)
     })
-    
+
     output$plot <- renderPlot({
         input$run
         if(input$run == 0){
             return(NULL)
         }
-        tryCatch({
-            plo <- stat_test()
-            if(!is.null(plo))
-                tmodPanelPlot(plo, text.cex = 0.9, legend.style = "auto")
-            print("plot done")
-        },
-        warning = function(w){
-            print("no correct gene column selected")
-        },
-        error = function(e){
-            print("gene column is selected, but it is processed by isolated() function")
-            return(NULL)
+        
+        withProgress(message = 'Making plot', value = 0, {
+            n <- 10
+            # Number of times we'll go through the loop
+            for (i in 1:n) {
+                # Each time through the loop, add another row of data. This is
+                # a stand-in for a long-running computation.
+                
+                # Increment the progress bar, and update the detail text.
+                incProgress(1/n, detail = paste("Doing part", i))
+                
+                # Pause for 0.1 seconds to simulate a long computation.
+                Sys.sleep(0.1)
+            }
+            tryCatch({
+                plo <- stat_test()
+                if(!is.null(plo))
+                    tmodPanelPlot(plo, text.cex = 0.9, legend.style = "auto")
+                print("plot done")
+            },
+            warning = function(w){
+                print("no correct gene column selected")
+            },
+            error = function(e){
+                print("gene column is selected, but it is processed by isolated() function")
+                return(NULL)
+            })
         })
     }, bg="transparent")
     
@@ -190,11 +205,27 @@ function(input, output, session) {
         if(input$run1 == 0){
             return(NULL)
         }
-        res <- isolate(stat_test())
-        pie <- isolate(stat_test1())
-        names(pie) <- names(res)
-        if(!is.null(res))
-            tmodPanelPlot(res, pie=pie, pie.style="r", grid="b", filter.rows.pval=0.001)
+        
+        
+        withProgress(message = 'Making plot', value = 0, {
+            n <- 10
+            # Number of times we'll go through the loop
+            for (i in 1:n) {
+                # Each time through the loop, add another row of data. This is
+                # a stand-in for a long-running computation.
+                
+                # Increment the progress bar, and update the detail text.
+                incProgress(1/n, detail = paste("Doing part", i))
+                
+                # Pause for 0.1 seconds to simulate a long computation.
+                Sys.sleep(0.1)
+            }
+            res <- isolate(stat_test())
+            pie <- isolate(stat_test1())
+            names(pie) <- names(res)
+            if(!is.null(res))
+                tmodPanelPlot(res, pie=pie, pie.style="r", grid="b", filter.rows.pval=0.001)
+        })
     }, bg="transparent")
     
     # This will show an allert, if the user trys to run without selecting gene column
