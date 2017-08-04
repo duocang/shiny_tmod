@@ -233,6 +233,10 @@ function(input, output, session) {
         if(input$run == 0){
             return(NULL)
         }
+        
+        if(is.null(input$which_col_genename))
+            return(NULL)
+        
         if(input$which_col_genename == "-----------------"){
             session$sendCustomMessage(type = "alert_message",
                                       message = 'Please select gene cloumn!')
@@ -272,9 +276,15 @@ function(input, output, session) {
                     isolate(input$mset)))
     })
     
+    # When "rug-like plot" is clicked, it will show rug-like tab
     observeEvent(input$run1,{
         updateTabsetPanel(session, "inTabset",
                           selected = "rug-like")
+    })
+    # When "headmap-like plot" is clicked, it will show heatmap-like tab
+    observeEvent(input$run,{
+        updateTabsetPanel(session, "inTabset",
+                          selected = "heatmap-like")
     })
     
     
