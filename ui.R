@@ -78,7 +78,6 @@ sidebar <- dashboardSidebar(
         menuItem("Test", tabName = "file", icon = icon("file-o"),
                  menuSubItem("Upload File(s)", tabName = "file_preview"),
                  menuSubItem("Test", tabName = "tests"),
-                 menuSubItem("Test1", tabName = "test1"),
                  menuSubItem("Test2", tabName = "test2"),
                  startExpanded = TRUE
         ),
@@ -116,11 +115,10 @@ body <- dashboardBody(
         tabItem(tabName = "tests",
                 fluidRow(
                     column(3, "  Gene module"),
-                    column(2, "  Gene sort:" ),
-                    column(2, "  Trend:" ),
-                    column(1, "  Abs:" ),
-                    column(2, "  Test type:" ),
-                    column(2, "  test:" ),
+                    column(2, "  Gene sort" ),
+                    column(2, "  Trend" ),
+                    column(1, "  Abs" ),
+                    column(2, "  Test type" ),
                     class="paramHeader"
                 ),
                 fluidRow(
@@ -170,27 +168,27 @@ body <- dashboardBody(
                     column(2, actionButton("run", "Plot it")
                     )
                 ),
-                fluidRow( column(12, offset=0, htmlOutput("message", inline=TRUE), class="tmodMsg" )),
-                plotOutput("plot", height = "1200px")
-        ),
-        tabItem(tabName = "test1",
+                fluidRow(
+                    column(2, "  pie.pval"),
+                    column(2, "  pie.lfc" ),
+                    class="paramHeader"
+                ),
                 fluidRow(
                     column(2,  
                            numericInput("pie.pval", 
-                                        "pie.pval", 
+                                        NULL, 
                                         0.05, min = 0, max = 0.1, step = 0.01)
                     ),
                     column(2,
                            numericInput("pie.lfc",
-                                        "pie.lfc",
+                                        NULL,
                                         1, min = 0, max = 5, step = 0.5)
                     ),
                     column(2, actionButton("run1", "Polt it")
-                    ),
-                
-                    plotOutput("plot1" , height = "1500px")
-                )
-            
+                    )
+                ),
+                fluidRow( column(12, offset=0, htmlOutput("message", inline=TRUE), class="tmodMsg" )),
+                plotOutput("plot", height = "1200px")
         ),
         tabItem(tabName = "test2",
                 # ----------------------------------------------------------------------
