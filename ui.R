@@ -113,6 +113,7 @@ body <- dashboardBody(
                 DT::dataTableOutput("table")
         ),
         tabItem(tabName = "tests",
+                fluidRow( column(12, offset=0, htmlOutput("message", inline=TRUE), class="tmodMsg" )),
                 fluidRow(
                     column(3, "  Gene module"),
                     column(2, "  Gene sort" ),
@@ -165,7 +166,7 @@ body <- dashboardBody(
                                                       "tmodUtest" = "tmodUtest")
                                           )
                     ),
-                    column(2, actionButton("run", "Plot it")
+                    column(2, actionButton("run", "Plot heatmap-like")
                     )
                 ),
                 fluidRow(
@@ -184,10 +185,9 @@ body <- dashboardBody(
                                         NULL,
                                         1, min = 0, max = 5, step = 0.5)
                     ),
-                    column(2, actionButton("run1", "Polt it")
+                    column(2, actionButton("run1", "Plot rug-like")
                     )
                 ),
-                fluidRow( column(12, offset=0, htmlOutput("message", inline=TRUE), class="tmodMsg" )),
                 tabsetPanel(
                     tabPanel("heatmap-like", plotOutput("plot", height = "1200px")),
                     tabPanel("rug-like", plotOutput("plot1", height = "1200px"))
@@ -279,9 +279,6 @@ body <- dashboardBody(
                 
                 popupWindow("tagcloudW",
                             div(plotOutput( "tagcloudPlot" ), style="width:600px;height:600px;" ))
-                
-
-               
         ),
         
         tabItem(tabName = "help",

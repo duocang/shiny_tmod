@@ -18,6 +18,9 @@ load("data/msig.rda")
 options(shiny.maxRequestSize=30*1024^2)
 
 function(input, output, session) {
+    # load the code
+    source("R/data_loading.R", local=TRUE)
+    source("R/visualizations.R", local=TRUE)
     source("R/helpers.R", local = TRUE)
     # this variable will be used for keeping file data
     loaded_data <- reactiveVal(value=NULL)
@@ -100,18 +103,20 @@ function(input, output, session) {
     data
     })
     
+
+    
     # below will do many things:
     # 1. sort data by selected column
     # 2. abs
     # 3. increasing or decreasing
     # 4. tmod test 
     stat_test <- reactive({
+        input$run
         dat <- isolate(loaded_data())
         if(is.null(dat) || length(dat)==0) {
           print("no data yet")
           return(NULL)
         }
-        print("running test")
         sort_col <- isolate(input$sort_by)# isolate() is used, we donot want to rerun this code block every time, 
         sort_abs <- isolate(input$abs)    # when we change sorting column or othre choices
         sort_decr <- isolate(input$inc_dec)
@@ -131,25 +136,15 @@ function(input, output, session) {
     })
     
     stat_test1 <- reactive({
+        input$run1
         dat <- isolate(loaded_data())
-
         if(is.null(dat) || length(dat)==0) {
             print("no data yet")
             return(NULL)
         }
-        print("running test1")
-        
-        print("dat[[1]]的数据类型")
-        print(class(dat[[1]]))
-        print(dim(dat[[1]]))
-        
-        pie_pval <- 0.05
-        pie_lfc <- 1
-        
         lfcs <- sapply(dat, function(x) {
             as.matrix(x[, "logFC", with=FALSE])
         })
-        
         pvals <- sapply(dat, function(x){
             as.matrix(x[, "qval", with=FALSE])
         })
@@ -157,33 +152,18 @@ function(input, output, session) {
         geneName <- isolate(input$which_col_genename)
         gene <- dat[[1]][, geneName, with=FALSE]
         
-        lfc_thr <- isolate(input$pie.lfc)
-        pval_thr <- isolate(input$pie.pval)
-        
+
         ddd <- data.frame(dat[[1]])
         gg <- ddd[[geneName]]
         pie <- tmodDecideTests(g=gg,
                                lfc=lfcs,
                                pval=pvals,
-                               lfc.thr=lfc_thr,
-                               pval.thr=pval_thr,
+                               lfc.thr=isolate(input$pie.lfc),
+                               pval.thr=isolate(input$pie.pval),
                                mset=mset
         )
-        print("333")
         return(pie)
     })
-    
-    
-   
-    
-    
-    output$plot <- renderPlot({
-        input$run
-        if(input$run == 0)
-            return(NULL)
-        v$plot_data
-    }, bg="transparent")
-    
     
     output$plot <- renderPlot({
         input$run
@@ -191,7 +171,6 @@ function(input, output, session) {
             return(NULL)
         }
         tryCatch({
-            print("making the plot")
             plo <- stat_test()
             if(!is.null(plo))
                 tmodPanelPlot(plo, text.cex = 0.9, legend.style = "auto")
@@ -211,20 +190,18 @@ function(input, output, session) {
         if(input$run1 == 0){
             return(NULL)
         }
-        print("making the plot1")
         res <- isolate(stat_test())
         pie <- isolate(stat_test1())
         names(pie) <- names(res)
-        print(names(res))
-        print("方程运行到此处1")
-        
         if(!is.null(res))
             tmodPanelPlot(res, pie=pie, pie.style="r", grid="b", filter.rows.pval=0.001)
-        print("方程运行到此处2")
     }, bg="transparent")
     
     # This will show an allert, if the user trys to run without selecting gene column
     observeEvent(input$run,{
+        if(input$run == 0){
+            return(NULL)
+        }
         if(input$which_col_genename == "-----------------"){
             session$sendCustomMessage(type = "alert_message",
                                       message = 'Please select gene cloumn!')
@@ -251,10 +228,7 @@ function(input, output, session) {
     rv <- reactiveValues()
     rv$results <- NULL
     
-    # load the code
-    source("R/helpers.R", local=TRUE)
-    source("R/data_loading.R", local=TRUE)
-    source("R/visualizations.R", local=TRUE)
+    
     
     si <- sessionInfo()
     addLog("Running tmod in version %s", si$otherPkgs$tmod$Version)
