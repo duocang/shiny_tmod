@@ -272,6 +272,11 @@ function(input, output, session) {
                     isolate(input$mset)))
     })
     
+    observeEvent(input$run1,{
+        updateTabsetPanel(session, "inTabset",
+                          selected = "rug-like")
+    })
+    
     
 }
 
