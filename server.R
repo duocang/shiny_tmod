@@ -106,7 +106,6 @@ function(input, output, session) {
     # 3. increasing or decreasing
     # 4. tmod test 
     stat_test <- reactive({
-        input$run# track "plot it" button, onece clicked, run this code bolck
         dat <- isolate(loaded_data())
         if(is.null(dat) || length(dat)==0) {
           print("no data yet")
@@ -158,28 +157,45 @@ function(input, output, session) {
         geneName <- isolate(input$which_col_genename)
         gene <- dat[[1]][, geneName, with=FALSE]
         
+        lfc_thr <- isolate(input$pie.lfc)
+        pval_thr <- isolate(input$pie.pval)
         
         ddd <- data.frame(dat[[1]])
         gg <- ddd[[geneName]]
         pie <- tmodDecideTests(g=gg,
                                lfc=lfcs,
                                pval=pvals,
-                               lfc.thr=1,
-                               pval.thr=0.05,
+                               lfc.thr=lfc_thr,
+                               pval.thr=pval_thr,
                                mset=mset
         )
         print("333")
         return(pie)
     })
     
+    
+   
+    
+    
     output$plot <- renderPlot({
         input$run
-        #input$which_col_genename
+        if(input$run == 0)
+            return(NULL)
+        v$plot_data
+    }, bg="transparent")
+    
+    
+    output$plot <- renderPlot({
+        input$run
+        if(input$run == 0){
+            return(NULL)
+        }
         tryCatch({
             print("making the plot")
             plo <- stat_test()
             if(!is.null(plo))
                 tmodPanelPlot(plo, text.cex = 0.9, legend.style = "auto")
+            print("plot done")
         },
         warning = function(w){
             print("no correct gene column selected")
@@ -192,7 +208,9 @@ function(input, output, session) {
     
     output$plot1 <- renderPlot({
         input$run1
-        
+        if(input$run1 == 0){
+            return(NULL)
+        }
         print("making the plot1")
         res <- isolate(stat_test())
         pie <- isolate(stat_test1())
@@ -214,7 +232,7 @@ function(input, output, session) {
     })
     
     observeEvent(input$which_preview_file,{
-        Sys.sleep(1)
+        Sys.sleep(0.5)
         if(file_num() != 0){
             session$sendCustomMessage(type = "alert_message",
                                       message = "Please select gene cloumn!")
@@ -240,7 +258,16 @@ function(input, output, session) {
     
     si <- sessionInfo()
     addLog("Running tmod in version %s", si$otherPkgs$tmod$Version)
-
+    
+    # when we click plot, it shows message on the page
+    observeEvent(input$run,{
+        addMsg(
+            sprintf("Running test %s whith mset=%s, pleast wait", 
+                    isolate(input$test_type),
+                    isolate(input$mset)))
+    })
+    
+    
 }
 
-# 松 Print version information about R, the OS and attached or loaded packages.
+

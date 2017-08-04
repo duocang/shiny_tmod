@@ -188,7 +188,10 @@ body <- dashboardBody(
                     )
                 ),
                 fluidRow( column(12, offset=0, htmlOutput("message", inline=TRUE), class="tmodMsg" )),
-                plotOutput("plot", height = "1200px")
+                tabsetPanel(
+                    tabPanel("heatmap-like", plotOutput("plot", height = "1200px")),
+                    tabPanel("rug-like", plotOutput("plot1", height = "1200px"))
+                )
         ),
         tabItem(tabName = "test2",
                 # ----------------------------------------------------------------------

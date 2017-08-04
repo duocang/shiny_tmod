@@ -14,3 +14,5 @@ filterModulesByCategory <- function(mset, cat){
     mset$GENES <- mset$GENES[ mset$GENES$ID %in% unique(unlist(mset$MODULES2GENES)),, drop=FALSE ]
     return(mset)
 }
+
+
