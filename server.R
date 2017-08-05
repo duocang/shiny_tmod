@@ -171,61 +171,68 @@ function(input, output, session) {
             return(NULL)
         }
         
-        withProgress(message = 'Making plot', value = 0, {
-            n <- 10
-            # Number of times we'll go through the loop
-            for (i in 1:n) {
-                # Each time through the loop, add another row of data. This is
-                # a stand-in for a long-running computation.
-                
-                # Increment the progress bar, and update the detail text.
-                incProgress(1/n, detail = paste("Doing part", i))
-                
-                # Pause for 0.1 seconds to simulate a long computation.
-                Sys.sleep(0.1)
-            }
-            tryCatch({
-                plo <- stat_test()
-                if(!is.null(plo))
-                    tmodPanelPlot(plo, text.cex = 0.9, legend.style = "auto")
-                print("plot done")
-            },
-            warning = function(w){
-                print("no correct gene column selected")
-            },
-            error = function(e){
-                print("gene column is selected, but it is processed by isolated() function")
-                return(NULL)
+        if((input$sort_by != "") && (input$inc_dec != "") && (input$abs != "") && (input$test_type == "")){
+            withProgress(message = 'Making plot', value = 0, {
+                n <- 10
+                # Number of times we'll go through the loop
+                for (i in 1:n) {
+                    # Each time through the loop, add another row of data. This is
+                    # a stand-in for a long-running computation.
+                    
+                    # Increment the progress bar, and update the detail text.
+                    incProgress(1/n, detail = paste("Doing part", i))
+                    
+                    # Pause for 0.1 seconds to simulate a long computation.
+                    Sys.sleep(0.1)
+                }
+                tryCatch({
+                    plo <- stat_test()
+                    if(!is.null(plo))
+                        tmodPanelPlot(plo, text.cex = 0.9, legend.style = "auto")
+                    print("plot done")
+                },
+                warning = function(w){
+                    print("no correct gene column selected")
+                },
+                error = function(e){
+                    print("gene column is selected, but it is processed by isolated() function")
+                    return(NULL)
+                })
             })
-        })
+        }
     }, bg="transparent")
+    
+    is.not.null <- function(x){
+        ! is.null(x)
+    }
     
     output$plot1 <- renderPlot({
         input$run1
         if(input$run1 == 0){
             return(NULL)
         }
+        if((input$sort_by != "") && (input$inc_dec != "") && (input$abs != "") && (input$test_type == "")){
+            withProgress(message = 'Making plot', value = 0, {
+                n <- 10
+                # Number of times we'll go through the loop
+                for (i in 1:n) {
+                    # Each time through the loop, add another row of data. This is
+                    # a stand-in for a long-running computation.
+                    
+                    # Increment the progress bar, and update the detail text.
+                    incProgress(1/n, detail = paste("Doing part", i))
+                    # Pause for 0.1 seconds to simulate a long computation.
+                    Sys.sleep(0.1)
+                }
+                res <- isolate(stat_test())
+                pie <- isolate(stat_test1())
+                names(pie) <- names(res)
+                if(!is.null(res))
+                    tmodPanelPlot(res, pie=pie, pie.style="r", grid="b", filter.rows.pval=0.001)
+            })
+        }
         
-        
-        withProgress(message = 'Making plot', value = 0, {
-            n <- 10
-            # Number of times we'll go through the loop
-            for (i in 1:n) {
-                # Each time through the loop, add another row of data. This is
-                # a stand-in for a long-running computation.
-                
-                # Increment the progress bar, and update the detail text.
-                incProgress(1/n, detail = paste("Doing part", i))
-                
-                # Pause for 0.1 seconds to simulate a long computation.
-                Sys.sleep(0.1)
-            }
-            res <- isolate(stat_test())
-            pie <- isolate(stat_test1())
-            names(pie) <- names(res)
-            if(!is.null(res))
-                tmodPanelPlot(res, pie=pie, pie.style="r", grid="b", filter.rows.pval=0.001)
-        })
+       
     }, bg="transparent")
     
     # This will show an allert, if the user trys to run without selecting gene column
@@ -270,10 +277,21 @@ function(input, output, session) {
     
     # when we click plot, it shows message on the page
     observeEvent(input$run,{
-        addMsg(
-            sprintf("Running test %s whith mset=%s, pleast wait", 
-                    isolate(input$test_type),
-                    isolate(input$mset)))
+        
+        
+        if((input$sort_by != "") && (input$inc_dec != "") && (input$abs != "") && (input$test_type == "")){
+            addMsg(
+                sprintf("Running test %s whith mset=%s, pleast wait", 
+                        isolate(input$test_type),
+                        isolate(input$mset)))
+        }else{
+            addMsg(
+                "Attention!\nPlease, make sure all parameters are set!"
+            )
+        }
+        
+        
+        
     })
     
     # When "rug-like plot" is clicked, it will show rug-like tab
@@ -281,6 +299,8 @@ function(input, output, session) {
         updateTabsetPanel(session, "inTabset",
                           selected = "rug-like")
     })
+    
+        
     # When "headmap-like plot" is clicked, it will show heatmap-like tab
     observeEvent(input$run,{
         updateTabsetPanel(session, "inTabset",
