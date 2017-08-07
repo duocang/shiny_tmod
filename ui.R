@@ -99,11 +99,21 @@ body <- dashboardBody(
         tabItem(tabName = "file_preview",
                 fluidRow(
                     column(3, 
-                           fileInput("files", label = h6(""), 
+                           fileInput("files", label = "Upload file(s)", 
                                      multiple = TRUE, 
                                      accept = c("text/csv", ".csv")
                                      
-                           )) ,
+                           )
+                    ) ,
+                    column(3,
+                           selectInput("example", "Or use example",
+                                       list("------"="exempty", 
+                                            "Load example for CERNO test"="cerno", 
+                                            "Load example for U test"="utest", 
+                                            "Load example for hg test"="hg",
+                                            "Reset"="reset")
+                            )
+                    ),
                     column(3, 
                            uiOutput("choose_preview_file")),
                     column(3, 
