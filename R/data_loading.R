@@ -1,3 +1,11 @@
+## ===================================================================
+## 
+##                 Functions related to data loading
+##
+## ===================================================================
+
+
+
 ## -------------------------------------------------------------------
 ## this is hooked to the "choose file" dialogs
 ## loads the data to be analysed and stores it in fg / bg

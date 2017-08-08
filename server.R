@@ -14,7 +14,7 @@ load("data/annotObject.RData")
 load("data/msig.rda")
 
 
-# below allows file bigger than 25M to be uploaded
+# It allows file bigger than 25M to be uploaded
 options(shiny.maxRequestSize=30*1024^2)
 
 function(input, output, session) {
@@ -22,6 +22,7 @@ function(input, output, session) {
     source("R/data_loading.R", local=TRUE)
     source("R/visualizations.R", local=TRUE)
     source("R/helpers.R", local = TRUE)
+    
     # this variable will be used for keeping file data
     loaded_data <- reactiveVal(value=NULL)
 
@@ -152,7 +153,7 @@ function(input, output, session) {
         geneName <- isolate(input$which_col_genename)
         gene <- dat[[1]][, geneName, with=FALSE]
         
-
+        
         ddd <- data.frame(dat[[1]])
         gg <- ddd[[geneName]]
         pie <- tmodDecideTests(g=gg,
@@ -171,7 +172,7 @@ function(input, output, session) {
             return(NULL)
         }
         
-        if((input$sort_by != "") && (input$inc_dec != "") && (input$abs != "") && (input$test_type == "")){
+        if((input$sort_by != "") && (input$inc_dec != "") && (input$abs != "") && (input$test_type != "")){
             withProgress(message = 'Making plot', value = 0, {
                 n <- 10
                 # Number of times we'll go through the loop
@@ -202,16 +203,13 @@ function(input, output, session) {
         }
     }, bg="transparent")
     
-    is.not.null <- function(x){
-        ! is.null(x)
-    }
     
     output$plot1 <- renderPlot({
         input$run1
         if(input$run1 == 0){
             return(NULL)
         }
-        if((input$sort_by != "") && (input$inc_dec != "") && (input$abs != "") && (input$test_type == "")){
+        if((input$sort_by != "") && (input$inc_dec != "") && (input$abs != "") && (input$test_type != "")){
             withProgress(message = 'Making plot', value = 0, {
                 n <- 10
                 # Number of times we'll go through the loop
@@ -273,33 +271,39 @@ function(input, output, session) {
     
     
     si <- sessionInfo()
+    # "2017-08-07 10:05:28: Running tmod in version 0.31" is printed in tab "Logs"
     addLog("Running tmod in version %s", si$otherPkgs$tmod$Version)
     
-    # when we click plot, it shows message on the page
+    # when we click "Plot heatmap-like", it shows message on the page
     observeEvent(input$run,{
-        
-        
-        if((input$sort_by != "") && (input$inc_dec != "") && (input$abs != "") && (input$test_type == "")){
+        if((input$sort_by != "") && (input$inc_dec != "") && (input$abs != "") && (input$test_type != "")){
             addMsg(
                 sprintf("Running test %s whith mset=%s, pleast wait", 
                         isolate(input$test_type),
                         isolate(input$mset)))
         }else{
-            addMsg(
-                "Attention!\nPlease, make sure all parameters are set!"
-            )
+            addMsg(" Attention! Please, make sure all parameters are set!")
         }
-        
-        
-        
     })
+    
+    # when we click "Plot rug-like", it shows message on the page
+    observeEvent(input$run1,{
+        if((input$sort_by != "") && (input$inc_dec != "") && (input$abs != "") && (input$test_type != "")){
+            addMsg(
+                sprintf("Running test %s whith mset=%s, pleast wait", 
+                        isolate(input$test_type),
+                        isolate(input$mset)))
+        }else{
+            addMsg(" Attention! Please, make sure all parameters are set!")
+        }
+    })
+    
     
     # When "rug-like plot" is clicked, it will show rug-like tab
     observeEvent(input$run1,{
         updateTabsetPanel(session, "inTabset",
                           selected = "rug-like")
     })
-    
         
     # When "headmap-like plot" is clicked, it will show heatmap-like tab
     observeEvent(input$run,{
@@ -307,6 +311,14 @@ function(input, output, session) {
                           selected = "heatmap-like")
     })
     
+    
+    
+    
+    
+    output$example_test <- renderMenu({
+        if(input$example != "empty")
+            menuSubItem("Example tests", tabName = "example_test")
+    })
     
 }
 
