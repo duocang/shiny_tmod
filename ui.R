@@ -134,7 +134,7 @@ body <- dashboardBody(
                 ),
                 fluidRow(
                     column(3, 
-                           selectInput( "mset", NULL,
+                           selectInput( "gene_module", NULL,
                                         list( ""
                                               ,"Li et al. and B. Pulendran (LI)"="LI"
                                               ,"Damien Chaussabel et al. (DC)"="DC"

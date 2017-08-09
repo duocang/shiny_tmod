@@ -140,46 +140,54 @@ function(input, output, session) {
         geneName <- isolate(input$which_col_genename)
         print("查看哪一种test")
         print(input$test_type)
-        if(input$test_type == " tmodCERNOtest"){
+        if(input$test_type == "tmodCERNOtest"){
+            print("这是一个类型")
+            print("tmodCERNOtest")
             res <- sapply(dat, function(x) {
                 x <- data.frame(x)
                 genes <- x[ , geneName ]
                 ord   <- x[ , sort_col ]
                 if(sort_abs == "YES") ord <- abs(ord)
                 ord <- order(ord, decreasing=sort_decr)
-                
+
                 tmodCERNOtest(genes[ord], mset=mset, qval=1)
             }, simplify=FALSE
-            ) 
+            )
         }else{
+            print("这是一个类型")
+            print("tmodUtest")
             res <- sapply(dat, function(x) {
                 x <- data.frame(x)
                 genes <- x[ , geneName ]
                 ord   <- x[ , sort_col ]
                 if(sort_abs == "YES") ord <- abs(ord)
                 ord <- order(ord, decreasing=sort_decr)
-                
+
                 tmodUtest(genes[ord], mset=mset, qval=1)
             }, simplify=FALSE
             )
         }
-        
-        
-        
-        
-        
-        
         # res <- sapply(dat, function(x) {
         #     x <- data.frame(x)
         #     genes <- x[ , geneName ]
         #     ord   <- x[ , sort_col ]
         #     if(sort_abs == "YES") ord <- abs(ord)
         #     ord <- order(ord, decreasing=sort_decr)
-        #     
-        #     tmodCERNOtest(genes[ord], mset=mset, qval=1)
+        #     if(input$test_type == "tmodCERNOtest"){
+        #         print("这是一个类型")
+        #         print("tmodCERNOtest")
+        #         tmodCERNOtest(genes[ord], mset=mset, qval=1)
+        #     }
+        #     if(input$test_type == " tmodUtest"){
+        #         print("这是一个类型")
+        #         print("tmodUtest")
+        #         tmodUtest(genes[ord], mset=mset, qval=1)
+        #     }
         # }, simplify=FALSE
         # )
         if(is.null(names(res))) names(res) <- input$files$name
+        res <- module_filter(res, input$gene_module)
+        print(head(res[1]))
         return(res)
     })
     
@@ -218,7 +226,6 @@ function(input, output, session) {
         if(input$run == 0){
             return(NULL)
         }
-        
         if((input$sort_by != "") && (input$inc_dec != "") && (input$abs != "") && (input$test_type != "")){
             withProgress(message = 'Making plot', value = 0, {
                 n <- 10
@@ -233,19 +240,26 @@ function(input, output, session) {
                     # Pause for 0.1 seconds to simulate a long computation.
                     Sys.sleep(0.1)
                 }
-                tryCatch({
-                    plo <- stat_test()
-                    if(!is.null(plo))
-                        tmodPanelPlot(plo, text.cex = 0.9, legend.style = "auto")
-                    print("plot done")
-                },
-                warning = function(w){
-                    print("no correct gene column selected")
-                },
-                error = function(e){
-                    print("gene column is selected, but it is processed by isolated() function")
-                    return(NULL)
-                })
+                
+                
+                
+                plo <- stat_test()
+                if(!is.null(plo))
+                    tmodPanelPlot(plo, text.cex = 0.9, legend.style = "auto")
+                print("plot done")
+                # tryCatch({
+                #     plo <- stat_test()
+                #     if(!is.null(plo))
+                #         tmodPanelPlot(plo, text.cex = 0.9, legend.style = "auto")
+                #     print("plot done")
+                # },
+                # warning = function(w){
+                #     print("no correct gene column selected")
+                # },
+                # error = function(e){
+                #     print("gene column is selected, but it is processed by isolated() function")
+                #     return(NULL)
+                # })
             })
         }
     }, bg="transparent")
@@ -276,8 +290,6 @@ function(input, output, session) {
                     tmodPanelPlot(res, pie=pie, pie.style="r", grid="b", filter.rows.pval=0.001)
             })
         }
-        
-       
     }, bg="transparent")
     
     # This will show an allert, if the user trys to run without selecting gene column
@@ -332,7 +344,6 @@ function(input, output, session) {
         }
     })
     
-    
     # When "rug-like plot" is clicked, it will show rug-like tab
     observeEvent(input$run1,{
         updateTabsetPanel(session, "inTabset",
@@ -345,85 +356,11 @@ function(input, output, session) {
                           selected = "heatmap-like")
     })
     
-    
     # if user wants to test with example data, a new tab will appear in sidebar
     output$example_test <- renderMenu({
         if(input$example != "empty")
             menuSubItem("Example tests", tabName = "example_test")
     })
-    
-    observe({
-        if(input$submit1 == 0){
-            print("example data is not ready, nothing to do")
-            return(NULL)
-        }
-        printf("submit=%s", input$submit1)
-        mset <- isolate(getMset())
-        isolate(load.data())
-        
-        if(is.null(fg) || (Utest == "hg" && is.null(bg))) {
-            print("No data sets loaded")
-            addMsg( 'Use the "Choose file" button to load data' )
-            return(NULL)
-        }
-        
-        rv$results <- run.stats(fg, bg, Utest, mset=mset, cols=c("Title", "URL"))
-        nr <- nrow(rv$results)
-        catf("! Generated %d results\n", nr)
-        
-        if(nr == 0) {
-            addMsg( 'Test %s: <span class="warn">no results found</span>', Utest)
-        } else {
-            addMsg( 'Test %s, found %d results. Click on "Plot" and "List" to inspect, and "Export" to save. Click on "tagcloud" to get an overview.', 
-                    Utest, nr)
-        }
-        
-        updateNumericInput(session, "submit1", 0)# change the value of a number input on the client
-    })
-    
-    
-    # observes the reactive value rv$resuolts and formats the results
-    # no side effects
-    # retruns res with additional column of radio buttons for display
-    # also with an URL to the module
-    output$results <- renderDataTable({
-        res <- formatResultsTable(rv$results)
-        if(is.null(res)) return(NULL)
-        catf("++ formatting results")
-        datatable(res, escape = FALSE)
-    })
-    
-    output$exportButton <- renderUI({
-        catf( "+ generating export button\n" )
-        if( !is.null(rv$results) && nrow(rv$results) > 0 ) {
-            return(tags$a(id = "export", class = "btn shiny-download-link tmodAct", href = "", target = "_blank", "⏬ Export"))
-        } else {
-            return( NULL )
-        }
-    })
-    
-    
-    # create a tagcloud button if results are generated
-    # depends on: reactive value rv$results
-    
-    
-    
-    # allows saving of the results in a csv file
-    # note that there is no error handling if no results
-    # have ben generated
-    output$export <- downloadHandler(  
-        filename=function() {
-        sprintf("results_%s_%s_%s.csv", Utest, isolate(input$mset), Sys.Date() ) 
-        },
-        content=function(file) {
-            if(!is.null(rv$results)) {
-                foo <- rv$results
-                foo$Genes <- getGenes(rv$results$ID, c(fg, bg), mset=isolate(input$mset))$Genes
-                write.csv(foo, file, row.names=FALSE)
-            }
-    })
-    
-    
 }
 
 
