@@ -134,7 +134,7 @@ body <- dashboardBody(
                 ),
                 fluidRow(
                     column(3, 
-                           selectInput( "gene_module", NULL,
+                           selectInput( "mset", NULL,
                                         list( ""
                                               ,"Li et al. and B. Pulendran (LI)"="LI"
                                               ,"Damien Chaussabel et al. (DC)"="DC"
@@ -290,3 +290,5 @@ dashboardPage(
     sidebar,
     body
 )
+
+fadsfas

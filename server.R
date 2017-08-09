@@ -186,7 +186,11 @@ function(input, output, session) {
         # }, simplify=FALSE
         # )
         if(is.null(names(res))) names(res) <- input$files$name
-        res <- module_filter(res, input$gene_module)
+        res <- module_filter(res, input$mset)
+        # res <- sapply(res, function(x){
+        #     subset(x, startsWith(x$ID, "LI"))
+        #     # x[startsWith(x$ID, "LI"), ]
+        # }, simplify = FALSE)
         print(head(res[1]))
         return(res)
     })
