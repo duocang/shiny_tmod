@@ -18,6 +18,21 @@ load("data/msig.rda")
 options(shiny.maxRequestSize=30*1024^2)
 
 function(input, output, session) {
+    
+    # global variables holding the state of the statistical tests
+    fg           <- NULL
+    bg           <- NULL
+    Utest        <- "hg"
+    example      <- FALSE
+    log          <- ""
+    
+    # reactive values
+    rv <- reactiveValues()
+    rv$results <- NULL
+    
+    
+    
+    si <- sessionInfo()
     # load the code
     source("R/data_loading.R", local=TRUE)
     source("R/visualizations.R", local=TRUE)
@@ -54,7 +69,8 @@ function(input, output, session) {
  
     # this will show the table of file in page
     output$table = DT::renderDataTable( preview_8_lines(),
-                                        options=list(scrollX=TRUE))
+                                        options=list(scrollX=TRUE)
+    )
  
     # this function will show first 8 rows of selected file to preview
     preview_8_lines <- reactive({
@@ -122,16 +138,47 @@ function(input, output, session) {
         sort_abs <- isolate(input$abs)    # when we change sorting column or othre choices
         sort_decr <- isolate(input$inc_dec)
         geneName <- isolate(input$which_col_genename)
-        res <- sapply(dat, function(x) {
-            x <- data.frame(x)
-            genes <- x[ , geneName ]
-            ord   <- x[ , sort_col ]
-            if(sort_abs == "YES") ord <- abs(ord)
-            ord <- order(ord, decreasing=sort_decr)
-            tmodCERNOtest(genes[ord], mset=mset, qval=1)
-        }, simplify=FALSE
-        )
-        #if(is.null(names(res))) names(res) <- paste0("N.", 1:length(res))
+        print("查看哪一种test")
+        print(input$test_type)
+        if(input$test_type == " tmodCERNOtest"){
+            res <- sapply(dat, function(x) {
+                x <- data.frame(x)
+                genes <- x[ , geneName ]
+                ord   <- x[ , sort_col ]
+                if(sort_abs == "YES") ord <- abs(ord)
+                ord <- order(ord, decreasing=sort_decr)
+                
+                tmodCERNOtest(genes[ord], mset=mset, qval=1)
+            }, simplify=FALSE
+            ) 
+        }else{
+            res <- sapply(dat, function(x) {
+                x <- data.frame(x)
+                genes <- x[ , geneName ]
+                ord   <- x[ , sort_col ]
+                if(sort_abs == "YES") ord <- abs(ord)
+                ord <- order(ord, decreasing=sort_decr)
+                
+                tmodUtest(genes[ord], mset=mset, qval=1)
+            }, simplify=FALSE
+            )
+        }
+        
+        
+        
+        
+        
+        
+        # res <- sapply(dat, function(x) {
+        #     x <- data.frame(x)
+        #     genes <- x[ , geneName ]
+        #     ord   <- x[ , sort_col ]
+        #     if(sort_abs == "YES") ord <- abs(ord)
+        #     ord <- order(ord, decreasing=sort_decr)
+        #     
+        #     tmodCERNOtest(genes[ord], mset=mset, qval=1)
+        # }, simplify=FALSE
+        # )
         if(is.null(names(res))) names(res) <- input$files$name
         return(res)
     })
@@ -257,20 +304,7 @@ function(input, output, session) {
     })
     
     # 以下的内容将会实现january此前tmod enrichment tool 中的功能
-    # global variables holding the state of the statistical tests
-    fg           <- NULL
-    bg           <- NULL
-    Utest        <- "hg"
-    example      <- FALSE
-    log          <- ""
-    
-    # reactive values
-    rv <- reactiveValues()
-    rv$results <- NULL
-    
-    
-    
-    si <- sessionInfo()
+
     # "2017-08-07 10:05:28: Running tmod in version 0.31" is printed in tab "Logs"
     addLog("Running tmod in version %s", si$otherPkgs$tmod$Version)
     
@@ -312,13 +346,83 @@ function(input, output, session) {
     })
     
     
-    
-    
-    
+    # if user wants to test with example data, a new tab will appear in sidebar
     output$example_test <- renderMenu({
         if(input$example != "empty")
             menuSubItem("Example tests", tabName = "example_test")
     })
+    
+    observe({
+        if(input$submit1 == 0){
+            print("example data is not ready, nothing to do")
+            return(NULL)
+        }
+        printf("submit=%s", input$submit1)
+        mset <- isolate(getMset())
+        isolate(load.data())
+        
+        if(is.null(fg) || (Utest == "hg" && is.null(bg))) {
+            print("No data sets loaded")
+            addMsg( 'Use the "Choose file" button to load data' )
+            return(NULL)
+        }
+        
+        rv$results <- run.stats(fg, bg, Utest, mset=mset, cols=c("Title", "URL"))
+        nr <- nrow(rv$results)
+        catf("! Generated %d results\n", nr)
+        
+        if(nr == 0) {
+            addMsg( 'Test %s: <span class="warn">no results found</span>', Utest)
+        } else {
+            addMsg( 'Test %s, found %d results. Click on "Plot" and "List" to inspect, and "Export" to save. Click on "tagcloud" to get an overview.', 
+                    Utest, nr)
+        }
+        
+        updateNumericInput(session, "submit1", 0)# change the value of a number input on the client
+    })
+    
+    
+    # observes the reactive value rv$resuolts and formats the results
+    # no side effects
+    # retruns res with additional column of radio buttons for display
+    # also with an URL to the module
+    output$results <- renderDataTable({
+        res <- formatResultsTable(rv$results)
+        if(is.null(res)) return(NULL)
+        catf("++ formatting results")
+        datatable(res, escape = FALSE)
+    })
+    
+    output$exportButton <- renderUI({
+        catf( "+ generating export button\n" )
+        if( !is.null(rv$results) && nrow(rv$results) > 0 ) {
+            return(tags$a(id = "export", class = "btn shiny-download-link tmodAct", href = "", target = "_blank", "⏬ Export"))
+        } else {
+            return( NULL )
+        }
+    })
+    
+    
+    # create a tagcloud button if results are generated
+    # depends on: reactive value rv$results
+    
+    
+    
+    # allows saving of the results in a csv file
+    # note that there is no error handling if no results
+    # have ben generated
+    output$export <- downloadHandler(  
+        filename=function() {
+        sprintf("results_%s_%s_%s.csv", Utest, isolate(input$mset), Sys.Date() ) 
+        },
+        content=function(file) {
+            if(!is.null(rv$results)) {
+                foo <- rv$results
+                foo$Genes <- getGenes(rv$results$ID, c(fg, bg), mset=isolate(input$mset))$Genes
+                write.csv(foo, file, row.names=FALSE)
+            }
+    })
+    
     
 }
 

@@ -9,6 +9,8 @@ addMsg <- function(message, ...) {
     catf( "MESSAGE: %s\n", message )
 }
 
+
+
 ## a function which updates the log only
 ## side effect: modify the log global variable
 addLog <- function(message, ...) {

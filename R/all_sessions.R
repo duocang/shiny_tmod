@@ -39,4 +39,26 @@ filterModulesByCategory <- function(mset, cat){
     return(mset)
 }
 
-
+stat_run <- function(data_f, test_type_f, ...){
+    if(is.null(data_f) || length(data_f) == 0){
+        print("no data yet")
+        return(NULL)
+    }
+    sort_col <- isolate(input$sort_by)
+    sort_abs <- isolate(input$abs)
+    sort_decr <- isolate(input$inc_dec)
+    geneNmae <- isolate(input$which_col_genename)
+    
+    res <- sapply(data_f, function(x){
+        x <- data.frame(x)
+        genes <- x[, geneName]
+        ord <- x[, sort_cold]
+        if(sort_abs == "YES") ord <- abs(ord)
+        ord <- order(ord, decreasing = sort_decr)
+        if(test_type_f == "tmodCERNOtest")
+            tmodeCERNOtest(genes[ord], mset=mset, qval=1)
+        else
+            tmodUtest(genes[ord], mset = mset, qval=1)
+    })
+    
+}

@@ -171,7 +171,6 @@ body <- dashboardBody(
                     ),
                     column(2, selectInput("test_type", NULL,
                                           choices = c("" ,
-                                                      "NO SELECT",
                                                       "tmodCERNOtest" = "tmodCERNOtest",
                                                       "tmodUtest" = "tmodUtest")
                                           )
@@ -199,8 +198,8 @@ body <- dashboardBody(
                     )
                 ),
                 tabsetPanel(id = "inTabset",
-                    tabPanel("heatmap-like", plotOutput("plot", height = "1200px")),
-                    tabPanel("rug-like", plotOutput("plot1", height = "1200px"))
+                    tabPanel("heatmap-like", plotOutput("plot", height = "2666px")),
+                    tabPanel("rug-like", plotOutput("plot1", height = "2666px"))
                 )
         ),
 
@@ -222,6 +221,12 @@ body <- dashboardBody(
                 )
         ),
         tabItem(tabName = "example_test",
+                fluidRow( column(12, offset=0, htmlOutput("message_example", inline=TRUE), class="tmodMsg" )),
+                fluidRow(
+                    column(3, "Module subset"),
+                    column(3, "Actions"),
+                    class="paramHeader"
+                ),
                 fluidRow(
                     column(3, 
                            selectInput( "mset", NULL,
@@ -239,10 +244,42 @@ body <- dashboardBody(
                                               ,"MSigDB Immunologic signatures (C7)"="msigC7"
                                         )
                             )
+                    ),
+                    column(3,
+                           actionButton( "submit1", label= "▶ Run tmod", class="tmodAct" ),
+                           uiOutput("tagcloudButton"),
+                           uiOutput("exportButton"),
+                           actionButton( "reset", label= "☒ Reset", class="tmodAct" )
                     )
-            )
+            ),
+            
+            # these are required for button to be reactive
+            div(id="glist", class="shiny-input-radiogroup", 
+                div(id="row", class="shiny-input-radiogroup", 
+                    
+                    # hidden buttons with value 0 
+                    div(class="hidden",
+                        HTML('<input type="radio" name="row" value="0" id="r0" /><label for="r0">Plot</label>'),
+                        HTML('<input type="radio" name="glist" value="0" id="r0" /><label for="r0">Plot</label>')
+                    ), hr(),
+                    dataTableOutput( "results" )) 
+            ),
+            
+            # plot popup panel
+            popupWindow("plotpanelW", 
+                        div(plotOutput( "evidencePlot2" ))),
+            
+            popupWindow("genelistW",  
+                        div(class="glist",
+                            p(tags$b(textOutput("genelist_title"))),
+                            p(HTML("Genes shown in <b>bold</b> are in the main data set")),
+                            p(uiOutput("genelist")))
+            ),
+            
+            popupWindow("tagcloudW",
+                        div(plotOutput( "tagcloudPlot" ), style="width:600px;height:600px;" ))
         )
-    )
+    ),class="params"
 )
 
 
