@@ -31,6 +31,28 @@ format.qval <- function( val ) {
     out
 }
 
+## format the table for attractive display
+format.table <- function( df ) {
+    csel <- grep( "qval", colnames( df ) )
+    df[ , csel ] <- apply( df[ , csel ], 2, format.qval )
+    csel <- grep( "logFC", colnames( df ) )
+    df[ , csel ] <- apply( df[ , csel ], 2, format.logfc )
+    df
+}
+
+## 
+formatTablePval <- function(df, cols) {
+    for(i in 1:50) {
+        tmp <- df[,cols,drop=FALSE]
+        sel <- tmp > 10^-i
+        tmp[sel] <- round(tmp[sel], digits=i+2)
+        df[,cols] <- tmp
+    }
+    
+    df
+}
+
+
 ## selects a category from a module set
 filterModulesByCategory <- function(mset, cat){
     mset$MODULES <- mset$MODULES[mset$MODULES$Category == cat, , drop=FALSE]
@@ -64,14 +86,75 @@ filterModulesByCategory <- function(mset, cat){
 # }
 
 # according to user's selection, specific module will be used.
-module_filter <- function(res, module_name){
-    if(module_name == "all")
-        return(res)
-    else{
-        res <- sapply(res, function(x){
-            subset(x, startsWith(x$ID, module_name))
-        }, simplify = FALSE)
+module_filter <- function(){
+    if(input$mset == ""){
+        
     }
 }
+# module_filter <- function(res, module_name){
+#     if(module_name == "all")
+#         return(res)
+#     else{
+#         res <- sapply(res, function(x){
+#             subset(x, startsWith(x$ID, module_name))
+#         }, simplify = FALSE)
+#     }
+# }
 
 
+## read genes from a file object returned by input[[]]
+## or from filename
+read.genes <- function( filename=NULL, output=NULL){
+    if(is.null(filename)) return(NULL)
+    
+    catf("Reading genes from %s...", filename)
+    
+    l <- read.csv(filename, stringsAsFactors = FALSE, header=FALSE)[,1]
+    catf("%d genes read\n", length(l))
+    
+    if(!is.null(output)){
+        output$message <- renderText(sprintf("Read %d genesd", length(l)))
+    }
+    return(l)
+}
+
+## calls tmod and runs the apropriate statistical test
+run.stats <- function(fg, Utest="utest", ...){
+    if(Utest == "cerno"){
+        catf("running tmodCERNOtest\n")
+        res <- tmodCERNOtest(fg, ...)
+    }else{
+        catf("running tmodUtest\n")
+        res <- tmodUtest(fg, ...)
+    }
+    res
+}
+
+## Prepare the result table from tmod for output in shiny
+## Add action buttons, format URLs, remove unnecessary columns 
+formatResultsTable <- function(res) {
+    
+    if(is.null(res)) return(NULL)
+    if(nrow(res) == 0) return(NULL)
+    res$cerno <- NULL
+    res$cES <- NULL
+    res <- formatTablePval(res, c( "P.Value", "adj.P.Val") )
+    if(!is.null(res$AUC)) res$AUC <- round(res$AUC, digits=2)
+    if(!is.null(res$E))   res$E <- round(res$E, digits=2)
+    
+    # need this for MSigDB names
+    res$Title <- gsub( "_", " ", res$Title)
+    
+    nn <- 1:nrow(res)
+    buttons <- paste0(
+        sprintf( '<input type="radio" name="row"   id="r%d" value="%d" /><label for="r%d">Plot</label>&nbsp;', nn, nn, nn),
+        sprintf( '<input type="radio" name="glist" id="l%d" value="%d" /><label for="l%d">List</label>', nn, nn, nn))
+    
+    if(!is.null(res$URL)) {
+        res$Title <- paste0( '<a href="', res$URL, '" target="_blank">', res$Title, '</a>' )
+        res$URL <- NULL
+    }
+    
+    res <- cbind(Action=buttons, res)
+    res
+}

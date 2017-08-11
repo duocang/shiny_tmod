@@ -5,9 +5,10 @@ library(tmod)
 library(shinyjs)
 library(markdown)
 library(tagcloud)
+library(DT)
 
 
-source("R/all_sessions.R")
+
 data(tmod)
 mset <- tmod
 load("data/annotObject.RData")
@@ -21,7 +22,6 @@ function(input, output, session) {
     
     # global variables holding the state of the statistical tests
     fg           <- NULL
-    bg           <- NULL
     Utest        <- "hg"
     example      <- FALSE
     log          <- ""
@@ -34,13 +34,14 @@ function(input, output, session) {
     
     si <- sessionInfo()
     # load the code
+    source("R/all_sessions.R")
     source("R/data_loading.R", local=TRUE)
     source("R/visualizations.R", local=TRUE)
     source("R/helpers.R", local = TRUE)
     
     # this variable will be used for keeping file data
     loaded_data <- reactiveVal(value=NULL)
-
+    
     print("I was called")
     
     # dispaly choosebox for which file to preview
@@ -66,12 +67,12 @@ function(input, output, session) {
         selectInput("which_col_genename", "Select genename column", 
                     choices = c("-----------------", common_columns()))
     })
- 
+    
     # this will show the table of file in page
     output$table = DT::renderDataTable( preview_8_lines(),
                                         options=list(scrollX=TRUE)
     )
- 
+    
     # this function will show first 8 rows of selected file to preview
     preview_8_lines <- reactive({
         tryCatch({
@@ -111,16 +112,16 @@ function(input, output, session) {
             # User has not uploaded files yet
         } else {
             data <- lapply(infile, 
-           function(x) {
-               fread(x, header = TRUE, stringsAsFactors = FALSE) 
-            })
-        loaded_data(data) # load file data into global variable loaded_dtat, which is a reactive value
-        print("data loaded")
-    }
-    data
+                           function(x) {
+                               fread(x, header = TRUE, stringsAsFactors = FALSE) 
+                           })
+            loaded_data(data) # load file data into global variable loaded_dtat, which is a reactive value
+            print("data loaded")
+        }
+        data
     })
     
-
+    
     
     # below will do many things:
     # 1. sort data by selected column
@@ -131,39 +132,33 @@ function(input, output, session) {
         input$run
         dat <- isolate(loaded_data())
         if(is.null(dat) || length(dat)==0) {
-          print("no data yet")
-          return(NULL)
+            print("no data yet")
+            return(NULL)
         }
         sort_col <- isolate(input$sort_by)# isolate() is used, we donot want to rerun this code block every time, 
         sort_abs <- isolate(input$abs)    # when we change sorting column or othre choices
         sort_decr <- isolate(input$inc_dec)
         geneName <- isolate(input$which_col_genename)
-        print("查看哪一种test")
-        print(input$test_type)
-        if(input$test_type == "tmodCERNOtest"){
-            print("这是一个类型")
-            print("tmodCERNOtest")
+        if(isolate(input$test_type) == "tmodCERNOtest"){
             res <- sapply(dat, function(x) {
                 x <- data.frame(x)
                 genes <- x[ , geneName ]
                 ord   <- x[ , sort_col ]
                 if(sort_abs == "YES") ord <- abs(ord)
                 ord <- order(ord, decreasing=sort_decr)
-
-                tmodCERNOtest(genes[ord], mset=mset, qval=1)
+                tmodCERNOtest(genes[ord], mset=isolate(getMset()), qval=1)
+                
             }, simplify=FALSE
             )
         }else{
-            print("这是一个类型")
-            print("tmodUtest")
             res <- sapply(dat, function(x) {
                 x <- data.frame(x)
                 genes <- x[ , geneName ]
                 ord   <- x[ , sort_col ]
                 if(sort_abs == "YES") ord <- abs(ord)
                 ord <- order(ord, decreasing=sort_decr)
-
-                tmodUtest(genes[ord], mset=mset, qval=1)
+                
+                tmodUtest(genes[ord], mset=isolate(getMset()), qval=1)
             }, simplify=FALSE
             )
         }
@@ -186,12 +181,18 @@ function(input, output, session) {
         # }, simplify=FALSE
         # )
         if(is.null(names(res))) names(res) <- input$files$name
-        res <- module_filter(res, input$mset)
-        # res <- sapply(res, function(x){
-        #     subset(x, startsWith(x$ID, "LI"))
-        #     # x[startsWith(x$ID, "LI"), ]
-        # }, simplify = FALSE)
-        print(head(res[1]))
+        # res <- module_filter(res, isolate(input$gene_module))
+        # print(head(res[1]))
+        # sapply(res, function(x){
+        #     if(nrow(x) == 0){
+        #         addMsg(
+        #             sprintf("There is no moudle named %s!", 
+        #                     isolate(input$gene_module)
+        #             )
+        #         )
+        #         return(NULL)
+        #     }
+        # })
         return(res)
     })
     
@@ -224,23 +225,23 @@ function(input, output, session) {
         )
         return(pie)
     })
-
+    
     output$plot <- renderPlot({
         input$run
         if(input$run == 0){
             return(NULL)
         }
-        if((input$sort_by != "") && (input$inc_dec != "") && (input$abs != "") && (input$test_type != "")){
+        if((isolate(input$sort_by) != "") && (isolate(input$inc_dec) != "") 
+           && (isolate(input$abs) != "") && (isolate(input$test_type) != "")){
+            
             withProgress(message = 'Making plot', value = 0, {
                 n <- 10
                 # Number of times we'll go through the loop
                 for (i in 1:n) {
                     # Each time through the loop, add another row of data. This is
                     # a stand-in for a long-running computation.
-                    
                     # Increment the progress bar, and update the detail text.
                     incProgress(1/n, detail = paste("Doing part", i))
-                    
                     # Pause for 0.1 seconds to simulate a long computation.
                     Sys.sleep(0.1)
                 }
@@ -288,6 +289,21 @@ function(input, output, session) {
                     Sys.sleep(0.1)
                 }
                 res <- isolate(stat_test())
+                
+                
+                sapply(res, function(x){
+                    if(nrow(x) == 0){
+                        addMsg(
+                            sprintf("There is no moudle named %s!", 
+                                    isolate(input$gene_module)
+                            )
+                        )
+                        return(NULL)
+                    }
+                })
+                
+                
+                
                 pie <- isolate(stat_test1())
                 names(pie) <- names(res)
                 if(!is.null(res))
@@ -320,17 +336,17 @@ function(input, output, session) {
     })
     
     # 以下的内容将会实现january此前tmod enrichment tool 中的功能
-
+    
     # "2017-08-07 10:05:28: Running tmod in version 0.31" is printed in tab "Logs"
-    addLog("Running tmod in version %s", si$otherPkgs$tmod$Version)
+    addLog("Run tmod in version %s", si$otherPkgs$tmod$Version)
     
     # when we click "Plot heatmap-like", it shows message on the page
     observeEvent(input$run,{
         if((input$sort_by != "") && (input$inc_dec != "") && (input$abs != "") && (input$test_type != "")){
             addMsg(
-                sprintf("Running test %s whith mset=%s, pleast wait", 
+                sprintf("Run test %s whith mset=%s, pleast wait", 
                         isolate(input$test_type),
-                        isolate(input$mset)))
+                        isolate(input$gene_module)))
         }else{
             addMsg(" Attention! Please, make sure all parameters are set!")
         }
@@ -340,7 +356,7 @@ function(input, output, session) {
     observeEvent(input$run1,{
         if((input$sort_by != "") && (input$inc_dec != "") && (input$abs != "") && (input$test_type != "")){
             addMsg(
-                sprintf("Running test %s whith mset=%s, pleast wait", 
+                sprintf("Run test %s whith mset=%s, pleast wait", 
                         isolate(input$test_type),
                         isolate(input$mset)))
         }else{
@@ -353,7 +369,7 @@ function(input, output, session) {
         updateTabsetPanel(session, "inTabset",
                           selected = "rug-like")
     })
-        
+    
     # When "headmap-like plot" is clicked, it will show heatmap-like tab
     observeEvent(input$run,{
         updateTabsetPanel(session, "inTabset",
@@ -365,6 +381,35 @@ function(input, output, session) {
         if(input$example != "empty")
             menuSubItem("Example tests", tabName = "example_test")
     })
+    
+    
+    observe({
+        if(input$example == "exempty")
+            return(NULL)
+        mset <- getMset()
+        isolate(load.example())
+        
+        if(is.null(fg)){
+            print("no example data is uploaded")
+            addMsg("Please, select example data")
+            return(NULL)
+        }
+        rv$results <- run.stats(fg, Utest, mset=mset)
+    })
+    
+    output$results <- renderDataTable({
+        res <- formatResultsTable(rv$results)
+        if(is.null(res)) return(NULL)
+        datatable(res, escape =FALSE)
+    })
+    
+    observeEvent(input$example,{
+        shinyjs::disable("sort_by")
+        shinyjs::disable("inc_dec")
+        shinyjs::disable("abs")
+        
+    })
+    
 }
 
 

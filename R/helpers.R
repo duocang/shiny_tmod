@@ -21,14 +21,16 @@ addLog <- function(message, ...) {
     catf( "MESSAGE: %s\n", message )
 }
 
-## create the mset parameter for the tmod test functions
-## depends on: input$mset
+
 getMset <- reactive({
-    mset <- input$mset
+    print("调用了gertMset()")
+    mset <- input$gene_module
     foo <- substr(mset, 1, 4)
     if(foo == "msig"){
         cat <- gsub("msig", "", mset) # gsub() function reeplaces all matches of a string..
         mset <- filterModulesByCategory(msig, cat)
     }
-    return(mset)
+    print("getmset中的mset")
+    print(mset)
+    mset
 })

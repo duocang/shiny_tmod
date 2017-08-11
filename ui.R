@@ -107,12 +107,11 @@ body <- dashboardBody(
                     ) ,
                     column(3,
                            selectInput("example", "Or use example",
-                                       list("------"="empty", 
+                                       list("------"="exempty", 
                                             "Load example for CERNO test"="cerno", 
-                                            "Load example for U test"="utest", 
-                                            "Load example for hg test"="hg",
-                                            "Reset"="reset")
-                            )
+                                            "Load example for U test"="utest"
+                                       )
+                           )
                     ),
                     column(3, 
                            uiOutput("choose_preview_file")),
@@ -134,21 +133,22 @@ body <- dashboardBody(
                 ),
                 fluidRow(
                     column(3, 
-                           selectInput( "mset", NULL,
-                                        list( ""
-                                              ,"Li et al. and B. Pulendran (LI)"="LI"
-                                              ,"Damien Chaussabel et al. (DC)"="DC"
-                                              ,"LI + DC"="all"
-                                              ,"MSigDB Hallmark gene sets"="msigH"
-                                              ,"MSigDB Positional gene sets (C1)"="msigC1"
-                                              ,"MSigDB Curated gene sets (C2)"="msigC2"
-                                              ,"MSigDB Motif gene sets (C3)"="msigC3"
-                                              ,"MSigDB Computational signatures (C4)"="msigC4"
-                                              ,"MSigDB GO gene sets (C5)"="msigC5"
-                                              ,"MSigDB Oncogenic signatures (C6)"="msigC6"
-                                              ,"MSigDB Immunologic signatures (C7)"="msigC7"
-                                        ))
-                           ),
+                           selectInput( "gene_module", NULL,
+                                        list(  "Li et al. and B. Pulendran (LI)"="LI"
+                                               ,"Damien Chaussabel et al. (DC)"="DC"
+                                               ,"LI + DC"="all"
+                                               ,"MSigDB Hallmark gene sets"="msigH"
+                                               ,"MSigDB Positional gene sets (C1)"="msigC1"
+                                               ,"MSigDB Curated gene sets (C2)"="msigC2"
+                                               ,"MSigDB Motif gene sets (C3)"="msigC3"
+                                               ,"MSigDB Computational signatures (C4)"="msigC4"
+                                               ,"MSigDB GO gene sets (C5)"="msigC5"
+                                               ,"MSigDB Oncogenic signatures (C6)"="msigC6"
+                                               ,"MSigDB Immunologic signatures (C7)"="msigC7"
+                                        ),
+                                        selected = "LI"
+                           )
+                    ),
                     column(2, selectInput("sort_by", NULL,
                                           choices = c("",
                                                       "logFC" = "logFC",
@@ -156,24 +156,29 @@ body <- dashboardBody(
                                                       "msd" = "msd",
                                                       "SE" = "SE",
                                                       "d" = "d",
-                                                      "qval" = "qval")
-                    )) ,
+                                                      "qval" = "qval"),
+                                          selected = "logFC"
+                    )
+                    ) ,
                     column(2, selectInput("inc_dec", NULL,
                                           choices = c("",
-                                                      "Increasing" = "False",
-                                                      "Decreasing" = "TRUE")
+                                                      "Increasing" = "FALSE",
+                                                      "Decreasing" = "TRUE"),
+                                          selected = "FALSE"
                     )),
                     column(1, selectInput("abs", NULL,
                                           choices = c("", 
                                                       "YES",
-                                                      "NO")
-                                          )
+                                                      "NO"),
+                                          selected = "NO"
+                    )
                     ),
                     column(2, selectInput("test_type", NULL,
                                           choices = c("" ,
                                                       "tmodCERNOtest" = "tmodCERNOtest",
-                                                      "tmodUtest" = "tmodUtest")
-                                          )
+                                                      "tmodUtest" = "tmodUtest"),
+                                          selected = "tmodUtest"
+                    )
                     ),
                     column(2, actionButton("run", "Plot heatmap-like")
                     )
@@ -198,11 +203,11 @@ body <- dashboardBody(
                     )
                 ),
                 tabsetPanel(id = "inTabset",
-                    tabPanel("heatmap-like", plotOutput("plot", height = "2666px")),
-                    tabPanel("rug-like", plotOutput("plot1", height = "2666px"))
+                            tabPanel("heatmap-like", plotOutput("plot", height = "2000px")),
+                            tabPanel("rug-like", plotOutput("plot1", height = "2000px"))
                 )
         ),
-
+        
         
         tabItem(tabName = "help",
                 includeMarkdown("md/help.md")
@@ -229,7 +234,7 @@ body <- dashboardBody(
                 ),
                 fluidRow(
                     column(3, 
-                           selectInput( "mset", NULL,
+                           selectInput( "module_set", NULL,
                                         list( ""
                                               ,"Li et al. and B. Pulendran (LI)"="LI"
                                               ,"Damien Chaussabel et al. (DC)"="DC"
@@ -243,7 +248,7 @@ body <- dashboardBody(
                                               ,"MSigDB Oncogenic signatures (C6)"="msigC6"
                                               ,"MSigDB Immunologic signatures (C7)"="msigC7"
                                         )
-                            )
+                           )
                     ),
                     column(3,
                            actionButton( "submit1", label= "▶ Run tmod", class="tmodAct" ),
@@ -251,33 +256,33 @@ body <- dashboardBody(
                            uiOutput("exportButton"),
                            actionButton( "reset", label= "☒ Reset", class="tmodAct" )
                     )
-            ),
-            
-            # these are required for button to be reactive
-            div(id="glist", class="shiny-input-radiogroup", 
-                div(id="row", class="shiny-input-radiogroup", 
-                    
-                    # hidden buttons with value 0 
-                    div(class="hidden",
-                        HTML('<input type="radio" name="row" value="0" id="r0" /><label for="r0">Plot</label>'),
-                        HTML('<input type="radio" name="glist" value="0" id="r0" /><label for="r0">Plot</label>')
-                    ), hr(),
-                    dataTableOutput( "results" )) 
-            ),
-            
-            # plot popup panel
-            popupWindow("plotpanelW", 
-                        div(plotOutput( "evidencePlot2" ))),
-            
-            popupWindow("genelistW",  
-                        div(class="glist",
-                            p(tags$b(textOutput("genelist_title"))),
-                            p(HTML("Genes shown in <b>bold</b> are in the main data set")),
-                            p(uiOutput("genelist")))
-            ),
-            
-            popupWindow("tagcloudW",
-                        div(plotOutput( "tagcloudPlot" ), style="width:600px;height:600px;" ))
+                ),
+                
+                # these are required for button to be reactive
+                div(id="glist", class="shiny-input-radiogroup", 
+                    div(id="row", class="shiny-input-radiogroup", 
+                        
+                        # hidden buttons with value 0 
+                        div(class="hidden",
+                            HTML('<input type="radio" name="row" value="0" id="r0" /><label for="r0">Plot</label>'),
+                            HTML('<input type="radio" name="glist" value="0" id="r0" /><label for="r0">Plot</label>')
+                        ), hr(),
+                        dataTableOutput( "results" )) 
+                ),
+                
+                # plot popup panel
+                popupWindow("plotpanelW", 
+                            div(plotOutput( "evidencePlot2" ))),
+                
+                popupWindow("genelistW",  
+                            div(class="glist",
+                                p(tags$b(textOutput("genelist_title"))),
+                                p(HTML("Genes shown in <b>bold</b> are in the main data set")),
+                                p(uiOutput("genelist")))
+                ),
+                
+                popupWindow("tagcloudW",
+                            div(plotOutput( "tagcloudPlot" ), style="width:600px;height:600px;" ))
         )
     ),class="params"
 )
@@ -290,5 +295,3 @@ dashboardPage(
     sidebar,
     body
 )
-
-fadsfas
