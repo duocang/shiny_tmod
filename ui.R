@@ -93,6 +93,7 @@ sidebar <- dashboardSidebar(
 )
 
 body <- dashboardBody(
+    useShinyjs(),
     # This will call message-handler.js
     tags$head(tags$script(src = "message-handler.js")),
     tabItems(

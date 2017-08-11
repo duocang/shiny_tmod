@@ -404,9 +404,20 @@ function(input, output, session) {
     })
     
     observeEvent(input$example,{
-        shinyjs::disable("sort_by")
-        shinyjs::disable("inc_dec")
-        shinyjs::disable("abs")
+        if(input$example != "exempty"){
+            shinyjs::disable("sort_by")
+            disable("inc_dec")
+            disable("abs")
+            disable("pie.pval")
+            disable("pie.lfc")
+            return()
+        }
+        enable("sort_by")
+        enable("inc_dec")
+        enable("abs")
+        enable("pie.pval")
+        enable("pie.lfc")
+
         
     })
     
