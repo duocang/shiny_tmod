@@ -203,10 +203,14 @@ body <- dashboardBody(
                     column(2, actionButton("run1", "Plot rug-like")
                     )
                 ),
-                tabsetPanel(id = "inTabset",
-                            tabPanel("heatmap-like", plotOutput("plot", height = "2000px")),
-                            tabPanel("rug-like", plotOutput("plot1", height = "2000px"))
-                )
+                uiOutput("testOrExample_result")
+                # ,
+                # tabsetPanel(id = "inTabset",
+                #             tabPanel("heatmap-like", plotOutput("plot", height = "2000px")),
+                #             tabPanel("rug-like", plotOutput("plot1", height = "2000px"))
+                # )
+                
+
         ),
         
         

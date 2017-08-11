@@ -30,8 +30,6 @@ function(input, output, session) {
     rv <- reactiveValues()
     rv$results <- NULL
     
-    
-    
     si <- sessionInfo()
     # load the code
     source("R/all_sessions.R")
@@ -42,7 +40,6 @@ function(input, output, session) {
     # this variable will be used for keeping file data
     loaded_data <- reactiveVal(value=NULL)
     
-    print("I was called")
     
     # dispaly choosebox for which file to preview
     output$choose_preview_file <- renderUI({
@@ -69,9 +66,7 @@ function(input, output, session) {
     })
     
     # this will show the table of file in page
-    output$table = DT::renderDataTable( preview_8_lines(),
-                                        options=list(scrollX=TRUE)
-    )
+    output$table = DT::renderDataTable( preview_8_lines(),options=list(scrollX=TRUE))
     
     # this function will show first 8 rows of selected file to preview
     preview_8_lines <- reactive({
@@ -98,12 +93,10 @@ function(input, output, session) {
     # print file name on sidebar
     output$upload_files <- renderTable({
         filename <- c()
-        for(i in 1:file_num()){
+        for(i in 1:file_num())
             filename <- c(filename, input$files$name[i])
-        }
         filename
-    }, colnames = FALSE
-    )
+    }, colnames = FALSE)
     
     # read data and  put into a list
     loadData <- observe({
@@ -111,17 +104,36 @@ function(input, output, session) {
         if(is.null(infile)){
             # User has not uploaded files yet
         } else {
-            data <- lapply(infile, 
-                           function(x) {
-                               fread(x, header = TRUE, stringsAsFactors = FALSE) 
-                           })
+            data <- lapply(infile, function(x) {fread(x, header = TRUE, stringsAsFactors = FALSE) })
             loaded_data(data) # load file data into global variable loaded_dtat, which is a reactive value
-            print("data loaded")
         }
         data
     })
     
     
+    
+    
+    
+    # if file(s) is/are uploaded, the test page shows with two tabs: heatmap-like and rug-like
+    # if example is used, the test page shows with three tabs: table, heatmap-like and rug-like
+    output$testOrExample_result <- renderUI({
+        if(input$example == "exempty"){
+            print("两个tab")
+            tabsetPanel(id = "inTabset",
+                        tabPanel("heatmap-like", plotOutput("plot0", height = "2000px")),
+                        tabPanel("rug-like", plotOutput("plot01", height = "2000px"))
+            )
+        }else{
+            print("三个tab")
+            tabsetPanel(id = "inTabset",
+                        tabPanel("table", dataTableOutput( "example_results" )),
+                        tabPanel("heatmap-like", plotOutput("plot", height = "2000px")),
+                        tabPanel("rug-like", plotOutput("plot1", height = "2000px"))
+            )
+        }
+    })
+    
+
     
     # below will do many things:
     # 1. sort data by selected column
@@ -226,7 +238,7 @@ function(input, output, session) {
         return(pie)
     })
     
-    output$plot <- renderPlot({
+    output$plot0 <- renderPlot({
         input$run
         if(input$run == 0){
             return(NULL)
@@ -270,7 +282,7 @@ function(input, output, session) {
     }, bg="transparent")
     
     
-    output$plot1 <- renderPlot({
+    output$plot01 <- renderPlot({
         input$run1
         if(input$run1 == 0){
             return(NULL)
@@ -317,10 +329,8 @@ function(input, output, session) {
         if(input$run == 0){
             return(NULL)
         }
-        
         if(is.null(input$which_col_genename))
             return(NULL)
-        
         if(input$which_col_genename == "-----------------"){
             session$sendCustomMessage(type = "alert_message",
                                       message = 'Please select gene cloumn!')
@@ -335,7 +345,6 @@ function(input, output, session) {
         }
     })
     
-    # 以下的内容将会实现january此前tmod enrichment tool 中的功能
     
     # "2017-08-07 10:05:28: Running tmod in version 0.31" is printed in tab "Logs"
     addLog("Run tmod in version %s", si$otherPkgs$tmod$Version)
@@ -382,6 +391,8 @@ function(input, output, session) {
             menuSubItem("Example tests", tabName = "example_test")
     })
     
+    # an example is selected, corresponding test will runn 
+    # and result will be given to rv$results
     
     observe({
         if(input$example == "exempty")
@@ -397,12 +408,14 @@ function(input, output, session) {
         rv$results <- run.stats(fg, Utest, mset=mset)
     })
     
-    output$results <- renderDataTable({
+    output$example_results <- renderDataTable({
         res <- formatResultsTable(rv$results)
         if(is.null(res)) return(NULL)
         datatable(res, escape =FALSE)
     })
     
+    
+    # when example is useed, disable some selection boxes
     observeEvent(input$example,{
         if(input$example != "exempty"){
             shinyjs::disable("sort_by")
@@ -417,9 +430,9 @@ function(input, output, session) {
         enable("abs")
         enable("pie.pval")
         enable("pie.lfc")
-
-        
     })
+    
+    
     
 }
 
