@@ -126,7 +126,34 @@ function(input, output, session) {
         }else{
             print("三个tab")
             tabsetPanel(id = "inTabset",
-                        tabPanel("table", dataTableOutput( "example_results" )),
+                        #tabPanel("table", dataTableOutput( "example_results" )),
+                        tabPanel("table", 
+                                 div(id="glist", class="shiny-input-radiogroup",
+                                     div(id="row", class="shiny-input-radigoroup",
+                                         div(class="hidden",
+                                             HTML('<input type="radio" name="row" value="0" id="r0" /><label for="r0">Plot</label>'),
+                                             HTML('<input type="radio" name="glist" value="0" id="r0" /><label for="r0">Plot</label>')
+                                         ), 
+                                         hr(),
+                                         print("这个不灵"), 
+                                         
+                                         HTML('<input type="radio" name="row" value="1" id="r0" /><label for="r0">Plot</label>'),
+                                         HTML('<input type="radio" name="glist" value="0" id="r0" /><label for="r0">Plot</label>'),
+                                         
+                                         dataTableOutput("example_results")
+                                     )
+                                 )
+                                 # ,
+                                 # popupWindow("plotpanelW", 
+                                 #             div(plotOutput( "evidencePlot2" ))),
+                                 # 
+                                 # popupWindow("genelistW",  
+                                 #             div(class="glist",
+                                 #                 p(tags$b(textOutput("genelist_title"))),
+                                 #                 p(HTML("Genes shown in <b>bold</b> are in the main data set")),
+                                 #                 p(uiOutput("genelist")))
+                                 # )
+                        ),
                         tabPanel("heatmap-like", plotOutput("plot", height = "2000px")),
                         tabPanel("rug-like", plotOutput("plot1", height = "2000px"))
             )
@@ -174,37 +201,7 @@ function(input, output, session) {
             }, simplify=FALSE
             )
         }
-        # res <- sapply(dat, function(x) {
-        #     x <- data.frame(x)
-        #     genes <- x[ , geneName ]
-        #     ord   <- x[ , sort_col ]
-        #     if(sort_abs == "YES") ord <- abs(ord)
-        #     ord <- order(ord, decreasing=sort_decr)
-        #     if(input$test_type == "tmodCERNOtest"){
-        #         print("这是一个类型")
-        #         print("tmodCERNOtest")
-        #         tmodCERNOtest(genes[ord], mset=mset, qval=1)
-        #     }
-        #     if(input$test_type == " tmodUtest"){
-        #         print("这是一个类型")
-        #         print("tmodUtest")
-        #         tmodUtest(genes[ord], mset=mset, qval=1)
-        #     }
-        # }, simplify=FALSE
-        # )
         if(is.null(names(res))) names(res) <- input$files$name
-        # res <- module_filter(res, isolate(input$gene_module))
-        # print(head(res[1]))
-        # sapply(res, function(x){
-        #     if(nrow(x) == 0){
-        #         addMsg(
-        #             sprintf("There is no moudle named %s!", 
-        #                     isolate(input$gene_module)
-        #             )
-        #         )
-        #         return(NULL)
-        #     }
-        # })
         return(res)
     })
     
@@ -284,9 +281,8 @@ function(input, output, session) {
     
     output$plot01 <- renderPlot({
         input$run1
-        if(input$run1 == 0){
+        if(input$run1 == 0)
             return(NULL)
-        }
         if((input$sort_by != "") && (input$inc_dec != "") && (input$abs != "") && (input$test_type != "")){
             withProgress(message = 'Making plot', value = 0, {
                 n <- 10
@@ -294,14 +290,12 @@ function(input, output, session) {
                 for (i in 1:n) {
                     # Each time through the loop, add another row of data. This is
                     # a stand-in for a long-running computation.
-                    
                     # Increment the progress bar, and update the detail text.
                     incProgress(1/n, detail = paste("Doing part", i))
                     # Pause for 0.1 seconds to simulate a long computation.
                     Sys.sleep(0.1)
                 }
                 res <- isolate(stat_test())
-                
                 
                 sapply(res, function(x){
                     if(nrow(x) == 0){
@@ -313,8 +307,6 @@ function(input, output, session) {
                         return(NULL)
                     }
                 })
-                
-                
                 
                 pie <- isolate(stat_test1())
                 names(pie) <- names(res)
@@ -368,9 +360,8 @@ function(input, output, session) {
                 sprintf("Run test %s whith mset=%s, pleast wait", 
                         isolate(input$test_type),
                         isolate(input$mset)))
-        }else{
+        }else
             addMsg(" Attention! Please, make sure all parameters are set!")
-        }
     })
     
     # When "rug-like plot" is clicked, it will show rug-like tab
@@ -393,7 +384,6 @@ function(input, output, session) {
     
     # an example is selected, corresponding test will runn 
     # and result will be given to rv$results
-    
     observe({
         if(input$example == "exempty")
             return(NULL)
@@ -431,9 +421,6 @@ function(input, output, session) {
         enable("pie.pval")
         enable("pie.lfc")
     })
-    
-    
-    
 }
 
 

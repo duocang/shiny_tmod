@@ -146,8 +146,9 @@ formatResultsTable <- function(res) {
     res$Title <- gsub( "_", " ", res$Title)
     
     nn <- 1:nrow(res)
+    # it includes two button in table
     buttons <- paste0(
-        sprintf( '<input type="radio" name="row"   id="r%d" value="%d" /><label for="r%d">Plot</label>&nbsp;', nn, nn, nn),
+        sprintf( '<input type="radio" name="row"   id="r%d" value="%d" /><label for="r%d">Plot天亮了</label>&nbsp;', nn, nn, nn),
         sprintf( '<input type="radio" name="glist" id="l%d" value="%d" /><label for="l%d">List</label>', nn, nn, nn))
     
     if(!is.null(res$URL)) {
