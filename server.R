@@ -128,25 +128,23 @@ function(input, output, session) {
             tabsetPanel(id = "inTabset",
                         #tabPanel("table", dataTableOutput( "example_results" )),
                         tabPanel("table", 
-                                 div(id="glist", class="shiny-input-radiogroup",
-                                     div(id="row", class="shiny-input-radigoroup",
+                                 HTML('<input type="radio" name="row" value="0" id="r0" /><label for="r0">Plot</label>'),
+                                 HTML('<input type="radio" name="glist" value="0" id="r0" /><label for="r0">Plot</label>'),
+                                 
+                                 # these are required for button to be reactive
+                                 div(id="glist", class="shiny-input-radiogroup", 
+                                     div(id="row", class="shiny-input-radiogroup", 
+                                         
+                                         # hidden buttons with value 0 
                                          div(class="hidden",
                                              HTML('<input type="radio" name="row" value="0" id="r0" /><label for="r0">Plot</label>'),
                                              HTML('<input type="radio" name="glist" value="0" id="r0" /><label for="r0">Plot</label>')
-                                         ), 
-                                         hr(),
-                                         print("这个不灵"), 
-                                         
-                                         HTML('<input type="radio" name="row" value="1" id="r0" /><label for="r0">Plot</label>'),
-                                         HTML('<input type="radio" name="glist" value="0" id="r0" /><label for="r0">Plot</label>'),
-                                         
-                                         dataTableOutput("example_results")
-                                     )
-                                 )
-                                 # ,
-                                 # popupWindow("plotpanelW", 
-                                 #             div(plotOutput( "evidencePlot2" ))),
-                                 # 
+                                         ), hr(),
+                                         dataTableOutput( "example_results" )) 
+                                 ),
+                                 popupWindow("plotpanelW",
+                                             div(plotOutput( "evidencePlot2" )))
+
                                  # popupWindow("genelistW",  
                                  #             div(class="glist",
                                  #                 p(tags$b(textOutput("genelist_title"))),

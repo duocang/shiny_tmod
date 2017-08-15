@@ -23,19 +23,22 @@ popupWindow <- function(varname, contents) {
 ## depends on: input$row
 ## side effect: modifies the input value for showplotpanel
 ## -------------------------------------------------------------------
-# observe({
-#     if(is.null(input$row) || input$row == 0)
-#         return(NULL)
-#     no <- as.numeric(isolate(input$row))
-#     mset <- isolate(getMset())
-#     # first, create ghe graphics
-#     output$evidencePlot2 <- renderPlot({
-#         catf("making evidence plot with %d genes and ID=%s(%d)\n", length(fg), rv$results$ID[no], no)
-#         evidencePlot(fg, rv$results$ID[no], mset=mset)
-#     }, width=600, height400)
-#     # second, make it visible by changing variable showplotpanel
-#     updateTextInput(seesion, "show_plotpanelW", value=1) # show_plotpanleW gets by var show 
-# })
+observe({
+    print("打印input$row")
+    print(input$row)
+    print(input$glist)
+    if(is.null(input$row) || input$row == 0)
+        return(NULL)
+    no <- as.numeric(isolate(input$row))
+    mset <- isolate(getMset())
+    # first, create ghe graphics
+    output$evidencePlot2 <- renderPlot({
+        catf("making evidence plot with %d genes and ID=%s(%d)\n", length(fg), rv$results$ID[no], no)
+        evidencePlot(fg, rv$results$ID[no], mset=mset)
+    }, width=600, height=400)
+    # second, make it visible by changing variable showplotpanel
+    # updateTextInput(seesion, "show_plotpanelW", value=1) # show_plotpanleW gets by var show
+})
 # 
 # ## hide the plot panel if dismissPlot2 is clicked
 # ## also, the value for the radio buttons is set to the hidden radio button
