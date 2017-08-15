@@ -72,7 +72,8 @@ sidebar <- dashboardSidebar(
         menuItem("Gallery", tabName = "gallery", icon = icon("file-picture-o"),startExpanded = FALSE
         ),
         menuItem("Logs", tabName = "logs", icon = icon("info"), startExpanded = FALSE
-        )
+        ),
+        menuItem("DelLater", tabName = "del")
     )
 )
 
@@ -284,6 +285,9 @@ body <- dashboardBody(
         #         popupWindow("tagcloudW",
         #                     div(plotOutput( "tagcloudPlot" ), style="width:600px;height:600px;" ))
         # )
+        ,
+        tabItem(tabName = "delLater",
+                )
     ),class="params"
 )
 

@@ -160,7 +160,7 @@ function(input, output, session) {
         }
     })
     
-
+    
     
     # below will do many things:
     # 1. sort data by selected column
@@ -422,5 +422,3 @@ function(input, output, session) {
         enable("pie.lfc")
     })
 }
-
-
