@@ -110,10 +110,6 @@ function(input, output, session) {
         data
     })
     
-    
-    
-    
-    
     # if file(s) is/are uploaded, the test page shows with two tabs: heatmap-like and rug-like
     # if example is used, the test page shows with three tabs: table, heatmap-like and rug-like
     output$testOrExample_result <- renderUI({
@@ -121,8 +117,7 @@ function(input, output, session) {
             print("两个tab")
             tabsetPanel(id = "inTabset",
                         tabPanel("heatmap-like", plotOutput("plot0", height = "2000px")),
-                        tabPanel("rug-like", plotOutput("plot01", height = "2000px"))
-            )
+                        tabPanel("rug-like", plotOutput("plot01", height = "2000px")))
         }else{
             print("三个tab")
             tabsetPanel(id = "inTabset",
@@ -130,7 +125,6 @@ function(input, output, session) {
                         tabPanel("table", 
                                  HTML('<input type="radio" name="row" value="0" id="r0" /><label for="r0">Plot</label>'),
                                  HTML('<input type="radio" name="glist" value="0" id="r0" /><label for="r0">Plot</label>'),
-                                 
                                  # these are required for button to be reactive
                                  div(id="glist", class="shiny-input-radiogroup", 
                                      div(id="row", class="shiny-input-radiogroup", 
@@ -140,25 +134,20 @@ function(input, output, session) {
                                              HTML('<input type="radio" name="row" value="0" id="r0" /><label for="r0">Plot</label>'),
                                              HTML('<input type="radio" name="glist" value="0" id="r0" /><label for="r0">Plot</label>')
                                          ), hr(),
-                                         dataTableOutput( "example_results" )) 
-                                 ),
+                                         dataTableOutput( "example_results" )) ),
                                  popupWindow("plotpanelW",
-                                             div(plotOutput( "evidencePlot2" )))
+                                             div(plotOutput( "evidencePlot2" ))),
 
-                                 # popupWindow("genelistW",  
-                                 #             div(class="glist",
-                                 #                 p(tags$b(textOutput("genelist_title"))),
-                                 #                 p(HTML("Genes shown in <b>bold</b> are in the main data set")),
-                                 #                 p(uiOutput("genelist")))
-                                 # )
-                        ),
+                                 popupWindow("genelistW",
+                                             div(class="glist",
+                                                 p(tags$b(textOutput("genelist_title"))),
+                                                 p(HTML("Genes shown in <b>bold</b> are in the main data set")),
+                                                 p(uiOutput("genelist"))))),
                         tabPanel("heatmap-like", plotOutput("plot", height = "2000px")),
-                        tabPanel("rug-like", plotOutput("plot1", height = "2000px"))
-            )
+                        tabPanel("rug-like", plotOutput("plot1", height = "2000px")),
+                        tabPanel("pppp", plotOutput("pppp")))
         }
     })
-    
-
     
     # below will do many things:
     # 1. sort data by selected column
@@ -185,8 +174,7 @@ function(input, output, session) {
                 ord <- order(ord, decreasing=sort_decr)
                 tmodCERNOtest(genes[ord], mset=isolate(getMset()), qval=1)
                 
-            }, simplify=FALSE
-            )
+            }, simplify=FALSE)
         }else{
             res <- sapply(dat, function(x) {
                 x <- data.frame(x)
@@ -196,8 +184,7 @@ function(input, output, session) {
                 ord <- order(ord, decreasing=sort_decr)
                 
                 tmodUtest(genes[ord], mset=isolate(getMset()), qval=1)
-            }, simplify=FALSE
-            )
+            }, simplify=FALSE)
         }
         if(is.null(names(res))) names(res) <- input$files$name
         return(res)
@@ -220,7 +207,6 @@ function(input, output, session) {
         geneName <- isolate(input$which_col_genename)
         gene <- dat[[1]][, geneName, with=FALSE]
         
-        
         ddd <- data.frame(dat[[1]])
         gg <- ddd[[geneName]]
         pie <- tmodDecideTests(g=gg,
@@ -228,16 +214,14 @@ function(input, output, session) {
                                pval=pvals,
                                lfc.thr=isolate(input$pie.lfc),
                                pval.thr=isolate(input$pie.pval),
-                               mset=mset
-        )
+                               mset=mset)
         return(pie)
     })
     
     output$plot0 <- renderPlot({
         input$run
-        if(input$run == 0){
+        if(input$run == 0)
             return(NULL)
-        }
         if((isolate(input$sort_by) != "") && (isolate(input$inc_dec) != "") 
            && (isolate(input$abs) != "") && (isolate(input$test_type) != "")){
             
@@ -298,10 +282,7 @@ function(input, output, session) {
                 sapply(res, function(x){
                     if(nrow(x) == 0){
                         addMsg(
-                            sprintf("There is no moudle named %s!", 
-                                    isolate(input$gene_module)
-                            )
-                        )
+                            sprintf("There is no moudle named %s!", isolate(input$gene_module)))
                         return(NULL)
                     }
                 })
@@ -329,10 +310,9 @@ function(input, output, session) {
     
     observeEvent(input$which_preview_file,{
         Sys.sleep(0.5)
-        if(file_num() != 0){
+        if(file_num() != 0)
             session$sendCustomMessage(type = "alert_message",
                                       message = "Please select gene cloumn!")
-        }
     })
     
     

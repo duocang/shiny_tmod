@@ -30,10 +30,22 @@ observe({
     if(is.null(input$row) || input$row == 0)
         return(NULL)
     no <- as.numeric(isolate(input$row))
+    print("打印no的值")
+    print(no)
     mset <- isolate(getMset())
+    print("打印mset")
+    print(mset)
+    print("打印fg")
+    print(head(fg))
+    print("打印rv$results$ID")
+    print(rv$results$ID)
     # first, create ghe graphics
-    output$evidencePlot2 <- renderPlot({
+    output$pppp <- renderPlot({
         catf("making evidence plot with %d genes and ID=%s(%d)\n", length(fg), rv$results$ID[no], no)
+        evidencePlot(fg, rv$results$ID[no], mset=mset)
+    }, width=600, height=400)
+    output$evidencePlot2 <- renderPlot({
+        catf("这一部分似乎没有工作")
         evidencePlot(fg, rv$results$ID[no], mset=mset)
     }, width=600, height=400)
     # second, make it visible by changing variable showplotpanel
