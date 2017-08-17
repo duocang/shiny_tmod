@@ -113,7 +113,6 @@ formatResultsTable <- function(res) {
     res$Title <- gsub( "_", " ", res$Title)
     
     nn <- 1:nrow(res)
-    print(nn)
     # it includes two button in table
     buttons <- paste0(
         sprintf( '<input type="radio" name="row"   id="r%d" value="%d" /><label for="r%d">Plot天亮了</label>&nbsp;', nn, nn, nn),

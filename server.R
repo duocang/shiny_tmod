@@ -130,20 +130,18 @@ function(input, output, session) {
                                          # hidden buttons with value 0 
                                          div(class="hidden",
                                              HTML('<input type="radio" name="row" value="0" id="r0" /><label for="r0">Plot</label>'),
-                                             HTML('<input type="radio" name="glist" value="0" id="r0" /><label for="r0">Plot</label>')
-                                         ), hr(),
-                                         dataTableOutput( "example_results" )) ),
+                                             HTML('<input type="radio" name="glist" value="0" id="r0" /><label for="r0">Plot</label>')), 
+                                         hr(),
+                                         dataTableOutput( "example_results" ))),
                                  # plot popup panel
                                  popupWindow("plotpanelW", 
-                                             div(plotOutput( "evidencePlot2" ))),
+                                             div(plotOutput("evidencePlot2"))),
                                  
                                  popupWindow("genelistW",  
                                              div(class="glist",
                                                  p(tags$b(textOutput("genelist_title"))),
                                                  p(HTML("Genes shown in <b>bold</b> are in the main data set")),
-                                                 p(uiOutput("genelist")))
-                                             
-                                 )),
+                                                 p(uiOutput("genelist"))))),
                         tabPanel("heatmap-like", plotOutput("plot", height = "2000px")),
                         tabPanel("rug-like", plotOutput("plot1", height = "2000px")))
         }
