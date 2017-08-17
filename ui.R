@@ -72,7 +72,8 @@ sidebar <- dashboardSidebar(
         menuItem("Gallery", tabName = "gallery", icon = icon("file-picture-o"),startExpanded = FALSE
         ),
         menuItem("Logs", tabName = "logs", icon = icon("info"), startExpanded = FALSE
-        )
+        ),
+        menuItem("DelLater", tabName = "del")
     )
 )
 
@@ -196,7 +197,9 @@ body <- dashboardBody(
         tabItem(tabName = "logs",
                 fluidRow(
                     column(10, htmlOutput( "messageLog"), br()) )
-        )
+        ),
+        tabItem(tabName = "delLater", "pppp"
+                )
     ),class="params"
 )
 

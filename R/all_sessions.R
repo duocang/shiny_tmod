@@ -113,16 +113,16 @@ formatResultsTable <- function(res) {
     res$Title <- gsub( "_", " ", res$Title)
     
     nn <- 1:nrow(res)
+    print(nn)
     # it includes two button in table
     buttons <- paste0(
         sprintf( '<input type="radio" name="row"   id="r%d" value="%d" /><label for="r%d">Plot天亮了</label>&nbsp;', nn, nn, nn),
-        sprintf( '<input type="radio" name="glist" id="l%d" value="%d" /><label for="l%d">List</label>', nn, nn, nn))
-    
+        sprintf( '<input type="radio" name="glist" id="l%d" value="%d" /><label for="l%d">List天黑了</label>', nn, nn, nn))
     if(!is.null(res$URL)) {
         res$Title <- paste0( '<a href="', res$URL, '" target="_blank">', res$Title, '</a>' )
         res$URL <- NULL
     }
-    
+
     res <- cbind(Action=buttons, res)
     res
 }
