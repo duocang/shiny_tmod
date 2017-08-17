@@ -3,8 +3,12 @@ popupWindow <- function(varname, contents) {
     show    <- paste0( "show_", varname)
     dismiss <- paste0( "dismiss_", varname)
     
+    print("popupWindow是否在运行")
+    print(show)
+    print(dismiss)
+    
     conditionalPanel(
-        condition=sprintf('input.%s == 1', show),# condition is a javascript expression that will be evaluated 
+        condition=sprintf('input.%s == 1', show),# condition is a javascript expression that will be evaluated repeatedly
         
         # variable to keep track of showing the overlay
         div(style="display:none;", textInput(show, "", 0)),
@@ -12,10 +16,7 @@ popupWindow <- function(varname, contents) {
         div(class="overlay", draggable="true",
             p(actionButton(dismiss, label="Dismiss [X]" )), contents)
     )
-    
-    print("popupWindow是否在运行")
-    print(show)
-    print(dismiss)
+
 }
 
 ## -------------------------------------------------------------------
@@ -38,13 +39,14 @@ observe({
     print("打印fg")
     print(head(fg))
     print("打印rv$results$ID")
-    print(rv$results$ID)
+    print(head(rv$results$ID))
     # first, create ghe graphics
     output$pppp <- renderPlot({
         catf("making evidence plot with %d genes and ID=%s(%d)\n", length(fg), rv$results$ID[no], no)
         evidencePlot(fg, rv$results$ID[no], mset=mset)
     }, width=600, height=400)
     output$evidencePlot2 <- renderPlot({
+        print("这一部分似乎没有工作")
         catf("这一部分似乎没有工作")
         evidencePlot(fg, rv$results$ID[no], mset=mset)
     }, width=600, height=400)
