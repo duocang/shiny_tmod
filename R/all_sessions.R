@@ -62,11 +62,19 @@ filterModulesByCategory <- function(mset, cat){
 }
 
 
-# according to user's selection, specific module will be used.
-module_filter <- function(){
-    if(input$mset == ""){
-        
+## get the actual mset as list
+## if it is the original tmod, it returns a list with tmod objects
+getMsetReal <- function(mset){
+    if(is(mset, "list"))
+        return(mset)
+    ret <- tmod
+    
+    if(mset != "all") {
+        ret$MODULES <- ret$MODULES[ ret$MODULES$SourceID == mset, ]
+        ret$MODULES2GENES <- ret$MODULES2GENES[ ret$MODULES$ID ]
     }
+    
+    return(ret)
 }
 
 ## read genes from a file object returned by input[[]]

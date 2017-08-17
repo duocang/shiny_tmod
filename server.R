@@ -217,82 +217,6 @@ function(input, output, session) {
         return(pie)
     })
     
-    output$plot0 <- renderPlot({
-        input$run
-        if(input$run == 0)
-            return(NULL)
-        if((isolate(input$sort_by) != "") && (isolate(input$inc_dec) != "") 
-           && (isolate(input$abs) != "") && (isolate(input$test_type) != "")){
-            
-            withProgress(message = 'Making plot', value = 0, {
-                n <- 10
-                # Number of times we'll go through the loop
-                for (i in 1:n) {
-                    # Each time through the loop, add another row of data. This is
-                    # a stand-in for a long-running computation.
-                    # Increment the progress bar, and update the detail text.
-                    incProgress(1/n, detail = paste("Doing part", i))
-                    # Pause for 0.1 seconds to simulate a long computation.
-                    Sys.sleep(0.1)
-                }
-                
-                
-                
-                plo <- stat_test()
-                if(!is.null(plo))
-                    tmodPanelPlot(plo, text.cex = 0.9, legend.style = "auto")
-                print("plot done")
-                # tryCatch({
-                #     plo <- stat_test()
-                #     if(!is.null(plo))
-                #         tmodPanelPlot(plo, text.cex = 0.9, legend.style = "auto")
-                #     print("plot done")
-                # },
-                # warning = function(w){
-                #     print("no correct gene column selected")
-                # },
-                # error = function(e){
-                #     print("gene column is selected, but it is processed by isolated() function")
-                #     return(NULL)
-                # })
-            })
-        }
-    }, bg="transparent")
-    
-    
-    output$plot01 <- renderPlot({
-        input$run1
-        if(input$run1 == 0)
-            return(NULL)
-        if((input$sort_by != "") && (input$inc_dec != "") && (input$abs != "") && (input$test_type != "")){
-            withProgress(message = 'Making plot', value = 0, {
-                n <- 10
-                # Number of times we'll go through the loop
-                for (i in 1:n) {
-                    # Each time through the loop, add another row of data. This is
-                    # a stand-in for a long-running computation.
-                    # Increment the progress bar, and update the detail text.
-                    incProgress(1/n, detail = paste("Doing part", i))
-                    # Pause for 0.1 seconds to simulate a long computation.
-                    Sys.sleep(0.1)
-                }
-                res <- isolate(stat_test())
-                
-                sapply(res, function(x){
-                    if(nrow(x) == 0){
-                        addMsg(
-                            sprintf("There is no moudle named %s!", isolate(input$gene_module)))
-                        return(NULL)
-                    }
-                })
-                
-                pie <- isolate(stat_test1())
-                names(pie) <- names(res)
-                if(!is.null(res))
-                    tmodPanelPlot(res, pie=pie, pie.style="r", grid="b", filter.rows.pval=0.001)
-            })
-        }
-    }, bg="transparent")
     
     # This will show an allert, if the user trys to run without selecting gene column
     observeEvent(input$run,{
@@ -353,11 +277,11 @@ function(input, output, session) {
                           selected = "heatmap-like")
     })
     
-    # if user wants to test with example data, a new tab will appear in sidebar
-    output$example_test <- renderMenu({
-        if(input$example != "empty")
-            menuSubItem("Example tests", tabName = "example_test")
-    })
+    # # if user wants to test with example data, a new tab will appear in sidebar
+    # output$example_test <- renderMenu({
+    #     if(input$example != "empty")
+    #         menuSubItem("Example tests", tabName = "example_test")
+    # })
     
     # an example is selected, corresponding test will runn 
     # and result will be given to rv$results
@@ -373,6 +297,7 @@ function(input, output, session) {
             return(NULL)
         }
         rv$results <- run.stats(fg, Utest, mset=mset)
+        print(rv$results)
     })
     
     output$example_results <- renderDataTable({
