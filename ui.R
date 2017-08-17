@@ -60,6 +60,7 @@ img.link <- function(file) {
 
 
 sidebar <- dashboardSidebar(
+    width = 150,
     sidebarMenu(
         menuItem("Test", tabName = "file", icon = icon("file-o"),
                  menuSubItem("Upload File(s)", tabName = "file_preview"),
@@ -81,7 +82,10 @@ sidebar <- dashboardSidebar(
 body <- dashboardBody(
     useShinyjs(),
     # This will call message-handler.js
-    tags$head(tags$script(src = "message-handler.js")),
+    tags$head(tags$script(src = "message-handler.js")
+              ,
+              tags$link(rel = "stylesheet", type = "text/css", href = "css/tmod.css")
+              ),
     tabItems(
         tabItem(tabName = "file_preview",
                 fluidRow(
@@ -159,7 +163,7 @@ body <- dashboardBody(
                                                       "tmodUtest" = "tmodUtest"),
                                           selected = "tmodUtest")
                     ),
-                    column(2, actionButton("run", "Plot heatmap-like")
+                    column(2, actionButton("run", "Plot heatmap-like", class="tmodAct")
                     )
                 ),
                 fluidRow(
@@ -178,7 +182,7 @@ body <- dashboardBody(
                                         NULL,
                                         1, min = 0, max = 5, step = 0.5)
                     ),
-                    column(2, actionButton("run1", "Plot rug-like")
+                    column(2, actionButton("run1", "Plot rug-like", class="tmodAct")
                     )
                 ),
                 uiOutput("testOrExample_result")
@@ -224,7 +228,8 @@ dashboardPage(
                                  messageItem(
                                      from = "Dr. January Weiner 3",
                                      message = "+49-30-28460514"
-                                 ))
+                                 )),
+                    titleWidth = 150
     ),
     sidebar,
     body

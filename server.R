@@ -119,7 +119,7 @@ function(input, output, session) {
             print("两个tab")
             tabsetPanel(id = "inTabset",
                         tabPanel("heatmap-like", plotOutput("plot0", height = "2000px")),
-                        tabPanel("rug-like", plotOutput("plot01", height = "2000px")))
+                        tabPanel("rug-like", plotOutput("plot01", height = "2000px"), class="ui-state-active"))
         }else{
             print("三个tab")
             tabsetPanel(id = "inTabset",
@@ -144,8 +144,8 @@ function(input, output, session) {
                                                  p(tags$b(textOutput("genelist_title"))),
                                                  p(HTML("Genes shown in <b>bold</b> are in the main data set")),
                                                  p(uiOutput("genelist"))))),
-                        tabPanel("heatmap-like", plotOutput("plot", height = "2000px")),
-                        tabPanel("rug-like", plotOutput("plot1", height = "2000px")))
+                        tabPanel("heatmap-like", plotOutput("plot0", height = "2000px")),
+                        tabPanel("rug-like", plotOutput("plot01", height = "2000px")))
         }
     })
     
@@ -302,6 +302,9 @@ function(input, output, session) {
     })
     
     output$example_results <- renderDataTable({
+        print("rv$results的数据结构")
+        print(class(rv$results))
+        print(head(rv$results))
         res <- formatResultsTable(rv$results)
         if(is.null(res)) return(NULL)
         datatable(res, escape =FALSE)
@@ -325,9 +328,17 @@ function(input, output, session) {
         enable("pie.lfc")
     })
     
+    # jsResetCode <- "shinyjs.reset = function() {history.go(0)}"
+    # useShinyjs()
+    # extendShinyjs(text = jsResetCode)
+    # # refresh page
+    # observeEvent
     
-    # refresh page
-    observeEvent(input$refresh, {
-        invalidateLater(1, session)
+    observeEvent(input$refresh,{
+        shinyjs::useShinyjs()
+        shinyjs::extendShinyjs(text = "shinyjs.refresh = function() { location.reload(); }")
+        shinyjs::js$refresh()
+        # shinyjs::useShinyjs()
+        # shinyjs::reset("form")
     })
 }

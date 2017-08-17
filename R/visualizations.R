@@ -109,8 +109,10 @@ output$plot0 <- renderPlot({
             if(!is.null(input$files) && input$example == "exempty")
                 plo <- isolate(stat_test())
             
-            print("打印plo")
-            print(plo[1])
+            if(input$example != "exempty")
+                plo <- as.list(rv$results)
+            
+            
             if(!is.null(plo))
                 tmodPanelPlot(plo, text.cex = 0.9, legend.style = "auto")
             print("plot done")
@@ -147,6 +149,7 @@ output$plot01 <- renderPlot({
                 Sys.sleep(0.1)
             }
             res <- isolate(stat_test())
+            
             
             sapply(res, function(x){
                 if(nrow(x) == 0){
