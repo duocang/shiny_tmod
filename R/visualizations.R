@@ -6,7 +6,11 @@ popupWindow <- function(varname, contents) {
     print("popupWindow是否在运行")
     print(show)
     print(dismiss)
+    if(!is.null(isolate(input$row)))
+        print(isolate(input$row))
     
+    print("打印个锤子")
+    print(input$show == 1)
     conditionalPanel(
         condition=sprintf('input.%s == 1', show),# condition is a javascript expression that will be evaluated repeatedly
         # variable to keep track of showing the overlay
@@ -25,7 +29,8 @@ popupWindow <- function(varname, contents) {
 observe({
     print("打印input$row")
     print(input$row)
-    print(input$glist)
+    print("打印个小米")
+    print(input$show == 1)
     if(is.null(input$row) || input$row == 0)
         return(NULL)
     no <- as.numeric(isolate(input$row))
@@ -40,15 +45,16 @@ observe({
     print(head(rv$results$ID))
     # first, create ghe graphics
     output$pppp <- renderPlot({
+        print("这一部分似乎没有工作fdfdsf")
         catf("making evidence plot with %d genes and ID=%s(%d)\n", length(fg), rv$results$ID[no], no)
         evidencePlot(fg, rv$results$ID[no], mset=mset)
     }, width=600, height=400)
     output$evidencePlot2 <- renderPlot({
         print("这一部分似乎没有工作")
-        catf("这一部分似乎没有工作")
+        catf("making evidence plot with %d genes and ID=%s(%d)\n", length(fg), rv$results$ID[no], no)
         evidencePlot(fg, rv$results$ID[no], mset=mset)
     }, width=600, height=400)
     # second, make it visible by changing variable showplotpanel
-    # updateTextInput(seesion, "show_plotpanelW", value=1) # show_plotpanleW gets by var show
+    updateTextInput(session, "show_plotpanelW", value=1) # show_plotpanleW gets by var show
 })
 

@@ -123,8 +123,6 @@ function(input, output, session) {
             tabsetPanel(id = "inTabset",
                         #tabPanel("table", dataTableOutput( "example_results" )),
                         tabPanel("table", 
-                                 HTML('<input type="radio" name="row" value="0" id="r0" /><label for="r0">Plot</label>'),
-                                 HTML('<input type="radio" name="glist" value="0" id="r0" /><label for="r0">Plot</label>'),
                                  # these are required for button to be reactive
                                  div(id="glist", class="shiny-input-radiogroup", 
                                      div(id="row", class="shiny-input-radiogroup", 
@@ -147,8 +145,7 @@ function(input, output, session) {
                                              
                                  )),
                         tabPanel("heatmap-like", plotOutput("plot", height = "2000px")),
-                        tabPanel("rug-like", plotOutput("plot1", height = "2000px")),
-                        tabPanel("pppp", plotOutput("pppp")))
+                        tabPanel("rug-like", plotOutput("plot1", height = "2000px")))
         }
     })
     
