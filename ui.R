@@ -4,6 +4,7 @@ library(data.table)
 library(tmod)
 library(shinyjs)
 library(markdown)
+library(shinyBS)
 data(tmod)
 options(shiny.maxRequestSize=30*1024^2)
 
@@ -55,6 +56,7 @@ img.link <- function(file) {
     }
     return(div(class="gallerypanel", img, tags$br(), tags$hr(), name, desc))  # song: div: A division of text with a uniform style
 } 
+
 
 
 sidebar <- dashboardSidebar(
@@ -204,7 +206,26 @@ body <- dashboardBody(
 # Put them together into a dashboardPage
 dashboardPage(
     skin = "black",
-    dashboardHeader(title = "tmod tests beta"),
+    dashboardHeader(title = "tmod tests beta",
+                    tags$li(a(href = 'http://shinyapps.company.com',
+                              icon("download"),
+                              title = "Back to Apps Home"),
+                            class = "dropdown"),
+                    tags$li(
+                        actionLink("refresh", "Refresh", icon("refresh")),
+                        class = "dropdown"
+                    ),
+                        
+                    dropdownMenu(type = "messages",
+                                 messageItem(
+                                     from = "Xuesong Wang",
+                                     message = "wangxuesong29@gmail.com"
+                                 ),
+                                 messageItem(
+                                     from = "Dr. January Weiner 3",
+                                     message = "+49-30-28460514"
+                                 ))
+    ),
     sidebar,
     body
 )

@@ -23,14 +23,11 @@ addLog <- function(message, ...) {
 
 
 getMset <- reactive({
-    print("调用了gertMset()")
     mset <- input$gene_module
     foo <- substr(mset, 1, 4)
     if(foo == "msig"){
         cat <- gsub("msig", "", mset) # gsub() function reeplaces all matches of a string..
         mset <- filterModulesByCategory(msig, cat)
     }
-    print("getmset中的mset")
-    print(mset)
     mset
 })

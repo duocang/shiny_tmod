@@ -18,6 +18,8 @@ load("data/msig.rda")
 # It allows file bigger than 25M to be uploaded
 options(shiny.maxRequestSize=30*1024^2)
 
+
+
 function(input, output, session) {
     
     # global variables holding the state of the statistical tests
@@ -297,7 +299,6 @@ function(input, output, session) {
             return(NULL)
         }
         rv$results <- run.stats(fg, Utest, mset=mset)
-        print(rv$results)
     })
     
     output$example_results <- renderDataTable({
@@ -322,5 +323,11 @@ function(input, output, session) {
         enable("abs")
         enable("pie.pval")
         enable("pie.lfc")
+    })
+    
+    
+    # refresh page
+    observeEvent(input$refresh, {
+        invalidateLater(1, session)
     })
 }

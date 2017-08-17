@@ -105,7 +105,12 @@ output$plot0 <- renderPlot({
                 # Pause for 0.1 seconds to simulate a long computation.
                 Sys.sleep(0.1)
             }
-            plo <- stat_test()
+            
+            if(!is.null(input$files) && input$example == "exempty")
+                plo <- isolate(stat_test())
+            
+            print("打印plo")
+            print(plo[1])
             if(!is.null(plo))
                 tmodPanelPlot(plo, text.cex = 0.9, legend.style = "auto")
             print("plot done")
