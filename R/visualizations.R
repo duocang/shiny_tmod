@@ -105,9 +105,13 @@ output$plot0 <- renderPlot({
                 # Pause for 0.1 seconds to simulate a long computation.
                 Sys.sleep(0.1)
             }
+            plo <- isolate(stat_test())
             
-            if(!is.null(input$files) && input$example == "exempty")
-                plo <- isolate(stat_test())
+            print("打印plo的数据")
+            print(class(plo))
+            print(class(plo[1]))
+            print(class(plo[[1]]))
+            print(head(plo[[1]]))
             
             if(input$example != "exempty")
                 plo <- as.list(rv$results)
@@ -153,16 +157,47 @@ output$plot01 <- renderPlot({
             
             sapply(res, function(x){
                 if(nrow(x) == 0){
-                    addMsg(
-                        sprintf("There is no moudle named %s!", isolate(input$gene_module)))
+                    addMsg(sprintf("There is no moudle named %s!", isolate(input$gene_module)))
                     return(NULL)
                 }
             })
             
             pie <- isolate(stat_test1())
+
+            print(paste0("打印res ", class(res)))
+            print(paste0("打印pie ", class(pie)))
+            print(length(res))
+            print(length(pie))
+            print(dim(res[[1]]))
+            print(dim(pie[[1]]))
+            print(class(res[[1]]))
+            print(class(pie[[1]]))
+            print(head(res[[1]]))
+            print(head(pie[[1]]))
+            print(names(pie))
+            print(names(res))
+            
             names(pie) <- names(res)
             if(!is.null(res))
                 tmodPanelPlot(res, pie=pie, pie.style="r", grid="b", filter.rows.pval=0.001)
         })
     }
+}, bg="transparent")
+
+output$plot3 <- renderPlot({
+    input$run
+    req(isolate(input$example))
+    plo <- list(isolate(rv$results))
+    names(plo) <- "Example Data"
+    tmodPanelPlot(plo, text.cex = 0.9, legend.style = "auto")
+}, bg="transparent")
+
+output$plot03 <- renderPlot({
+    input$run1
+    req(isolate(input$example))
+    print(head(fg))
+    pie <- tmodDecideTests(g=fg, mset = isolate(getMset()))
+    print(head(pie))
+    
+    plot(1:1000, 1:1000)
 }, bg="transparent")

@@ -31,3 +31,20 @@ getMset <- reactive({
     }
     mset
 })
+
+# uiReset <- function() {
+#     fg <<- NULL
+# 
+#     updateSelectInput(session, "example", selected = "exempty")
+#     output$choose_preview_file <- renderUI(NULL)
+#     output$genename_col <- renderUI(NULL)
+#     updateSelectInput(session, "gene_module", selected = "LI" )
+#     updateSelectInput(session, "sort_by", selected = "logFC")
+#     updateSelectInput(session, "inc_dec", selected = "FALSE")
+#     updateSelectInput(session, "abs",  selected = "NO")
+#     updateSelectInput(session, "test_type", selected = "tmodUtest")
+#     output$table <- renderUI(NULL)
+#     #updateNumericInput(session, "pie.pval", 0.05)
+#     #updatenumericInput(session, "pie.lfc", 1)
+#     addMsg("Page is resetted.")
+# }

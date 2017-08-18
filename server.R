@@ -19,7 +19,6 @@ load("data/msig.rda")
 options(shiny.maxRequestSize=30*1024^2)
 
 
-
 function(input, output, session) {
     
     # global variables holding the state of the statistical tests
@@ -119,7 +118,7 @@ function(input, output, session) {
             print("两个tab")
             tabsetPanel(id = "inTabset",
                         tabPanel("heatmap-like", plotOutput("plot0", height = "2000px")),
-                        tabPanel("rug-like", plotOutput("plot01", height = "2000px"), class="ui-state-active"))
+                        tabPanel("rug-like", plotOutput("plot01", height = "2000px")))
         }else{
             print("三个tab")
             tabsetPanel(id = "inTabset",
@@ -144,8 +143,8 @@ function(input, output, session) {
                                                  p(tags$b(textOutput("genelist_title"))),
                                                  p(HTML("Genes shown in <b>bold</b> are in the main data set")),
                                                  p(uiOutput("genelist"))))),
-                        tabPanel("heatmap-like", plotOutput("plot0", height = "2000px")),
-                        tabPanel("rug-like", plotOutput("plot01", height = "2000px")))
+                        tabPanel("heatmap-like", plotOutput("plot3", height = "1000px")),
+                        tabPanel("rug-like", plotOutput("plot03", height = "1000px")))
         }
     })
     
@@ -302,9 +301,6 @@ function(input, output, session) {
     })
     
     output$example_results <- renderDataTable({
-        print("rv$results的数据结构")
-        print(class(rv$results))
-        print(head(rv$results))
         res <- formatResultsTable(rv$results)
         if(is.null(res)) return(NULL)
         datatable(res, escape =FALSE)
@@ -319,6 +315,7 @@ function(input, output, session) {
             disable("abs")
             disable("pie.pval")
             disable("pie.lfc")
+            disable("test_type")
             return()
         }
         enable("sort_by")
@@ -326,6 +323,7 @@ function(input, output, session) {
         enable("abs")
         enable("pie.pval")
         enable("pie.lfc")
+        enable("test_type")
     })
     
     # jsResetCode <- "shinyjs.reset = function() {history.go(0)}"
@@ -340,5 +338,10 @@ function(input, output, session) {
         shinyjs::js$refresh()
         # shinyjs::useShinyjs()
         # shinyjs::reset("form")
+    })
+    
+    observeEvent(input$refresh,{
+        session$reload()
+         print("吔屎啦")
     })
 }

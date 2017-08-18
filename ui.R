@@ -82,10 +82,8 @@ sidebar <- dashboardSidebar(
 body <- dashboardBody(
     useShinyjs(),
     # This will call message-handler.js
-    tags$head(tags$script(src = "message-handler.js")
-              ,
-              tags$link(rel = "stylesheet", type = "text/css", href = "css/tmod.css")
-              ),
+    tags$head(tags$script(src = "message-handler.js"),
+              tags$link(rel = "stylesheet", type = "text/css", href = "css/tmod.css")),
     tabItems(
         tabItem(tabName = "file_preview",
                 fluidRow(
