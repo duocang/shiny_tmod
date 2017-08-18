@@ -165,6 +165,9 @@ function(input, output, session) {
         sort_abs <- isolate(input$abs)    # when we change sorting column or othre choices
         sort_decr <- isolate(input$inc_dec)
         geneName <- isolate(input$which_col_genename)
+        validate(
+            need(geneName != "-----------------", "No task running, because there no is gene column selected yet!")
+        )
         if(isolate(input$test_type) == "tmodCERNOtest"){
             res <- sapply(dat, function(x) {
                 x <- data.frame(x)
@@ -221,11 +224,13 @@ function(input, output, session) {
     
     # This will show an allert, if the user trys to run without selecting gene column
     observeEvent(input$run,{
-        if(input$run == 0){
-            return(NULL)
-        }
-        if(is.null(input$which_col_genename))
-            return(NULL)
+        req(input$run)
+        req(input$which_col_genename)
+        # if(input$run == 0){
+        #     return(NULL)
+        # }
+        # if(is.null(input$which_col_genename))
+        #     return(NULL)
         if(input$which_col_genename == "-----------------"){
             session$sendCustomMessage(type = "alert_message",
                                       message = 'Please select gene cloumn!')
@@ -245,44 +250,24 @@ function(input, output, session) {
     
     # when we click "Plot heatmap-like", it shows message on the page
     observeEvent(input$run,{
-        if((input$sort_by != "") && (input$inc_dec != "") && (input$abs != "") && (input$test_type != "")){
-            addMsg(
-                sprintf("Run test %s whith mset=%s, pleast wait", 
-                        isolate(input$test_type),
-                        isolate(input$gene_module)))
-        }else{
-            addMsg(" Attention! Please, make sure all parameters are set!")
-        }
+        if((!is.null(input$files) && input$which_col_genename != "-----------------") || input$example != "exempty")
+            addMsg(sprintf("Run test %s whith mset=%s.", isolate(input$test_type),isolate(input$gene_module)))
     })
     
     # when we click "Plot rug-like", it shows message on the page
     observeEvent(input$run1,{
-        if((input$sort_by != "") && (input$inc_dec != "") && (input$abs != "") && (input$test_type != "")){
-            addMsg(
-                sprintf("Run test %s whith mset=%s, pleast wait", 
-                        isolate(input$test_type),
-                        isolate(input$mset)))
-        }else
-            addMsg(" Attention! Please, make sure all parameters are set!")
+        addMsg(sprintf("Run test %s whith mset=%s.", isolate(input$test_type), isolate(input$gene_module)))
     })
     
     # When "rug-like plot" is clicked, it will show rug-like tab
     observeEvent(input$run1,{
-        updateTabsetPanel(session, "inTabset",
-                          selected = "rug-like")
+        updateTabsetPanel(session, "inTabset", selected = "rug-like")
     })
     
     # When "headmap-like plot" is clicked, it will show heatmap-like tab
     observeEvent(input$run,{
-        updateTabsetPanel(session, "inTabset",
-                          selected = "heatmap-like")
+        updateTabsetPanel(session, "inTabset", selected = "heatmap-like")
     })
-    
-    # # if user wants to test with example data, a new tab will appear in sidebar
-    # output$example_test <- renderMenu({
-    #     if(input$example != "empty")
-    #         menuSubItem("Example tests", tabName = "example_test")
-    # })
     
     # an example is selected, corresponding test will runn 
     # and result will be given to rv$results
@@ -306,7 +291,6 @@ function(input, output, session) {
         datatable(res, escape =FALSE)
     })
     
-    
     # when example is useed, disable some selection boxes
     observeEvent(input$example,{
         if(input$example != "exempty"){
@@ -326,22 +310,7 @@ function(input, output, session) {
         enable("test_type")
     })
     
-    # jsResetCode <- "shinyjs.reset = function() {history.go(0)}"
-    # useShinyjs()
-    # extendShinyjs(text = jsResetCode)
-    # # refresh page
-    # observeEvent
-    
-    observeEvent(input$refresh,{
-        shinyjs::useShinyjs()
-        shinyjs::extendShinyjs(text = "shinyjs.refresh = function() { location.reload(); }")
-        shinyjs::js$refresh()
-        # shinyjs::useShinyjs()
-        # shinyjs::reset("form")
-    })
-    
     observeEvent(input$refresh,{
         session$reload()
-         print("吔屎啦")
     })
 }

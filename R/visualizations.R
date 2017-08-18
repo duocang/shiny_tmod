@@ -3,8 +3,6 @@ popupWindow <- function(varname, contents) {
     show    <- paste0( "show_", varname)
     dismiss <- paste0( "dismiss_", varname)
     
-    
-    print("打印个锤子")
     conditionalPanel(
         condition=sprintf('input.%s == 1', show),# condition is a javascript expression that will be evaluated repeatedly
         # variable to keep track of showing the overlay
@@ -51,19 +49,14 @@ observe({
 ## Creates the gene list
 ## -------------------------------------------------------------------
 observe({
-    print("打印input$glist")
-    print(input$glist)
     if(is.null(input$glist) || input$glist == 0 || is.null(fg)) { return(NULL) ; }
     no   <- as.numeric(isolate(input$glist))
-    print("打印mset")
-    print(isolate(getMset()))
     mset <- getMsetReal(isolate(getMset()))
     print(mset)
     
     mod <- rv$results$ID[no]
     catf("generating gene list for module %d\n", no)
     glist <- sort(mset$MODULES2GENES[[mod]])
-    print(head(fg))
     sel <- glist %in% fg
     glist[sel] <- gsub( "(.*)", "<b>\\1</b>", glist[sel])
     glist <- paste( glist, collapse=", ")
@@ -89,99 +82,71 @@ observe({
 
 
 output$plot0 <- renderPlot({
-    if(input$run == 0)
-        return(NULL)
-    if((isolate(input$sort_by) != "") && (isolate(input$inc_dec) != "") 
-       && (isolate(input$abs) != "") && (isolate(input$test_type) != "")){
+    req(input$run)
         
-        withProgress(message = 'Making plot', value = 0, {
-            n <- 10
-            # Number of times we'll go through the loop
-            for (i in 1:n) {
-                # Each time through the loop, add another row of data. This is
-                # a stand-in for a long-running computation.
-                # Increment the progress bar, and update the detail text.
-                incProgress(1/n, detail = paste("Doing part", i))
-                # Pause for 0.1 seconds to simulate a long computation.
-                Sys.sleep(0.1)
-            }
-            plo <- isolate(stat_test())
-            
-            print("打印plo的数据")
-            print(class(plo))
-            print(class(plo[1]))
-            print(class(plo[[1]]))
-            print(head(plo[[1]]))
-            
-            if(input$example != "exempty")
-                plo <- as.list(rv$results)
-            
-            
-            if(!is.null(plo))
-                tmodPanelPlot(plo, text.cex = 0.9, legend.style = "auto")
-            print("plot done")
-            # tryCatch({
-            #     plo <- stat_test()
-            #     if(!is.null(plo))
-            #         tmodPanelPlot(plo, text.cex = 0.9, legend.style = "auto")
-            #     print("plot done")
-            # },
-            # warning = function(w){
-            #     print("no correct gene column selected")
-            # },
-            # error = function(e){
-            #     print("gene column is selected, but it is processed by isolated() function")
-            #     return(NULL)
-            # })
-        })
-    }
+    withProgress(message = 'Making plot', value = 0, {
+        n <- 10
+        # Number of times we'll go through the loop
+        for (i in 1:n) {
+            # Each time through the loop, add another row of data. This is
+            # a stand-in for a long-running computation.
+            # Increment the progress bar, and update the detail text.
+            incProgress(1/n, detail = paste("", ""))
+            # Pause for 0.1 seconds to simulate a long computation.
+            Sys.sleep(0.1)
+        }
+        plo <- isolate(stat_test())
+        
+        
+        
+        if(!is.null(plo))
+            tmodPanelPlot(plo, text.cex = 0.9, legend.style = "auto")
+        print("plot done")
+        # tryCatch({
+        #     plo <- stat_test()
+        #     if(!is.null(plo))
+        #         tmodPanelPlot(plo, text.cex = 0.9, legend.style = "auto")
+        #     print("plot done")
+        # },
+        # warning = function(w){
+        #     print("no correct gene column selected")
+        # },
+        # error = function(e){
+        #     print("gene column is selected, but it is processed by isolated() function")
+        #     return(NULL)
+        # })
+    })
+    
 }, bg="transparent")
 
 output$plot01 <- renderPlot({
-    if(input$run1 == 0)
-        return(NULL)
-    if((input$sort_by != "") && (input$inc_dec != "") && (input$abs != "") && (input$test_type != "")){
-        withProgress(message = 'Making plot', value = 0, {
-            n <- 10
-            # Number of times we'll go through the loop
-            for (i in 1:n) {
-                # Each time through the loop, add another row of data. This is
-                # a stand-in for a long-running computation.
-                # Increment the progress bar, and update the detail text.
-                incProgress(1/n, detail = paste("Doing part", i))
-                # Pause for 0.1 seconds to simulate a long computation.
-                Sys.sleep(0.1)
+    input$run1
+    withProgress(message = 'Making plot', value = 0, {
+        n <- 10
+        # Number of times we'll go through the loop
+        for (i in 1:n) {
+            # Each time through the loop, add another row of data. This is
+            # a stand-in for a long-running computation.
+            # Increment the progress bar, and update the detail text.
+            incProgress(1/n, detail = paste("", ""))
+            # Pause for 0.1 seconds to simulate a long computation.
+            Sys.sleep(0.1)
+        }
+        res <- isolate(stat_test())
+        
+        sapply(res, function(x){
+            if(nrow(x) == 0){
+                addMsg(sprintf("There is no moudle named %s!", isolate(input$gene_module)))
+                return(NULL)
             }
-            res <- isolate(stat_test())
-            
-            
-            sapply(res, function(x){
-                if(nrow(x) == 0){
-                    addMsg(sprintf("There is no moudle named %s!", isolate(input$gene_module)))
-                    return(NULL)
-                }
-            })
-            
-            pie <- isolate(stat_test1())
-
-            print(paste0("打印res ", class(res)))
-            print(paste0("打印pie ", class(pie)))
-            print(length(res))
-            print(length(pie))
-            print(dim(res[[1]]))
-            print(dim(pie[[1]]))
-            print(class(res[[1]]))
-            print(class(pie[[1]]))
-            print(head(res[[1]]))
-            print(head(pie[[1]]))
-            print(names(pie))
-            print(names(res))
-            
-            names(pie) <- names(res)
-            if(!is.null(res))
-                tmodPanelPlot(res, pie=pie, pie.style="r", grid="b", filter.rows.pval=0.001)
         })
-    }
+        
+        pie <- isolate(stat_test1())
+        
+        names(pie) <- names(res)
+        if(!is.null(res))
+            tmodPanelPlot(res, pie=pie, pie.style="r", grid="b", filter.rows.pval=0.001)
+    })
 }, bg="transparent")
 
 output$plot3 <- renderPlot({

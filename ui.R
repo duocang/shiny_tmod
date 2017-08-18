@@ -57,25 +57,17 @@ img.link <- function(file) {
     return(div(class="gallerypanel", img, tags$br(), tags$hr(), name, desc))  # song: div: A division of text with a uniform style
 } 
 
-
-
 sidebar <- dashboardSidebar(
     width = 150,
     sidebarMenu(
         menuItem("Test", tabName = "file", icon = icon("file-o"),
                  menuSubItem("Upload File(s)", tabName = "file_preview"),
                  menuSubItem("Test", tabName = "tests"),
-                 sidebarMenuOutput("example_test"),
-                 startExpanded = TRUE
-        ),
-        menuItem("Help", tabName = "help", icon = icon("question")
-        ),
-        menuItem("Download", tabName = "download", icon = icon("download"), startExpanded = FALSE
-        ),
-        menuItem("Gallery", tabName = "gallery", icon = icon("file-picture-o"),startExpanded = FALSE
-        ),
-        menuItem("Logs", tabName = "logs", icon = icon("info"), startExpanded = FALSE
-        )
+                 startExpanded = TRUE),
+        menuItem("Help", tabName = "help", icon = icon("question")),
+        menuItem("Download", tabName = "download", icon = icon("download"), startExpanded = FALSE),
+        menuItem("Gallery", tabName = "gallery", icon = icon("file-picture-o"),startExpanded = FALSE),
+        menuItem("Logs", tabName = "logs", icon = icon("info"), startExpanded = FALSE)
     )
 )
 
@@ -90,22 +82,19 @@ body <- dashboardBody(
                     column(3, 
                            fileInput("files", label = "Upload file(s)", 
                                      multiple = TRUE, 
-                                     accept = c("text/csv", ".csv"))
-                    ) ,
+                                     accept = c("text/csv", ".csv"))) ,
                     column(3,
                            selectInput("example", "Or use example",
                                        list("------"="exempty", 
                                             "Load example for CERNO test"="cerno", 
-                                            "Load example for U test"="utest"))
-                    ),
+                                            "Load example for U test"="utest"))),
                     column(3, 
                            uiOutput("choose_preview_file")),
                     column(3, 
                            uiOutput("genename_col"))
                 ),
                 class="params",
-                DT::dataTableOutput("table")
-        ),
+                DT::dataTableOutput("table")),
         tabItem(tabName = "tests",
                 fluidRow( column(12, offset=0, htmlOutput("message", inline=TRUE), class="tmodMsg" )),
                 fluidRow(
@@ -114,8 +103,7 @@ body <- dashboardBody(
                     column(2, "  Trend" ),
                     column(1, "  Abs" ),
                     column(2, "  Test type" ),
-                    class="paramHeader"
-                ),
+                    class="paramHeader"),
                 fluidRow(
                     column(3, 
                            selectInput( "gene_module", NULL,
@@ -129,10 +117,8 @@ body <- dashboardBody(
                                                ,"MSigDB Computational signatures (C4)"="msigC4"
                                                ,"MSigDB GO gene sets (C5)"="msigC5"
                                                ,"MSigDB Oncogenic signatures (C6)"="msigC6"
-                                               ,"MSigDB Immunologic signatures (C7)"="msigC7"
-                                        ),
-                                        selected = "LI")
-                    ),
+                                               ,"MSigDB Immunologic signatures (C7)"="msigC7"),
+                                        selected = "LI")),
                     column(2, selectInput("sort_by", NULL,
                                           choices = c("",
                                                       "logFC" = "logFC",
@@ -141,69 +127,48 @@ body <- dashboardBody(
                                                       "SE" = "SE",
                                                       "d" = "d",
                                                       "qval" = "qval"),
-                                          selected = "logFC"
-                    )) ,
+                                          selected = "logFC")) ,
                     column(2, selectInput("inc_dec", NULL,
                                           choices = c("",
                                                       "Increasing" = "FALSE",
                                                       "Decreasing" = "TRUE"),
-                                          selected = "FALSE"
-                    )),
+                                          selected = "FALSE")),
                     column(1, selectInput("abs", NULL,
                                           choices = c("", 
                                                       "YES",
                                                       "NO"),
-                                          selected = "NO")
-                    ),
+                                          selected = "NO")),
                     column(2, selectInput("test_type", NULL,
                                           choices = c("" ,
                                                       "tmodCERNOtest" = "tmodCERNOtest",
                                                       "tmodUtest" = "tmodUtest"),
-                                          selected = "tmodUtest")
-                    ),
-                    column(2, actionButton("run", "Plot heatmap-like", class="tmodAct")
-                    )
-                ),
+                                          selected = "tmodUtest")),
+                    column(2, actionButton("run", "Plot heatmap-like", class="tmodAct"))),
                 fluidRow(
                     column(2, "  pie.pval"),
                     column(2, "  pie.lfc" ),
-                    class="paramHeader"
-                ),
+                    class="paramHeader"),
                 fluidRow(
                     column(2,  
                            numericInput("pie.pval", 
-                                        NULL, 
-                                        0.05, min = 0, max = 0.1, step = 0.01)
-                    ),
+                                        NULL, 0.05, min = 0, max = 0.1, step = 0.01)),
                     column(2,
                            numericInput("pie.lfc",
-                                        NULL,
-                                        1, min = 0, max = 5, step = 0.5)
-                    ),
-                    column(2, actionButton("run1", "Plot rug-like", class="tmodAct")
-                    )
+                                        NULL, 1, min = 0, max = 5, step = 0.5)),
+                    column(2, actionButton("run1", "Plot rug-like", class="tmodAct"))
                 ),
                 uiOutput("testOrExample_result")
         ),
-        
-        
         tabItem(tabName = "help",
-                includeMarkdown("md/help.md")
-        ),
+                includeMarkdown("md/help.md")),
         tabItem(tabName = "download",
-                includeMarkdown("md/downloads.md")
-        ),
+                includeMarkdown("md/downloads.md")),
         tabItem(tabName = "gallery",
-                get.gallery()
-                #includeMarkdown("md/gallery.md")
-        ),
+                get.gallery()),
         tabItem(tabName = "logs",
-                fluidRow(
-                    column(10, htmlOutput( "messageLog"), br()) )
-        )
+                fluidRow(column(10, htmlOutput( "messageLog"), br()) ))
     ),class="params"
 )
-
 
 # Put them together into a dashboardPage
 dashboardPage(
@@ -215,20 +180,15 @@ dashboardPage(
                             class = "dropdown"),
                     tags$li(
                         actionLink("refresh", "Refresh", icon("refresh")),
-                        class = "dropdown"
-                    ),
-                        
+                        class = "dropdown"),
                     dropdownMenu(type = "messages",
                                  messageItem(
                                      from = "Xuesong Wang",
-                                     message = "wangxuesong29@gmail.com"
-                                 ),
+                                     message = "wangxuesong29@gmail.com"),
                                  messageItem(
                                      from = "Dr. January Weiner 3",
-                                     message = "+49-30-28460514"
-                                 )),
-                    titleWidth = 150
-    ),
+                                     message = "+49-30-28460514")),
+                    titleWidth = 150),
     sidebar,
     body
 )
