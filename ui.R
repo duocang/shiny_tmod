@@ -78,6 +78,7 @@ body <- dashboardBody(
               tags$link(rel = "stylesheet", type = "text/css", href = "css/tmod.css")),
     tabItems(
         tabItem(tabName = "file_preview",
+                fluidRow( column(12, offset=0, uiOutput("message_upload_page"),class="tmodMsg")),
                 fluidRow(
                     column(3, 
                            fileInput("files", label = "Upload file(s)", 
@@ -183,8 +184,10 @@ dashboardPage(
                         class = "dropdown"),
                     dropdownMenu(type = "messages",
                                  messageItem(
-                                     from = "Xuesong Wang",
-                                     message = "wangxuesong29@gmail.com"),
+                                     from = "王雪松(Xuesong Wang)",
+                                     message = "wangxuesong29@gmail.com",
+                                     href = "mailto:wangxuesong29@gmail.com"
+                                     ),
                                  messageItem(
                                      from = "Dr. January Weiner 3",
                                      message = "+49-30-28460514")),

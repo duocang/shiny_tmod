@@ -1,31 +1,66 @@
-## Only run examples in interactive R sessions
+## Only run this example in interactive R sessions
 if (interactive()) {
+    library(shiny)
     
-    ui <- fluidPage(
-        sliderInput("n", "Number of observations", 2, 1000, 500),
-        plotOutput("plot")
+    # A dashboard header with 3 dropdown menus
+    header <- dashboardHeader(
+        title = "Dashboard Demo",
+        
+        # Dropdown menu for messages
+        dropdownMenu(type = "messages", badgeStatus = "success",
+                     messageItem("Support Team",
+                                 "This is the content of a message.",
+                                 time = "5 mins"
+                     ),
+                     messageItem("Support Team",
+                                 "This is the content of another message.",
+                                 time = "2 hours"
+                     ),
+                     messageItem("New User",
+                                 "Can I get some help?",
+                                 time = "Today"
+                     )
+        ),
+        
+        # Dropdown menu for notifications
+        dropdownMenu(type = "notifications", badgeStatus = "warning",
+                     notificationItem(icon = icon("users"), status = "info",
+                                      "5 new members joined today"
+                     ),
+                     notificationItem(icon = icon("warning"), status = "danger",
+                                      "Resource usage near limit."
+                     ),
+                     notificationItem(icon = icon("shopping-cart", lib = "glyphicon"),
+                                      status = "success", "25 sales made"
+                     ),
+                     notificationItem(icon = icon("user", lib = "glyphicon"),
+                                      status = "danger", "You changed your username"
+                     )
+        ),
+        
+        # Dropdown menu for tasks, with progress bar
+        dropdownMenu(type = "tasks", badgeStatus = "danger",
+                     taskItem(value = 20, color = "aqua",
+                              "Refactor code"
+                     ),
+                     taskItem(value = 40, color = "green",
+                              "Design new layout"
+                     ),
+                     taskItem(value = 60, color = "yellow",
+                              "Another task"
+                     ),
+                     taskItem(value = 80, color = "red",
+                              "Write documentation"
+                     )
+        )
     )
     
-    server <- function(input, output, session) {
-        
-        observe({
-            # Re-execute this reactive expression after 1000 milliseconds
-            invalidateLater(1000, session)
-            
-            # Do something each time this is invalidated.
-            # The isolate() makes this observer _not_ get invalidated and re-executed
-            # when input$n changes.
-            print(paste("The value of input$n is", isolate(input$n)))
-        })
-        
-        # Generate a new histogram at timed intervals, but not when
-        # input$n changes.
-        output$plot <- renderPlot({
-            # Re-execute this reactive expression after 2000 milliseconds
-            invalidateLater(2000)
-            hist(rnorm(isolate(input$n)))
-        })
-    }
-    
-    shinyApp(ui, server)
+    shinyApp(
+        ui = dashboardPage(
+            header,
+            dashboardSidebar(),
+            dashboardBody()
+        ),
+        server = function(input, output) { }
+    )
 }

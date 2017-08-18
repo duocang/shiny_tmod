@@ -83,7 +83,7 @@ observe({
 
 output$plot0 <- renderPlot({
     req(input$run)
-        
+    
     withProgress(message = 'Making plot', value = 0, {
         n <- 10
         # Number of times we'll go through the loop
@@ -96,9 +96,6 @@ output$plot0 <- renderPlot({
             Sys.sleep(0.1)
         }
         plo <- isolate(stat_test())
-        
-        
-        
         if(!is.null(plo))
             tmodPanelPlot(plo, text.cex = 0.9, legend.style = "auto")
         print("plot done")
@@ -116,7 +113,6 @@ output$plot0 <- renderPlot({
         #     return(NULL)
         # })
     })
-    
 }, bg="transparent")
 
 output$plot01 <- renderPlot({
@@ -133,7 +129,8 @@ output$plot01 <- renderPlot({
             Sys.sleep(0.1)
         }
         res <- isolate(stat_test())
-        
+        print("fasdfsadfasdf发多少发松岛枫")
+        print(res)
         sapply(res, function(x){
             if(nrow(x) == 0){
                 addMsg(sprintf("There is no moudle named %s!", isolate(input$gene_module)))

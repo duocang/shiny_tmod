@@ -115,12 +115,10 @@ function(input, output, session) {
     # if example is used, the test page shows with three tabs: table, heatmap-like and rug-like
     output$testOrExample_result <- renderUI({
         if(input$example == "exempty"){
-            print("两个tab")
             tabsetPanel(id = "inTabset",
                         tabPanel("heatmap-like", plotOutput("plot0", height = "2000px")),
                         tabPanel("rug-like", plotOutput("plot01", height = "2000px")))
         }else{
-            print("三个tab")
             tabsetPanel(id = "inTabset",
                         #tabPanel("table", dataTableOutput( "example_results" )),
                         tabPanel("table", 
@@ -155,19 +153,22 @@ function(input, output, session) {
     # 3. increasing or decreasing
     # 4. tmod test 
     stat_test <- reactive({
-        input$run
         dat <- isolate(loaded_data())
         if(is.null(dat) || length(dat)==0) {
-            print("no data yet")
+            addMsg("NO DATA! Upload file(s) or select an example.")
             return(NULL)
         }
         sort_col <- isolate(input$sort_by)# isolate() is used, we donot want to rerun this code block every time, 
         sort_abs <- isolate(input$abs)    # when we change sorting column or othre choices
         sort_decr <- isolate(input$inc_dec)
         geneName <- isolate(input$which_col_genename)
+        
+        if(geneName == "-----------------" )
+            addMsg("No task running, because there no is gene column selected yet!")
         validate(
             need(geneName != "-----------------", "No task running, because there no is gene column selected yet!")
         )
+        
         if(isolate(input$test_type) == "tmodCERNOtest"){
             res <- sapply(dat, function(x) {
                 x <- data.frame(x)
@@ -176,7 +177,6 @@ function(input, output, session) {
                 if(sort_abs == "YES") ord <- abs(ord)
                 ord <- order(ord, decreasing=sort_decr)
                 tmodCERNOtest(genes[ord], mset=isolate(getMset()), qval=1)
-                
             }, simplify=FALSE)
         }else{
             res <- sapply(dat, function(x) {
@@ -189,12 +189,13 @@ function(input, output, session) {
                 tmodUtest(genes[ord], mset=isolate(getMset()), qval=1)
             }, simplify=FALSE)
         }
+        
         if(is.null(names(res))) names(res) <- input$files$name
+        print(res)
         return(res)
     })
     
     stat_test1 <- reactive({
-        input$run1
         dat <- isolate(loaded_data())
         if(is.null(dat) || length(dat)==0) {
             print("no data yet")
@@ -256,7 +257,8 @@ function(input, output, session) {
     
     # when we click "Plot rug-like", it shows message on the page
     observeEvent(input$run1,{
-        addMsg(sprintf("Run test %s whith mset=%s.", isolate(input$test_type), isolate(input$gene_module)))
+        if((!is.null(input$files) && input$which_col_genename != "-----------------") || input$example != "exempty")
+            addMsg(sprintf("Run test %s whith mset=%s.", isolate(input$test_type), isolate(input$gene_module)))
     })
     
     # When "rug-like plot" is clicked, it will show rug-like tab
@@ -287,7 +289,8 @@ function(input, output, session) {
     
     output$example_results <- renderDataTable({
         res <- formatResultsTable(rv$results)
-        if(is.null(res)) return(NULL)
+        req(res)
+        # if(is.null(res)) return(NULL)
         datatable(res, escape =FALSE)
     })
     
@@ -300,6 +303,8 @@ function(input, output, session) {
             disable("pie.pval")
             disable("pie.lfc")
             disable("test_type")
+            disable("files")
+            output$message_upload_page <- renderText("💡 <b>Message:</b> Example is ready for running! <br>  💡 <b>Go to Test tap</b>")
             return()
         }
         enable("sort_by")
@@ -308,6 +313,15 @@ function(input, output, session) {
         enable("pie.pval")
         enable("pie.lfc")
         enable("test_type")
+    })
+    
+    # when example is useed, disable some selection boxes
+    observeEvent(input$files,{
+        if(!is.null(input$files)){
+            disable("example")
+            output$message_upload_page <- renderText(
+                "💡 <b>Message:</b> Uploaded file(s) will be used for running! <br>  💡 <b>Go to Test tap</b>")
+        }
     })
     
     observeEvent(input$refresh,{
