@@ -84,6 +84,7 @@ observe({
 output$plot0 <- renderPlot({
     req(input$run)
     
+    plo <- NULL
     withProgress(message = 'Making plot', value = 0, {
         n <- 10
         # Number of times we'll go through the loop
@@ -95,9 +96,27 @@ output$plot0 <- renderPlot({
             # Pause for 0.1 seconds to simulate a long computation.
             Sys.sleep(0.1)
         }
-        plo <- isolate(stat_test())
+        tryCatch({
+            plo <- isolate(stat_test())
+        },warning=function(w){
+            addMsg("Wrong gene column selected!")
+            updateSelectInput(session, "which_col_genename", selected = "-----------------")
+            session$sendCustomMessage(type = "alert_message",
+                                      message = "Wrong gene column selected! Please select gene cloumn, again!")
+            
+        },error=function(e){
+            addMsg("Wrong gene column selected!")
+            updateSelectInput(session, "which_col_genename", selected = "-----------------")
+            session$sendCustomMessage(type = "alert_message",
+                                      message = "Wrong gene column selected! Please select gene cloumn, again!")
+        }
+        )
+        
+        
         if(!is.null(plo))
             tmodPanelPlot(plo, text.cex = 0.9, legend.style = "auto")
+        else
+            return(NULL)
         print("plot done")
         # tryCatch({
         #     plo <- stat_test()

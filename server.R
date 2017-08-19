@@ -153,6 +153,7 @@ function(input, output, session) {
     # 3. increasing or decreasing
     # 4. tmod test 
     stat_test <- reactive({
+        input$run
         dat <- isolate(loaded_data())
         if(is.null(dat) || length(dat)==0) {
             addMsg("NO DATA! Upload file(s) or select an example.")
@@ -191,11 +192,11 @@ function(input, output, session) {
         }
         
         if(is.null(names(res))) names(res) <- input$files$name
-        print(res)
         return(res)
     })
     
     stat_test1 <- reactive({
+        input$run1
         dat <- isolate(loaded_data())
         if(is.null(dat) || length(dat)==0) {
             print("no data yet")
