@@ -75,7 +75,23 @@ body <- dashboardBody(
     useShinyjs(),
     # This will call message-handler.js
     tags$head(tags$script(src = "message-handler.js"),
-              tags$link(rel = "stylesheet", type = "text/css", href = "css/tmod.css")),
+              tags$link(rel = "stylesheet", type = "text/css", href = "css/tmod.css"),
+              tags$style(HTML(
+                  '.myClass { 
+                  font-size: 15px;
+                  line-height: 50px;
+                  text-align: left;
+                  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+                  padding: 0 15px;
+                  overflow:hidden;
+                  color:#2780e3;
+                  }
+                  '))),
+    tags$script(HTML('
+                         $(document).ready(function() {
+                     $("header").find("nav").append(\'<span class="myClass"> Text Here </span>\');
+                     })
+                     ')),
     tabItems(
         tabItem(tabName = "file_preview",
                 fluidRow( column(12, offset=0, uiOutput("message_upload_page"),class="tmodMsg")),

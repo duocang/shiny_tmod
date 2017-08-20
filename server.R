@@ -305,7 +305,7 @@ function(input, output, session) {
             disable("pie.lfc")
             disable("test_type")
             disable("files")
-            output$message_upload_page <- renderText("💡 <b>Message:</b> Example is ready for running! <br>  💡 <b>Go to Test tap</b>")
+            output$message_upload_page <- renderText("💡 <b>Message:</b> Example is ready for running!   💡 <b>Go to Test tap</b>")
             return()
         }
         enable("sort_by")
@@ -321,7 +321,8 @@ function(input, output, session) {
         if(!is.null(input$files)){
             disable("example")
             output$message_upload_page <- renderText(
-                "💡 <b>Message:</b> Uploaded file(s) will be used for running! <br>  💡 <b>Go to Test tap</b>")
+                "💡 <b>Message:</b> Uploaded file(s) will be used for running!   💡 <b>Go to Test tap</b>")
+            
         }
     })
     
