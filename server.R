@@ -5,6 +5,7 @@ library(tmod)
 library(shinyjs)
 library(markdown)
 library(tagcloud)
+library(shinyjqui)
 library(DT)
 
 

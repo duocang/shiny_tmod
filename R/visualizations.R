@@ -3,14 +3,16 @@ popupWindow <- function(varname, contents) {
     show    <- paste0( "show_", varname)
     dismiss <- paste0( "dismiss_", varname)
     
-    conditionalPanel(
-        condition=sprintf('input.%s == 1', show),# condition is a javascript expression that will be evaluated repeatedly
-        # variable to keep track of showing the overlay
-        div(style="display:none;", textInput(show, "", 0)),
-        
-        div(class="overlay", draggable="true",
-            p(actionButton(dismiss, label="Dismiss [X]" )), 
-            contents)
+    jqui_draggabled(
+        conditionalPanel(
+            condition=sprintf('input.%s == 1', show),# condition is a javascript expression that will be evaluated repeatedly
+            # variable to keep track of showing the overlay
+            div(style="display:none;", textInput(show, "", 0)),
+            
+            div(class="overlay", draggable="true",
+                p(actionButton(dismiss, label="Dismiss [X]" )), 
+                contents)
+        )
     )
 }
 

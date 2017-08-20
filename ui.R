@@ -5,6 +5,7 @@ library(tmod)
 library(shinyjs)
 library(markdown)
 library(shinyBS)
+library(shinyjqui)
 data(tmod)
 options(shiny.maxRequestSize=30*1024^2)
 
@@ -71,6 +72,20 @@ sidebar <- dashboardSidebar(
     )
 )
 
+
+JScode <- 
+"
+    
+
+"
+
+
+
+
+
+
+
+
 body <- dashboardBody(
     useShinyjs(),
     # This will call message-handler.js
@@ -87,8 +102,7 @@ body <- dashboardBody(
                   color:#2780e3;
                   }
                   '))),
-    tags$script(HTML('
-                         $(document).ready(function() {
+    tags$script(HTML('$(document).ready(function() {
                      $("header").find("nav").append(\'<span class="myClass"> Text Here </span>\');
                      })
                      ')),
