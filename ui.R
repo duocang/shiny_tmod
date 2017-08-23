@@ -58,6 +58,7 @@ img.link <- function(file) {
     return(div(class="gallerypanel", img, tags$br(), tags$hr(), name, desc))  # song: div: A division of text with a uniform style
 } 
 
+
 sidebar <- dashboardSidebar(
     width = 150,
     sidebarMenu(
@@ -72,40 +73,16 @@ sidebar <- dashboardSidebar(
     )
 )
 
-
-JScode <- 
-"
-    
-
-"
-
-
-
-
-
-
-
-
 body <- dashboardBody(
     useShinyjs(),
     # This will call message-handler.js
-    tags$head(tags$script(src = "message-handler.js"),
-              tags$link(rel = "stylesheet", type = "text/css", href = "css/tmod.css"),
-              tags$style(HTML(
-                  '.myClass { 
-                  font-size: 15px;
-                  line-height: 50px;
-                  text-align: left;
-                  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-                  padding: 0 15px;
-                  overflow:hidden;
-                  color:#2780e3;
-                  }
-                  '))),
-    tags$script(HTML('$(document).ready(function() {
-                     $("header").find("nav").append(\'<span class="myClass"> Text Here </span>\');
-                     })
-                     ')),
+    tags$head(tags$script(src = "alert_message.js"),
+              tags$script(scr = "showMessage.js"),
+              tags$link(rel = "stylesheet", type = "text/css", href = "css/tmod.css")),
+    # tags$script(HTML('$(document).ready(function() {
+    #                  $("header").find("nav").append(\'<span class="myClass"> Text Here </span>\');
+    #                  })
+    #                  ')),
     tabItems(
         tabItem(tabName = "file_preview",
                 fluidRow( column(12, offset=0, uiOutput("message_upload_page"),class="tmodMsg")),
@@ -186,7 +163,8 @@ body <- dashboardBody(
                     column(2,
                            numericInput("pie.lfc",
                                         NULL, 1, min = 0, max = 5, step = 0.5)),
-                    column(2, actionButton("run1", "Plot rug-like", class="tmodAct"))
+                    column(2, actionButton("run1", "Plot rug-like", class="tmodAct")),
+                    column(2,  uiOutput("tagcloudButton"))
                 ),
                 uiOutput("testOrExample_result")
         ),
@@ -212,7 +190,10 @@ dashboardPage(
                     tags$li(
                         actionLink("refresh", "Refresh", icon("refresh")),
                         class = "dropdown"),
+                    dropdownMenuOutput("downloadMenu"),
                     dropdownMenu(type = "messages",
+                                 icon = icon("user"),
+                                 headerText = "",
                                  messageItem(
                                      from = "王雪松(Xuesong Wang)",
                                      message = "wangxuesong29@gmail.com",
@@ -220,7 +201,17 @@ dashboardPage(
                                      ),
                                  messageItem(
                                      from = "Dr. January Weiner 3",
-                                     message = "+49-30-28460514")),
+                                     message = "+49-30-28460514"
+                                     )),
+                    dropdownMenu(
+                        tags$li(a(href = 'http://shinyapps.company.com',
+                                  icon("download"),
+                                  title = "Back to Apps Home"),
+                                class = "dropdown"),
+                        tags$li(
+                            actionLink("refresh", "Refresh", icon("refresh")),
+                            class = "dropdown")
+                    ),
                     titleWidth = 150),
     sidebar,
     body

@@ -82,10 +82,51 @@ observe({
 })
 
 
+# create a tagcloud button if results are generated
+# depends on: reactive value rv$results
+output$tagcloudButton <- renderUI({
+    catf( "+ generating tagcloud button\n" )
+    if( !is.null(rv$results) && nrow(rv$results) > 0 )
+        actionButton( "tagcloud", label= "⁘ Tagcloud", class="tmodAct" )
+    else
+        return( NULL )
+})
+
+## -------------------------------------------------------------------
+## Creates a tag cloud 
+## -------------------------------------------------------------------
+
+observeEvent(input$tagcloud, {
+    res <- isolate(rv$results)
+    req(res)
+    print("+ generating tagcloud")
+    w <- -log10(res$P.Value)
+    if(!is.null(res$AUC)) 
+        v <- res$AUC
+    else
+        v <- res$E
+    c <- smoothPalette(v, min=0.5) # Replace A Vector Of Numbers By A Gradient Of Colors
+    tags <- strmultline(gsub("_", " ", res$Title))
+    print(c)
+    print(tags)
+    output$tagcloudPlot <- renderPlot({ tagcloud(tags, weights=w, col=c)}, width=600, height=600)
+    updateTextInput(session, "show_tagcloudW", value=1)
+})
+
+## hide the popup window
+## also, the value for the radio buttons is set to the hidden radio button
+observe({
+    req(input$dismiss_tagcloudW)
+    if(input$dismiss_tagcloudW > 0)
+        updateTextInput(session, "show_tagcloudW", value=0)
+})
+
+
+
+
 
 output$plot0 <- renderPlot({
     req(input$run)
-    
     plo <- NULL
     withProgress(message = 'Making plot', value = 0, {
         n <- 10
@@ -105,14 +146,12 @@ output$plot0 <- renderPlot({
             updateSelectInput(session, "which_col_genename", selected = "-----------------")
             session$sendCustomMessage(type = "alert_message",
                                       message = "Wrong gene column selected! Please select gene cloumn, again!")
-            
         },error=function(e){
             addMsg("Wrong gene column selected!")
             updateSelectInput(session, "which_col_genename", selected = "-----------------")
             session$sendCustomMessage(type = "alert_message",
                                       message = "Wrong gene column selected! Please select gene cloumn, again!")
-        }
-        )
+        })
         
         
         if(!is.null(plo))
@@ -184,3 +223,49 @@ output$plot03 <- renderPlot({
     
     plot(1:1000, 1:1000)
 }, bg="transparent")
+
+
+
+
+output$downloadMenu <- renderMenu({
+    if(input$example == "exempty"){
+        from <-  c("heatmap-like", "rug-like ")
+        message <- c("张三", "李四")
+        df <- data.frame(from, message)
+        # Code to generate each of the messageItems here, in a list. This assumes
+        # that messageData is a data frame with two columns, 'from' and 'message'.
+        msgs <- apply(df, 1, function(row) {
+            messageItem(from = row[["from"]], message = row[["message"]])
+        })
+        
+        # This is equivalent to calling:
+        #   dropdownMenu(type="messages", msgs[[1]], msgs[[2]], ...)
+        dropdownMenu(type = "tasks", .list = msgs, icon = icon("download"))
+    }
+    if(input$example != "exempty"){
+        from <-  c("heatmap-like", "rug-like ")
+        message <- c("王二", "周四")
+        like <- c()
+        df <- data.frame(from, message)
+        # Code to generate each of the messageItems here, in a list. This assumes
+        # that messageData is a data frame with two columns, 'from' and 'message'.
+        msgs <- apply(df, 1, function(row) {
+            messageItem(from = row[["from"]], message = row[["message"]])
+        })
+        
+        # This is equivalent to calling:
+        #   dropdownMenu(type="messages", msgs[[1]], msgs[[2]], ...)
+        dropdownMenu(type = "tasks", .list = msgs, icon = icon("download"))
+    }
+})
+
+# create an export button if results are generated
+# depends on: reactive value rv$results
+output$exportButton <- renderUI({
+    catf( "+ generating export button\n" )
+    if( !is.null(rv$results) && nrow(rv$results) > 0 ) {
+        return(tags$a(id = "export", class = "btn shiny-download-link tmodAct", href = "", target = "_blank", "⏬ Export"))
+    } else {
+        return( NULL )
+    }
+})

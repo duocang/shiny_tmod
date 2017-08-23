@@ -9,7 +9,6 @@ library(shinyjqui)
 library(DT)
 
 
-
 data(tmod)
 mset <- tmod
 load("data/annotObject.RData")
@@ -141,7 +140,9 @@ function(input, output, session) {
                                              div(class="glist",
                                                  p(tags$b(textOutput("genelist_title"))),
                                                  p(HTML("Genes shown in <b>bold</b> are in the main data set")),
-                                                 p(uiOutput("genelist"))))),
+                                                 p(uiOutput("genelist")))),
+                                 popupWindow("tagcloudW",
+                                             div(plotOutput( "tagcloudPlot" ), style="width:600px;height:600px;" ))),
                         tabPanel("heatmap-like", plotOutput("plot3", height = "1000px")),
                         tabPanel("rug-like", plotOutput("plot03", height = "1000px")))
         }
@@ -235,8 +236,7 @@ function(input, output, session) {
         # if(is.null(input$which_col_genename))
         #     return(NULL)
         if(input$which_col_genename == "-----------------"){
-            session$sendCustomMessage(type = "alert_message",
-                                      message = 'Please select gene cloumn!')
+            session$sendCustomMessage(type = "alert_message", message = 'Please select gene cloumn!')
         }
     })
     
@@ -327,7 +327,27 @@ function(input, output, session) {
         }
     })
     
+    # refresh page
     observeEvent(input$refresh,{
         session$reload()
     })
+    
+    
+    # allows saving of the results in a CSV file
+    # note that there is no error handling if no results 
+    # have been generated
+    output$export <- downloadHandler(
+        filename=function() {
+            sprintf("results_%s_%s_%s.csv", Utest, isolate(input$mset), Sys.Date() ) 
+        },
+        content=function(file) {
+            if(!is.null(rv$results)) {
+                foo <- rv$results
+                foo$Genes <- getGenes(rv$results$ID, c(fg, bg), mset=isolate(input$gene_module))$Genes
+                write.csv(foo, file, row.names=FALSE)
+            }
+        }
+    )
+
+
 }
