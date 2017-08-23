@@ -1,0 +1,16 @@
+library(shiny)
+library(shinydashboard)
+library(data.table)
+library(tmod)
+library(shinyjs)
+library(markdown)
+library(shinyBS)
+library(shinyjqui)
+library(markdown)
+library(tagcloud)
+library(DT)
+library(shinyWidgets)
+data(tmod)
+mset <- tmod
+# It allows file bigger than 25M to be uploaded
+options(shiny.maxRequestSize=30*1024^2)

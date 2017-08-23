@@ -1,27 +1,7 @@
-library(shiny)
-library(shinydashboard)
-library(data.table)
-library(tmod)
-library(shinyjs)
-library(markdown)
-library(tagcloud)
-library(shinyjqui)
-library(DT)
-library(shinyWidgets)
-
-
-data(tmod)
-mset <- tmod
 load("data/annotObject.RData")
 load("data/msig.rda")
 
-
-# It allows file bigger than 25M to be uploaded
-options(shiny.maxRequestSize=30*1024^2)
-
-
 function(input, output, session) {
-    
     # global variables holding the state of the statistical tests
     fg           <- NULL
     Utest        <- "hg"

@@ -95,7 +95,6 @@ output$tagcloudButton <- renderUI({
 ## -------------------------------------------------------------------
 ## Creates a tag cloud 
 ## -------------------------------------------------------------------
-
 observeEvent(input$tagcloud, {
     res <- isolate(rv$results)
     req(res)

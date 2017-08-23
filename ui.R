@@ -1,16 +1,3 @@
-library(shiny)
-library(shinydashboard)
-library(data.table)
-library(tmod)
-library(shinyjs)
-library(markdown)
-library(shinyBS)
-library(shinyjqui)
-data(tmod)
-options(shiny.maxRequestSize=30*1024^2)
-
-mset <- tmod
-
 gallery.dir <- 'www/gallery/'
 ## creates a gallery with figures found in www/gallery
 get.gallery <- function() {
@@ -75,6 +62,7 @@ sidebar <- dashboardSidebar(
 )
 
 body <- dashboardBody(
+    
     useShinyjs(),
     # This will call message-handler.js
     tags$head(tags$script(src = "alert_message.js"),
@@ -221,7 +209,8 @@ body <- dashboardBody(
 # Put them together into a dashboardPage
 dashboardPage(
     skin = "black",
-    dashboardHeader(title = "tmod tests beta",
+    dashboardHeader(title = "tmod tests beta", 
+                    
                     tags$li(a(href = 'http://shinyapps.company.com',
                               icon("download"),
                               title = "Back to Apps Home"),
