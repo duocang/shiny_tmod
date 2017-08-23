@@ -7,6 +7,7 @@ library(markdown)
 library(tagcloud)
 library(shinyjqui)
 library(DT)
+library(shinyWidgets)
 
 
 data(tmod)
@@ -338,16 +339,14 @@ function(input, output, session) {
     # have been generated
     output$export <- downloadHandler(
         filename=function() {
-            sprintf("results_%s_%s_%s.csv", Utest, isolate(input$mset), Sys.Date() ) 
+            sprintf("results_%s_%s_%s.csv", Utest, isolate(input$gene_module), Sys.Date() ) 
         },
         content=function(file) {
             if(!is.null(rv$results)) {
                 foo <- rv$results
-                foo$Genes <- getGenes(rv$results$ID, c(fg, bg), mset=isolate(input$gene_module))$Genes
+                foo$Genes <- getGenes(rv$results$ID, fg, mset=isolate(input$gene_module))$Genes
                 write.csv(foo, file, row.names=FALSE)
             }
         }
     )
-
-
 }

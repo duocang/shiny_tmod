@@ -70,6 +70,7 @@ sidebar <- dashboardSidebar(
         menuItem("Download", tabName = "download", icon = icon("download"), startExpanded = FALSE),
         menuItem("Gallery", tabName = "gallery", icon = icon("file-picture-o"),startExpanded = FALSE),
         menuItem("Logs", tabName = "logs", icon = icon("info"), startExpanded = FALSE)
+        ,menuItem("实验", tabName = "shiyan")
     )
 )
 
@@ -164,7 +165,8 @@ body <- dashboardBody(
                            numericInput("pie.lfc",
                                         NULL, 1, min = 0, max = 5, step = 0.5)),
                     column(2, actionButton("run1", "Plot rug-like", class="tmodAct")),
-                    column(2,  uiOutput("tagcloudButton"))
+                    column(2,  uiOutput("tagcloudButton")),
+                    column(2, uiOutput("exportButton"))
                 ),
                 uiOutput("testOrExample_result")
         ),
@@ -176,6 +178,43 @@ body <- dashboardBody(
                 get.gallery()),
         tabItem(tabName = "logs",
                 fluidRow(column(10, htmlOutput( "messageLog"), br()) ))
+        ,tabItem(tabName = "shiyan",
+                 checkboxGroupButtons(
+                     inputId = "somevalue", label = "Make a choice :", 
+                     choices = c("Choice A", "Choice B", " Choice C", "Choice D"), 
+                     justified = TRUE, status = "primary",
+                     checkIcon = list(yes = icon("ok", lib = "glyphicon"), no = icon("remove", lib = "glyphicon"))),
+                 searchInput(
+                     inputId = "id", 
+                     label = "Enter your search :", 
+                     placeholder = "This is a placeholder", 
+                     btnSearch = icon("search"), 
+                     btnReset = icon("remove"), 
+                     width = "100%"
+                 ),
+                 dropdownButton(
+                     tags$h3("List of Input"),
+                     selectInput(inputId = 'xcol', label = 'X Variable', choices = names(iris)),
+                     selectInput(inputId = 'ycol', label = 'Y Variable', choices = names(iris), selected = names(iris)[[2]]),
+                     sliderInput(inputId = 'clusters', label = 'Cluster count', value = 3, min = 1, max = 9),
+                     circle = FALSE, status = "danger", icon = icon("gear"), width = "300px",
+                     tooltip = tooltipOptions(title = "Click to see inputs !")
+                 ),
+                 materialSwitch(inputId = "id", label = "Primary switch", status = "primary", right = TRUE)
+                 ,switchInput(inputId = "Id012", 
+                              onLabel = "Example", offLabel = "Files")
+                 ,pickerInput(
+                     inputId = "id", 
+                     label = "Select/deselect all options", 
+                     choices = LETTERS, options = list(`actions-box` = TRUE), 
+                     multiple = TRUE
+                 )
+                
+                 
+                 
+                 
+                 
+                 )
     ),class="params"
 )
 

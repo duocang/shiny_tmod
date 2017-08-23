@@ -107,8 +107,6 @@ observeEvent(input$tagcloud, {
         v <- res$E
     c <- smoothPalette(v, min=0.5) # Replace A Vector Of Numbers By A Gradient Of Colors
     tags <- strmultline(gsub("_", " ", res$Title))
-    print(c)
-    print(tags)
     output$tagcloudPlot <- renderPlot({ tagcloud(tags, weights=w, col=c)}, width=600, height=600)
     updateTextInput(session, "show_tagcloudW", value=1)
 })
