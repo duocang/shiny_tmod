@@ -11,6 +11,7 @@ function(input, output, session) {
     # reactive values
     rv <- reactiveValues()
     rv$results <- NULL
+    rv$headerMessage <- NULL# this is used to show message in header
     
     si <- sessionInfo()
     # load the code
@@ -254,6 +255,11 @@ function(input, output, session) {
         updateTabsetPanel(session, "inTabset", selected = "heatmap-like")
     })
     
+    # when "Tagcloud" is clicked, it will show table tab
+    observeEvent(input$tagcloud,{
+        updateTabsetPanel(session, "inTabset", selected = "table")
+    })
+    
     # an example is selected, corresponding test will runn 
     # and result will be given to rv$results
     observe({
@@ -304,7 +310,6 @@ function(input, output, session) {
             disable("example")
             output$message_upload_page <- renderText(
                 "💡 <b>Message:</b> Uploaded file(s) will be used for running!   💡 <b>Go to Test tap</b>")
-            
         }
     })
     
@@ -312,7 +317,6 @@ function(input, output, session) {
     observeEvent(input$refresh,{
         session$reload()
     })
-    
     
     # allows saving of the results in a CSV file
     # note that there is no error handling if no results 
@@ -329,4 +333,24 @@ function(input, output, session) {
             }
         }
     )
+    
+    
+    
+    
+    
+    # this block fires each time we receive a message from JavaScript
+    output$text <- renderText({
+        count <- 0
+        paste("you clicked", input$count, "times on the RStudio ball",  input$gene_module)
+        
+    })
+    
+    observe({
+        input$run
+        mess <- "I am worried about you"
+        
+        print("I am worried about you")
+        session$sendCustomMessage(type="header_message", mess)
+    })
+    
 }

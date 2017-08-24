@@ -1,4 +1,4 @@
-## a function which updates the log as well as the status message
+ ## a function which updates the log as well as the status message
 ## side effect: modify the log global variable
 addMsg <- function(message, ...) {
     message <- sprintf( message, ... )
@@ -7,8 +7,8 @@ addMsg <- function(message, ...) {
     log <<- paste0( time, ": ", message, "\n", log )
     output$messageLog <- renderUI({ HTML(paste0("<pre>", log, "</pre>")) })
     catf( "MESSAGE: %s\n", message )
+    rv$headerMessage <- message
 }
-
 
 
 ## a function which updates the log only

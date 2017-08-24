@@ -186,17 +186,13 @@ output$plot01 <- renderPlot({
             Sys.sleep(0.1)
         }
         res <- isolate(stat_test())
-        print("fasdfsadfasdf发多少发松岛枫")
-        print(res)
         sapply(res, function(x){
             if(nrow(x) == 0){
                 addMsg(sprintf("There is no moudle named %s!", isolate(input$gene_module)))
                 return(NULL)
             }
         })
-        
         pie <- isolate(stat_test1())
-        
         names(pie) <- names(res)
         if(!is.null(res))
             tmodPanelPlot(res, pie=pie, pie.style="r", grid="b", filter.rows.pval=0.001)
@@ -221,47 +217,12 @@ output$plot03 <- renderPlot({
     plot(1:1000, 1:1000)
 }, bg="transparent")
 
-
-
-
-output$downloadMenu <- renderMenu({
-    if(input$example == "exempty"){
-        from <-  c("heatmap-like", "rug-like ")
-        message <- c("张三", "李四")
-        df <- data.frame(from, message)
-        # Code to generate each of the messageItems here, in a list. This assumes
-        # that messageData is a data frame with two columns, 'from' and 'message'.
-        msgs <- apply(df, 1, function(row) {
-            messageItem(from = row[["from"]], message = row[["message"]])
-        })
-        
-        # This is equivalent to calling:
-        #   dropdownMenu(type="messages", msgs[[1]], msgs[[2]], ...)
-        dropdownMenu(type = "tasks", .list = msgs, icon = icon("download"))
-    }
-    if(input$example != "exempty"){
-        from <-  c("heatmap-like", "rug-like ")
-        message <- c("王二", "周四")
-        like <- c()
-        df <- data.frame(from, message)
-        # Code to generate each of the messageItems here, in a list. This assumes
-        # that messageData is a data frame with two columns, 'from' and 'message'.
-        msgs <- apply(df, 1, function(row) {
-            messageItem(from = row[["from"]], message = row[["message"]])
-        })
-        
-        # This is equivalent to calling:
-        #   dropdownMenu(type="messages", msgs[[1]], msgs[[2]], ...)
-        dropdownMenu(type = "tasks", .list = msgs, icon = icon("download"))
-    }
-})
-
 # create an export button if results are generated
 # depends on: reactive value rv$results
 output$exportButton <- renderUI({
     catf( "+ generating export button\n" )
     if( !is.null(rv$results) && nrow(rv$results) > 0 ) {
-        return(tags$a(id = "export", class = "btn shiny-download-link tmodAct", href = "", target = "_blank", "⏬ Export"))
+        return(tags$a(id = "export", class = "btn shiny-download-link headerButton", href = "", target = "_blank",icon("download"), ""))
     } else {
         return( NULL )
     }

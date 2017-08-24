@@ -62,11 +62,10 @@ sidebar <- dashboardSidebar(
 )
 
 body <- dashboardBody(
-    
     useShinyjs(),
     # This will call message-handler.js
-    tags$head(tags$script(src = "alert_message.js"),
-              tags$script(scr = "showMessage.js"),
+    tags$head(tags$script(src = "js/alert_message.js"),
+              # tags$script(src = "//code.jquery.com/jquery-3.2.1.min.js"),
               tags$link(rel = "stylesheet", type = "text/css", href = "css/tmod.css")),
     # tags$script(HTML('$(document).ready(function() {
     #                  $("header").find("nav").append(\'<span class="myClass"> Text Here </span>\');
@@ -153,8 +152,8 @@ body <- dashboardBody(
                            numericInput("pie.lfc",
                                         NULL, 1, min = 0, max = 5, step = 0.5)),
                     column(2, actionButton("run1", "Plot rug-like", class="tmodAct")),
-                    column(2,  uiOutput("tagcloudButton")),
-                    column(2, uiOutput("exportButton"))
+                    column(2, uiOutput("tagcloudButton"))#,
+                    #column(2, uiOutput("exportButton"))
                 ),
                 uiOutput("testOrExample_result")
         ),
@@ -197,8 +196,15 @@ body <- dashboardBody(
                      choices = LETTERS, options = list(`actions-box` = TRUE), 
                      multiple = TRUE
                  )
-                
+                 ,
                  
+                  # image of rstudio logo
+                 img(src = "RStudio-Ball.png", id = "RStudio"),
+                  
+                  # text output
+                 textOutput("text")
+                     
+
                  
                  
                  
@@ -210,13 +216,15 @@ body <- dashboardBody(
 dashboardPage(
     skin = "black",
     dashboardHeader(title = "tmod tests beta", 
+                    tags$li(uiOutput(offset=0, htmlOutput("messageInHeader", inline=TRUE), class="tmodMsg" ),
+                        class= "dropdown"),
+                    tags$li(uiOutput("exportButton"),class="dropdown"),
                     
-                    tags$li(a(href = 'http://shinyapps.company.com',
-                              icon("download"),
-                              title = "Back to Apps Home"),
-                            class = "dropdown"),
+                    # tags$li(
+                    #     actionLink("dd", "", icon = icon("download"), class = "btn shiny-download-link headerButton", href = "", target = "_blank"),
+                    #     class = "dropdown"),
                     tags$li(
-                        actionLink("refresh", "Refresh", icon("refresh")),
+                        actionLink("refresh", "", icon("refresh")),
                         class = "dropdown"),
                     dropdownMenuOutput("downloadMenu"),
                     dropdownMenu(type = "messages",
@@ -231,15 +239,16 @@ dashboardPage(
                                      from = "Dr. January Weiner 3",
                                      message = "+49-30-28460514"
                                      )),
-                    dropdownMenu(
-                        tags$li(a(href = 'http://shinyapps.company.com',
-                                  icon("download"),
-                                  title = "Back to Apps Home"),
-                                class = "dropdown"),
-                        tags$li(
-                            actionLink("refresh", "Refresh", icon("refresh")),
-                            class = "dropdown")
-                    ),
+                    #tags$li(actionButton("download", "",icon = icon("download"), class="headerButton"), class = "dropdown"),
+                    # dropdownMenu(
+                    #     tags$li(a(href = 'http://shinyapps.company.com',
+                    #               icon("download"),
+                    #               title = "Back to Apps Home"),
+                    #             class = "dropdown"),
+                    #     tags$li(
+                    #         actionLink("refresh", "Refresh", icon("refresh")),
+                    #         class = "dropdown")
+                    # ),
                     titleWidth = 150),
     sidebar,
     body
