@@ -216,7 +216,7 @@ body <- dashboardBody(
 dashboardPage(
     skin = "black",
     dashboardHeader(title = "tmod tests beta", 
-                    tags$li(uiOutput(offset=0, htmlOutput("messageInHeader", inline=TRUE), class="tmodMsg" ),
+                    tags$li(uiOutput("messageInHeader", class="tmodMsgHeader"),
                         class= "dropdown"),
                     tags$li(uiOutput("exportButton"),class="dropdown"),
                     

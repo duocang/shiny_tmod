@@ -95,6 +95,15 @@ body{
   color:#2780e3;
 }
 
+.tmodMsgHeader{
+
+  color:#2780e3;
+  padding:14px;
+  position: fixed;
+  top:1px;
+  left:190px;
+}
+
 .warn {
   color:#600;
 }
@@ -116,7 +125,6 @@ body{
   cursor:pointer;
   overflow: hidden;
   padding:14px;
-
 }
 
 
