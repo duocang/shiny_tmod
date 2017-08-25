@@ -56,8 +56,9 @@ sidebar <- dashboardSidebar(
         menuItem("Help", tabName = "help", icon = icon("question")),
         menuItem("Download", tabName = "download", icon = icon("download"), startExpanded = FALSE),
         menuItem("Gallery", tabName = "gallery", icon = icon("file-picture-o"),startExpanded = FALSE),
-        menuItem("Logs", tabName = "logs", icon = icon("info"), startExpanded = FALSE)
-        ,menuItem("实验", tabName = "shiyan")
+        menuItem("Logs", tabName = "logs", icon = icon("info"), startExpanded = FALSE),
+        menuItem("实验", tabName = "shiyan")
+        ,uiOutput("developer")
     )
 )
 
@@ -73,7 +74,6 @@ body <- dashboardBody(
     #                  ')),
     tabItems(
         tabItem(tabName = "file_preview",
-                fluidRow( column(12, offset=0, uiOutput("message_upload_page"),class="tmodMsg")),
                 fluidRow(
                     column(3, 
                            fileInput("files", label = "Upload file(s)", 
@@ -92,7 +92,6 @@ body <- dashboardBody(
                 class="params",
                 DT::dataTableOutput("table")),
         tabItem(tabName = "tests",
-                fluidRow( column(12, offset=0, htmlOutput("message", inline=TRUE), class="tmodMsg" )),
                 fluidRow(
                     column(3, "  Gene module"),
                     column(2, "  Gene sort" ),

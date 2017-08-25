@@ -293,7 +293,7 @@ function(input, output, session) {
             disable("pie.lfc")
             disable("test_type")
             disable("files")
-            output$message_upload_page <- renderText("💡 <b>Message:</b> Example is ready for running!   💡 <b>Go to Test tap</b>")
+            addMsg("Example is ready for running!   <b>Go to Test tap</b>")
             return()
         }
         enable("sort_by")
@@ -308,8 +308,7 @@ function(input, output, session) {
     observeEvent(input$files,{
         if(!is.null(input$files)){
             disable("example")
-            output$message_upload_page <- renderText(
-                "💡 <b>Message:</b> Uploaded file(s) will be used for running!   💡 <b>Go to Test tap</b>")
+            addMsg(" Uploaded file(s) will be used for running!   <b>Go to Test tap</b>")
         }
     })
     
@@ -336,7 +335,15 @@ function(input, output, session) {
     
     
     
-    
+    output$developer <- renderText({
+        "青青子衿，悠悠我心。\n
+         纵我不往，子宁不嗣音？
+         青青子佩，悠悠我思。
+         纵我不往，子宁不来？
+         挑兮达兮，在城阙兮。
+         一日不见，如三月兮。
+        "
+    })
     
     # this block fires each time we receive a message from JavaScript
     output$text <- renderText({
