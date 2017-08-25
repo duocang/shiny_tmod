@@ -124,13 +124,12 @@ function(input, output, session) {
                                                  p(HTML("Genes shown in <b>bold</b> are in the main data set")),
                                                  p(uiOutput("genelist")))),
                                  popupWindow("tagcloudW",
-                                             div(plotOutput( "tagcloudPlot" ), style="width:600px;height:600px;" ))),
+                                             div(plotOutput( "tagcloudPlot" ), style="width:500px;height:500px;" ))),
                         tabPanel("heatmap-like", plotOutput("plot3", height = "1000px")),
                         tabPanel("rug-like", plotOutput("plot03", height = "1000px")))
         }
     })
     
-
     # below will do many things:
     # 1. sort data by selected column
     # 2. abs
@@ -212,11 +211,6 @@ function(input, output, session) {
     observeEvent(input$run,{
         req(input$run)
         req(input$which_col_genename)
-        # if(input$run == 0){
-        #     return(NULL)
-        # }
-        # if(is.null(input$which_col_genename))
-        #     return(NULL)
         if(input$which_col_genename == "-----------------"){
             session$sendCustomMessage(type = "alert_message", message = 'Please select gene cloumn!')
         }
@@ -336,12 +330,12 @@ function(input, output, session) {
     
     
     output$developer <- renderText({
-        "青青子衿，悠悠我心。\n
-         纵我不往，子宁不嗣音？
-         青青子佩，悠悠我思。
-         纵我不往，子宁不来？
-         挑兮达兮，在城阙兮。
-         一日不见，如三月兮。
+        " 青青子衿，悠悠我心。<br>
+          纵我不往，子宁不嗣音？<br>
+          青青子佩，悠悠我思。<br>
+          纵我不往，子宁不来？<br>
+          挑兮达兮，在城阙兮。<br>
+          一日不见，如三月兮。
         "
     })
     

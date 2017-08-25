@@ -47,18 +47,18 @@ img.link <- function(file) {
 
 
 sidebar <- dashboardSidebar(
-    width = 150,
+    width = 200,
     sidebarMenu(
-        menuItem("Test", tabName = "file", icon = icon("file-o"),
-                 menuSubItem("Upload File(s)", tabName = "file_preview"),
-                 menuSubItem("Test", tabName = "tests"),
+        menuItem("COME and GO", tabName = "file", icon = icon("file-o"),
+                 menuSubItem("Upload File(s)", tabName = "file_preview", icon = shiny::icon("upload")),
+                 menuSubItem("Test", tabName = "tests", icon = shiny::icon("area-chart")),
                  startExpanded = TRUE),
         menuItem("Help", tabName = "help", icon = icon("question")),
         menuItem("Download", tabName = "download", icon = icon("download"), startExpanded = FALSE),
         menuItem("Gallery", tabName = "gallery", icon = icon("file-picture-o"),startExpanded = FALSE),
         menuItem("Logs", tabName = "logs", icon = icon("info"), startExpanded = FALSE),
         menuItem("实验", tabName = "shiyan")
-        ,uiOutput("developer")
+        ,uiOutput("developer", class = "classicOfPoetry")
     )
 )
 
@@ -217,7 +217,8 @@ dashboardPage(
     dashboardHeader(title = "tmod tests beta", 
                     tags$li(uiOutput("messageInHeader", class="tmodMsgHeader"),
                         class= "dropdown"),
-                    tags$li(uiOutput("exportButton"),class="dropdown"),
+                    tags$li(uiOutput("cloudWordButton"), class= "dropdown"),
+                    tags$li(uiOutput("exportButton"), class="dropdown"),
                     
                     # tags$li(
                     #     actionLink("dd", "", icon = icon("download"), class = "btn shiny-download-link headerButton", href = "", target = "_blank"),
@@ -248,7 +249,7 @@ dashboardPage(
                     #         actionLink("refresh", "Refresh", icon("refresh")),
                     #         class = "dropdown")
                     # ),
-                    titleWidth = 150),
+                    titleWidth = 158),
     sidebar,
     body
 )

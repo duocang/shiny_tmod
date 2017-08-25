@@ -84,10 +84,17 @@ observe({
 
 # create a tagcloud button if results are generated
 # depends on: reactive value rv$results
-output$tagcloudButton <- renderUI({
+# output$tagcloudButton <- renderUI({
+#     catf( "+ generating tagcloud button\n" )
+#     if( !is.null(rv$results) && nrow(rv$results) > 0 )
+#         actionButton( "tagcloud", label= "⁘ Tagcloud", class="tmodAct" )
+#     else
+#         return( NULL )
+# })
+output$cloudWordButton <- renderUI({
     catf( "+ generating tagcloud button\n" )
     if( !is.null(rv$results) && nrow(rv$results) > 0 )
-        actionButton( "tagcloud", label= "⁘ Tagcloud", class="tmodAct" )
+        actionButton( "tagcloud", label= "",icon = icon("cloud"), class="headerButton" )
     else
         return( NULL )
 })

@@ -32,7 +32,7 @@ body{
 /* pop-up overlay windows */
 .overlay{
   position: absolute;
-  top: 30%;
+  top: 80%;
   left: 30%;
   margin-top:-150px;
   margin-left:-250px;
@@ -96,7 +96,7 @@ body{
 }
 
 .tmodMsgHeader{
-
+  font-size: 15px;
   color:#2780e3;
   padding:14px;
   position: fixed;
@@ -125,6 +125,15 @@ body{
   cursor:pointer;
   overflow: hidden;
   padding:14px;
+}
+
+.classicOfPoetry{
+  color: #696969;
+  margin-left:30px;
+  position: fixed;;
+  bottom: 20px;
+  font-size: 12px;
+  font-family:  Tahoma, Helvetica, Arial, "Microsoft Yahei","微软雅黑", STXihei, "华文细黑", sans-serif;
 }
 
 
