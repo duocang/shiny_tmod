@@ -82,21 +82,10 @@ observe({
 
 # create a tagcloud button if results are generated
 # depends on: reactive value rv$results
-# output$tagcloudButton <- renderUI({
-#     catf( "+ generating tagcloud button\n" )
-#     if( !is.null(rv$results) && nrow(rv$results) > 0 )
-#         actionButton( "tagcloud", label= "⁘ Tagcloud", class="tmodAct" )
-#     else
-#         return( NULL )
-# })
 output$cloudWordButton <- renderUI({
     req(rv$results)
     catf( "+ generating tagcloud button\n" )
     actionButton( "tagcloud", label= "",icon = icon("cloud"), class="headerButton" )
-    # if( !is.null(rv$results) && nrow(rv$results) > 0 )
-    #     actionButton( "tagcloud", label= "",icon = icon("cloud"), class="headerButton" )
-    # else
-    #     return( NULL )
 })
 
 ## -------------------------------------------------------------------
@@ -233,4 +222,22 @@ output$uploadExportButton <- renderUI({
     req(rv$uploadResults)
     catf( "+ generating uploaded files export button\n" )
     return(tags$a(id = "uploadExport", class = "btn shiny-download-link headerButton", href="", target = "_blank",icon("download"), ""))
+})
+
+
+output$tableToTest <- renderUI({
+    if(input$example != "exempty"){
+        return(selectInput("resultToTest", NULL, choices ="Example data"))
+    }
+    if(is.null(input$files))
+        selectInput("resultToTest", NULL, NULL)
+    else{
+        selectInput("resultToTest", label = NULL, choices = input$files$name)
+    }
+    # dropdownButton(
+    #     tags$h3("随便先说点什么"),
+    #     selectInput("resultToTest", label = "要显示哪一个文件的结果？", choices = input$files$name),
+    #     circle = FALSE, status = "danger", icon = icon("file"),color = "white",
+    #     tooltip = tooltipOptions(title = "Click to see inputs !")
+    # )
 })

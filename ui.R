@@ -89,6 +89,7 @@ body <- dashboardBody(
                 DT::dataTableOutput("table")),
         tabItem(tabName = "tests",
                 fluidRow(
+                    column(2, " Show each result"),
                     column(3, "  Gene module"),
                     column(2, "  Gene sort" ),
                     column(2, "  Trend" ),
@@ -96,6 +97,7 @@ body <- dashboardBody(
                     column(2, "  Test type" ),
                     class="paramHeader"),
                 fluidRow(
+                    column(2, uiOutput("tableToTest")),
                     column(3, 
                            selectInput( "gene_module", NULL,
                                         list(  "Li et al. and B. Pulendran (LI)"="LI"
@@ -133,8 +135,8 @@ body <- dashboardBody(
                                           choices = c("" ,
                                                       "tmodCERNOtest" = "tmodCERNOtest",
                                                       "tmodUtest" = "tmodUtest"),
-                                          selected = "tmodUtest")),
-                    column(2, actionButton("run", "Plot heatmap-like", class="tmodAct"))),
+                                          selected = "tmodUtest"))
+                    ),
                 fluidRow(
                     column(2, "  pie.pval"),
                     column(2, "  pie.lfc" ),
@@ -146,9 +148,9 @@ body <- dashboardBody(
                     column(2,
                            numericInput("pie.lfc",
                                         NULL, 1, min = 0, max = 5, step = 0.5)),
-                    column(2, actionButton("run1", "Plot rug-like", class="tmodAct")),
-                    column(2, uiOutput("tagcloudButton"))#,
-                    #column(2, uiOutput("exportButton"))
+                    column(2, actionButton("run", "Plot heatmap-like", class="tmodAct")),
+                    column(2, actionButton("run1", "Plot rug-like", class="tmodAct"))
+                    
                 ),
                 uiOutput("testOrExample_result")
         ),
@@ -211,14 +213,11 @@ body <- dashboardBody(
 dashboardPage(
     skin = "black",
     dashboardHeader(title = "tmod tests beta", 
-                    tags$li(uiOutput("messageInHeader", class="tmodMsgHeader"),class= "dropdown"),
-                    tags$li(uiOutput("cloudWordButton"), class= "dropdown"),
-                    tags$li(uiOutput("exampleExportButton"), class="dropdown"),
+                    tags$li(uiOutput("messageInHeader", class ="tmodMsgHeader"),class= "dropdown"),
+                    tags$li(uiOutput("uploadCloudWordButton"), class = "dropdown"),
+                    tags$li(uiOutput("cloudWordButton"), class = "dropdown"),
+                    tags$li(uiOutput("exampleExportButton"), class = "dropdown"),
                     tags$li(uiOutput("uploadExportButton"), class = "dropdown"),
-                    
-                    # tags$li(
-                    #     actionLink("dd", "", icon = icon("download"), class = "btn shiny-download-link headerButton", href = "", target = "_blank"),
-                    #     class = "dropdown"),
                     tags$li(
                         actionLink("refresh", "", icon("refresh")),
                         class = "dropdown"),
