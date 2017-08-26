@@ -117,98 +117,85 @@ observe({
 
 output$plot0 <- renderPlot({
     req(input$run)
-    plo <- NULL
-    withProgress(message = 'Making plot', value = 0, {
-        n <- 10
-        # Number of times we'll go through the loop
-        for (i in 1:n) {
-            # Each time through the loop, add another row of data. This is
-            # a stand-in for a long-running computation.
-            # Increment the progress bar, and update the detail text.
-            incProgress(1/n, detail = paste("", ""))
-            # Pause for 0.1 seconds to simulate a long computation.
-            Sys.sleep(0.1)
-        }
-        tryCatch({
-            plo <- isolate(stat_test())
-        },warning=function(w){
-            addMsg("Wrong gene column selected!")
-            updateSelectInput(session, "which_col_genename", selected = "-----------------")
-            session$sendCustomMessage(type = "alert_message",
-                                      message = "Wrong gene column selected! Please select gene cloumn, again!")
-        },error=function(e){
-            addMsg("Wrong gene column selected!")
-            updateSelectInput(session, "which_col_genename", selected = "-----------------")
-            session$sendCustomMessage(type = "alert_message",
-                                      message = "Wrong gene column selected! Please select gene cloumn, again!")
-        })
-        
-        req(plo)
-        tmodPanelPlot(plo, text.cex = 0.9, legend.style = "auto")
-        # if(!is.null(plo))
-        #     tmodPanelPlot(plo, text.cex = 0.9, legend.style = "auto")
-        # else
-        #     return(NULL)
-        print("plot done")
-        # tryCatch({
-        #     plo <- stat_test()
-        #     if(!is.null(plo))
-        #         tmodPanelPlot(plo, text.cex = 0.9, legend.style = "auto")
-        #     print("plot done")
-        # },
-        # warning = function(w){
-        #     print("no correct gene column selected")
-        # },
-        # error = function(e){
-        #     print("gene column is selected, but it is processed by isolated() function")
-        #     return(NULL)
-        # })
-    })
-}, bg="transparent")
-
-output$plot01 <- renderPlot({
-    input$run1
-    withProgress(message = 'Making plot', value = 0, {
-        n <- 10
-        # Number of times we'll go through the loop
-        for (i in 1:n) {
-            # Each time through the loop, add another row of data. This is
-            # a stand-in for a long-running computation.
-            # Increment the progress bar, and update the detail text.
-            incProgress(1/n, detail = paste("", ""))
-            # Pause for 0.1 seconds to simulate a long computation.
-            Sys.sleep(0.1)
-        }
-        res <- isolate(stat_test())
-        sapply(res, function(x){
-            if(nrow(x) == 0){
-                addMsg(sprintf("There is no moudle named %s!", isolate(input$gene_module)))
-                return(NULL)
+    if(!is.null(isolate(input$files))){
+        plo <- NULL
+        withProgress(message = 'Making plot', value = 0, {
+            n <- 10
+            # Number of times we'll go through the loop
+            for (i in 1:n) {
+                # Each time through the loop, add another row of data. This is
+                # a stand-in for a long-running computation.
+                # Increment the progress bar, and update the detail text.
+                incProgress(1/n, detail = paste("", ""))
+                # Pause for 0.1 seconds to simulate a long computation.
+                Sys.sleep(0.1)
             }
+            tryCatch({
+                plo <- isolate(stat_test())
+            },warning=function(w){
+                addMsg("Wrong gene column selected!")
+                updateSelectInput(session, "which_col_genename", selected = "-----------------")
+                session$sendCustomMessage(type = "alert_message",
+                                          message = "Wrong gene column selected! Please select gene cloumn, again!")
+            },error=function(e){
+                addMsg("Wrong gene column selected!")
+                updateSelectInput(session, "which_col_genename", selected = "-----------------")
+                session$sendCustomMessage(type = "alert_message",
+                                          message = "Wrong gene column selected! Please select gene cloumn, again!")
+            })
+            req(plo)
+            tmodPanelPlot(plo, text.cex = 0.9, legend.style = "auto")
+            #print("plot done")
         })
-        pie <- isolate(stat_test1())
-        names(pie) <- names(res)
-        if(!is.null(res))
-            tmodPanelPlot(res, pie=pie, pie.style="r", grid="b", filter.rows.pval=0.001)
-    })
-}, bg="transparent")
+    }
+    if(isolate(input$example) != "exempty"){
+        req(isolate(input$example))
+        plo <- list(isolate(rv$results))
+        names(plo) <- "Example Data"
+        tmodPanelPlot(plo, text.cex = 0.9, legend.style = "auto")
+    }
 
-output$plot0 <- renderPlot({
-    input$run
-    req(isolate(input$example))
-    plo <- list(isolate(rv$results))
-    names(plo) <- "Example Data"
-    tmodPanelPlot(plo, text.cex = 0.9, legend.style = "auto")
 }, bg="transparent")
 
 output$plot01 <- renderPlot({
     input$run1
-    req(isolate(input$example))
-    print(head(fg))
-    pie <- tmodDecideTests(g=fg, mset = isolate(getMset()))
-    print(head(pie))
-    plot(1:1000, 1:1000)
+    if(!is.null(isolate(input$files)))
+    {
+        withProgress(message = 'Making plot', value = 0, {
+            n <- 10
+            # Number of times we'll go through the loop
+            for (i in 1:n) {
+                # Each time through the loop, add another row of data. This is
+                # a stand-in for a long-running computation.
+                # Increment the progress bar, and update the detail text.
+                incProgress(1/n, detail = paste("", ""))
+                # Pause for 0.1 seconds to simulate a long computation.
+                Sys.sleep(0.1)
+            }
+            res <- isolate(stat_test())
+            sapply(res, function(x){
+                if(nrow(x) == 0){
+                    addMsg(sprintf("There is no moudle named %s!", isolate(input$gene_module)))
+                    return(NULL)
+                }
+            })
+            pie <- isolate(stat_test1())
+            names(pie) <- names(res)
+            if(!is.null(res))
+                tmodPanelPlot(res, pie=pie, pie.style="r", grid="b", filter.rows.pval=0.001)
+        })
+    }
+    if(isolate(input$example) != "exempty"){
+        req(isolate(input$example))
+        print(head(fg))
+        pie <- tmodDecideTests(g=fg, mset = isolate(getMset()))
+        print(head(pie))
+        plot(1:1000, 1:1000)
+    }
 }, bg="transparent")
+
+
+
 
 # create an export button if results are generated
 # depends on: reactive value rv$results

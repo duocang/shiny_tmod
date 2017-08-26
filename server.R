@@ -123,8 +123,8 @@ function(input, output, session) {
                                              p(uiOutput("genelist")))),
                              popupWindow("tagcloudW",
                                          div(plotOutput( "tagcloudPlot" ), style="width:600px;height:600px;" ))),
-                    tabPanel("heatmap-like", plotOutput("plot0", height = "1000px")),
-                    tabPanel("rug-like", plotOutput("plot01", height = "1000px")))
+                    tabPanel("heatmap-like", plotOutput("plot0", height = "1500px")),
+                    tabPanel("rug-like", plotOutput("plot01", height = "1500px")))
         
     })
     
@@ -220,12 +220,12 @@ function(input, output, session) {
         }
     })
     
-    observeEvent(input$which_preview_file,{
-        Sys.sleep(0.5)
-        if(file_num() != 0)
-            session$sendCustomMessage(type = "alert_message",
-                                      message = "Please select gene cloumn!")
-    })
+    # observeEvent(input$which_preview_file,{
+    #     Sys.sleep(0.5)
+    #     if(file_num() != 0)
+    #         session$sendCustomMessage(type = "alert_message",
+    #                                   message = "Please select gene cloumn!")
+    # })
     
     
     # "2017-08-07 10:05:28: Running tmod in version 0.31" is printed in tab "Logs"
