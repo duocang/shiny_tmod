@@ -193,7 +193,7 @@ output$plot01 <- renderPlot({
     })
 }, bg="transparent")
 
-output$plot3 <- renderPlot({
+output$plot0 <- renderPlot({
     input$run
     req(isolate(input$example))
     plo <- list(isolate(rv$results))
@@ -201,7 +201,7 @@ output$plot3 <- renderPlot({
     tmodPanelPlot(plo, text.cex = 0.9, legend.style = "auto")
 }, bg="transparent")
 
-output$plot03 <- renderPlot({
+output$plot01 <- renderPlot({
     input$run1
     req(isolate(input$example))
     print(head(fg))
@@ -226,18 +226,11 @@ output$uploadExportButton <- renderUI({
 
 
 output$tableToTest <- renderUI({
-    if(input$example != "exempty"){
+    if(input$example != "exempty")
         return(selectInput("resultToTest", NULL, choices ="Example data"))
-    }
     if(is.null(input$files))
         selectInput("resultToTest", NULL, NULL)
     else{
         selectInput("resultToTest", label = NULL, choices = input$files$name)
     }
-    # dropdownButton(
-    #     tags$h3("随便先说点什么"),
-    #     selectInput("resultToTest", label = "要显示哪一个文件的结果？", choices = input$files$name),
-    #     circle = FALSE, status = "danger", icon = icon("file"),color = "white",
-    #     tooltip = tooltipOptions(title = "Click to see inputs !")
-    # )
 })
