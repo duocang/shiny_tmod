@@ -114,14 +114,19 @@ formatResultsTable <- function(res) {
     res$cerno <- NULL
     res$cES <- NULL
     res <- formatTablePval(res, c( "P.Value", "adj.P.Val") )
+    print("到么大大发第三方")
+    print(class(res))
+    print(head(res))
     if(!is.null(res$AUC)) res$AUC <- round(res$AUC, digits=2)
     if(!is.null(res$E))   res$E <- round(res$E, digits=2)
-    
+    print("极乐空间了")
     # need this for MSigDB names
     res$Title <- gsub( "_", " ", res$Title)
-    
+    print(head(res))
+    print("UI欧普偶偶")
     nn <- 1:nrow(res)
     # it includes two button in table
+    print("没防守打法")
     buttons <- paste0(
         sprintf( '<input type="radio" name="row"   id="r%d" value="%d" /><label for="r%d">Plot</label>&nbsp;', nn, nn, nn),
         sprintf( '<input type="radio" name="glist" id="l%d" value="%d" /><label for="l%d">List</label>', nn, nn, nn))
@@ -129,7 +134,7 @@ formatResultsTable <- function(res) {
         res$Title <- paste0( '<a href="', res$URL, '" target="_blank">', res$Title, '</a>' )
         res$URL <- NULL
     }
-
+    print("则指的是")
     res <- cbind(Action=buttons, res)
     res
 }

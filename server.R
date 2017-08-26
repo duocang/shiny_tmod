@@ -135,6 +135,7 @@ function(input, output, session) {
     # 4. tmod test 
     stat_test <- reactive({
         input$run
+        input$which_col_genename
         dat <- isolate(loaded_data())
         if(is.null(dat) || length(dat)==0) {
             addMsg("NO DATA! Upload file(s) or select an example.")
@@ -219,15 +220,7 @@ function(input, output, session) {
             session$sendCustomMessage(type = "alert_message", message = 'Please select gene cloumn!')
         }
     })
-    
-    # observeEvent(input$which_preview_file,{
-    #     Sys.sleep(0.5)
-    #     if(file_num() != 0)
-    #         session$sendCustomMessage(type = "alert_message",
-    #                                   message = "Please select gene cloumn!")
-    # })
-    
-    
+
     # "2017-08-07 10:05:28: Running tmod in version 0.31" is printed in tab "Logs"
     addLog("Run tmod in version %s", si$otherPkgs$tmod$Version)
     
@@ -274,13 +267,6 @@ function(input, output, session) {
         rv$results <- run.stats(fg, Utest, mset=mset)
     })
     
-    output$example_results <- renderDataTable({
-        res <- formatResultsTable(rv$results)
-        req(res)
-        # if(is.null(res)) return(NULL)
-        datatable(res, escape =FALSE)
-    })
-    
     # when example is useed, disable some selection boxes
     observeEvent(input$example,{
         if(input$example != "exempty"){
@@ -294,12 +280,6 @@ function(input, output, session) {
             addMsg("Example is ready for running!   <b>Go to Test tap</b>")
             return()
         }
-        enable("sort_by")
-        enable("inc_dec")
-        enable("abs")
-        enable("pie.pval")
-        enable("pie.lfc")
-        enable("test_type")
     })
     
     # when example is useed, disable some selection boxes

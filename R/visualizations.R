@@ -114,6 +114,28 @@ observe({
         updateTextInput(session, "show_tagcloudW", value=0)
 })
 
+# Show the table of result
+output$example_results <- renderDataTable({
+    if(!is.null(input$files)){
+        print("我是齐天大圣孙悟空")
+        print(input$resultToTest)
+        print(names(rv$uploadResults))
+        print(head(rv$uploadResults[[input$resultToTest]]))
+        res <- formatResultsTable(rv$uploadResults[[input$resultToTest]])
+        req(res)
+        print("我是齐天大圣孙悟空")
+        print(head(res))
+        return(datatable(res, escape = FALSE))
+    }
+    if(isolate(input$example) != "exempty"){
+        res <- formatResultsTable(rv$results)
+        req(res)
+        print("我是齐天大圣孙悟空猪八戒")
+        print(head(res))
+        datatable(res, escape = FALSE)
+    }
+})
+
 
 output$plot0 <- renderPlot({
     req(input$run)
@@ -193,8 +215,6 @@ output$plot01 <- renderPlot({
         plot(1:1000, 1:1000)
     }
 }, bg="transparent")
-
-
 
 
 # create an export button if results are generated
