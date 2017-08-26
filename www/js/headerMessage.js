@@ -21,7 +21,7 @@ $(document).ready(function() {
 
 $(document).ready(function(){
 		$("#run").on("click", function(){
-			$("header").find("nav").append('<span  class="myClass"> Text Here</span>');
+			$("header").find("nav").text("text here");
 		});
 
 });

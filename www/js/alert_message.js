@@ -4,3 +4,9 @@ Shiny.addCustomMessageHandler("alert_message",
 		alert(JSON.stringify(message))
 	}
 )
+
+Shiny.addCustomMessageHandler("header_message",
+	function(message){
+		$("header").find("nav").text(message).css({"color":"#2780e3"})
+	}
+)

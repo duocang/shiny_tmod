@@ -346,12 +346,13 @@ function(input, output, session) {
         
     })
     
+    # this is another way to show message in header
     observe({
         input$run
         mess <- "I am worried about you"
-        
+
         print("I am worried about you")
-        session$sendCustomMessage(type="header_message", mess)
+        session$sendCustomMessage(type="header_message", HTML(rv$headerMessage))
     })
     
 }

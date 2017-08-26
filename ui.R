@@ -215,8 +215,7 @@ body <- dashboardBody(
 dashboardPage(
     skin = "black",
     dashboardHeader(title = "tmod tests beta", 
-                    tags$li(uiOutput("messageInHeader", class="tmodMsgHeader"),
-                        class= "dropdown"),
+                    # tags$li(uiOutput("messageInHeader", class="tmodMsgHeader"),class= "dropdown"),
                     tags$li(uiOutput("cloudWordButton"), class= "dropdown"),
                     tags$li(uiOutput("exportButton"), class="dropdown"),
                     
@@ -239,16 +238,6 @@ dashboardPage(
                                      from = "Dr. January Weiner 3",
                                      message = "+49-30-28460514"
                                      )),
-                    #tags$li(actionButton("download", "",icon = icon("download"), class="headerButton"), class = "dropdown"),
-                    # dropdownMenu(
-                    #     tags$li(a(href = 'http://shinyapps.company.com',
-                    #               icon("download"),
-                    #               title = "Back to Apps Home"),
-                    #             class = "dropdown"),
-                    #     tags$li(
-                    #         actionLink("refresh", "Refresh", icon("refresh")),
-                    #         class = "dropdown")
-                    # ),
                     titleWidth = 158),
     sidebar,
     body
