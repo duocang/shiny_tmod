@@ -175,11 +175,6 @@ function(input, output, session) {
         
         if(is.null(names(res))) names(res) <- input$files$name
         rv$uploadResults <- res    # it will be used for downloading
-        print("巴扎黑")
-        # print(class(rv$uploadResults))
-        # print(class(rv$uploadResults[[1]]))
-        # print(head(rv$uploadResults[[1]]))
-        # print(names(rv$uploadResults))
         return(res)
     })
     
@@ -258,7 +253,6 @@ function(input, output, session) {
             return(NULL)
         mset <- getMset()
         isolate(load.example())
-        
         if(is.null(fg)){
             print("no example data is uploaded")
             addMsg("Please, select example data")
@@ -326,8 +320,6 @@ function(input, output, session) {
         contentType = "application/zip"
     )
 
-    
-    
     output$developer <- renderText({
         " 青青子衿，悠悠我心。<br>
           纵我不往，子宁不嗣音？<br>
@@ -337,21 +329,4 @@ function(input, output, session) {
           一日不见，如三月兮。
         "
     })
-    
-    # this block fires each time we receive a message from JavaScript
-    output$text <- renderText({
-        count <- 0
-        paste("you clicked", input$count, "times on the RStudio ball",  input$gene_module)
-        
-    })
-    
-    # # this is another way to show message in header
-    # observe({
-    #     input$run
-    #     mess <- "I am worried about you"
-    # 
-    #     print("I am worried about you")
-    #     session$sendCustomMessage(type="header_message", HTML(rv$headerMessage))
-    # })
-    
 }

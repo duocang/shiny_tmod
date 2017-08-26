@@ -132,7 +132,7 @@ output$example_results <- renderDataTable({
         req(res)
         print("我是齐天大圣孙悟空猪八戒")
         print(head(res))
-        datatable(res, escape = FALSE)
+        return(datatable(res, escape = FALSE))
     }
 })
 
