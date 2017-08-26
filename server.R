@@ -10,8 +10,9 @@ function(input, output, session) {
     
     # reactive values
     rv <- reactiveValues()
-    rv$results <- NULL
-    rv$headerMessage <- NULL# this is used to show message in header
+    rv$results <- NULL       # it is used for storing example data
+    rv$uploadResults <- NULL # it is used for storing results after processing uploaded files
+    rv$headerMessage <- NULL # this is used to show message in header
     
     si <- sessionInfo()
     # load the code
@@ -175,6 +176,12 @@ function(input, output, session) {
         }
         
         if(is.null(names(res))) names(res) <- input$files$name
+        rv$uploadResults <- res    # it will be used for downloading
+        print("巴扎黑")
+        # print(class(rv$uploadResults))
+        # print(class(rv$uploadResults[[1]]))
+        # print(head(rv$uploadResults[[1]]))
+        # print(names(rv$uploadResults))
         return(res)
     })
     
@@ -314,7 +321,7 @@ function(input, output, session) {
     # allows saving of the results in a CSV file
     # note that there is no error handling if no results 
     # have been generated
-    output$export <- downloadHandler(
+    output$exampleExport <- downloadHandler(
         filename=function() {
             sprintf("results_%s_%s_%s.csv", Utest, isolate(input$gene_module), Sys.Date() ) 
         },
@@ -327,6 +334,21 @@ function(input, output, session) {
         }
     )
     
+    output$uploadExport <- downloadHandler(
+        filename = "data.zip",
+        content = function(fname){
+            req(loaded_data())
+            mapply( function(x, y){
+               write.csv(x, file = paste0("干哈啊", y))
+            },
+            rv$uploadResults,
+            names(rv$uploadResults))
+            
+            zip(zipfile = fname, files =paste0("干哈啊", names(rv$uploadResults)))
+        },
+        contentType = "application/zip"
+    )
+
     
     
     output$developer <- renderText({
@@ -346,13 +368,13 @@ function(input, output, session) {
         
     })
     
-    # this is another way to show message in header
-    observe({
-        input$run
-        mess <- "I am worried about you"
-
-        print("I am worried about you")
-        session$sendCustomMessage(type="header_message", HTML(rv$headerMessage))
-    })
+    # # this is another way to show message in header
+    # observe({
+    #     input$run
+    #     mess <- "I am worried about you"
+    # 
+    #     print("I am worried about you")
+    #     session$sendCustomMessage(type="header_message", HTML(rv$headerMessage))
+    # })
     
 }

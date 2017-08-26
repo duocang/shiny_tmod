@@ -68,10 +68,6 @@ body <- dashboardBody(
     tags$head(tags$script(src = "js/alert_message.js"),
               # tags$script(src = "//code.jquery.com/jquery-3.2.1.min.js"),
               tags$link(rel = "stylesheet", type = "text/css", href = "css/tmod.css")),
-    # tags$script(HTML('$(document).ready(function() {
-    #                  $("header").find("nav").append(\'<span class="myClass"> Text Here </span>\');
-    #                  })
-    #                  ')),
     tabItems(
         tabItem(tabName = "file_preview",
                 fluidRow(
@@ -215,9 +211,10 @@ body <- dashboardBody(
 dashboardPage(
     skin = "black",
     dashboardHeader(title = "tmod tests beta", 
-                    # tags$li(uiOutput("messageInHeader", class="tmodMsgHeader"),class= "dropdown"),
+                    tags$li(uiOutput("messageInHeader", class="tmodMsgHeader"),class= "dropdown"),
                     tags$li(uiOutput("cloudWordButton"), class= "dropdown"),
-                    tags$li(uiOutput("exportButton"), class="dropdown"),
+                    tags$li(uiOutput("exampleExportButton"), class="dropdown"),
+                    tags$li(uiOutput("uploadExportButton"), class = "dropdown"),
                     
                     # tags$li(
                     #     actionLink("dd", "", icon = icon("download"), class = "btn shiny-download-link headerButton", href = "", target = "_blank"),

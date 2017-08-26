@@ -2,13 +2,11 @@ popupWindow <- function(varname, contents) {
     # hooks for reactive elements to show / dismiss the window
     show    <- paste0( "show_", varname)
     dismiss <- paste0( "dismiss_", varname)
-    
     jqui_draggabled(
         conditionalPanel(
             condition=sprintf('input.%s == 1', show),# condition is a javascript expression that will be evaluated repeatedly
             # variable to keep track of showing the overlay
             div(style="display:none;", textInput(show, "", 0)),
-            
             div(class="overlay", draggable="true",
                 p(actionButton(dismiss, label="Dismiss [X]" )), 
                 contents)
@@ -22,8 +20,9 @@ popupWindow <- function(varname, contents) {
 ## side effect: modifies the input value for showplotpanel
 ## -------------------------------------------------------------------
 observe({
-    if(is.null(input$row) || input$row == 0)
-        return(NULL)
+    req(input$row)
+    # if(is.null(input$row) || input$row == 0)
+    #     return(NULL)
     no <- as.numeric(isolate(input$row))
     mset <- isolate(getMset())
     
@@ -54,7 +53,6 @@ observe({
     if(is.null(input$glist) || input$glist == 0 || is.null(fg)) { return(NULL) ; }
     no   <- as.numeric(isolate(input$glist))
     mset <- getMsetReal(isolate(getMset()))
-    print(mset)
     
     mod <- rv$results$ID[no]
     catf("generating gene list for module %d\n", no)
@@ -92,11 +90,13 @@ observe({
 #         return( NULL )
 # })
 output$cloudWordButton <- renderUI({
+    req(rv$results)
     catf( "+ generating tagcloud button\n" )
-    if( !is.null(rv$results) && nrow(rv$results) > 0 )
-        actionButton( "tagcloud", label= "",icon = icon("cloud"), class="headerButton" )
-    else
-        return( NULL )
+    actionButton( "tagcloud", label= "",icon = icon("cloud"), class="headerButton" )
+    # if( !is.null(rv$results) && nrow(rv$results) > 0 )
+    #     actionButton( "tagcloud", label= "",icon = icon("cloud"), class="headerButton" )
+    # else
+    #     return( NULL )
 })
 
 ## -------------------------------------------------------------------
@@ -124,9 +124,6 @@ observe({
     if(input$dismiss_tagcloudW > 0)
         updateTextInput(session, "show_tagcloudW", value=0)
 })
-
-
-
 
 
 output$plot0 <- renderPlot({
@@ -157,11 +154,12 @@ output$plot0 <- renderPlot({
                                       message = "Wrong gene column selected! Please select gene cloumn, again!")
         })
         
-        
-        if(!is.null(plo))
-            tmodPanelPlot(plo, text.cex = 0.9, legend.style = "auto")
-        else
-            return(NULL)
+        req(plo)
+        tmodPanelPlot(plo, text.cex = 0.9, legend.style = "auto")
+        # if(!is.null(plo))
+        #     tmodPanelPlot(plo, text.cex = 0.9, legend.style = "auto")
+        # else
+        #     return(NULL)
         print("plot done")
         # tryCatch({
         #     plo <- stat_test()
@@ -220,17 +218,19 @@ output$plot03 <- renderPlot({
     print(head(fg))
     pie <- tmodDecideTests(g=fg, mset = isolate(getMset()))
     print(head(pie))
-    
     plot(1:1000, 1:1000)
 }, bg="transparent")
 
 # create an export button if results are generated
 # depends on: reactive value rv$results
-output$exportButton <- renderUI({
-    catf( "+ generating export button\n" )
-    if( !is.null(rv$results) && nrow(rv$results) > 0 ) {
-        return(tags$a(id = "export", class = "btn shiny-download-link headerButton", href = "", target = "_blank",icon("download"), ""))
-    } else {
-        return( NULL )
-    }
+output$exampleExportButton <- renderUI({
+    req(rv$results)
+    catf( "+ generating example export button\n" )
+        return(tags$a(id = "exampleExport", class = "btn shiny-download-link headerButton", href = "", target = "_blank",icon("download"), ""))
+})
+
+output$uploadExportButton <- renderUI({
+    req(rv$uploadResults)
+    catf( "+ generating uploaded files export button\n" )
+    return(tags$a(id = "uploadExport", class = "btn shiny-download-link headerButton", href="", target = "_blank",icon("download"), ""))
 })
