@@ -41,10 +41,11 @@ function(input, output, session) {
         Reduce(intersect, foo)# 对列表foo不断做intersect操作，进而得出共同行
     })
     
-    # display choosebox for which column is genename
+    # display selection for which column is genename
     output$genename_col <- renderUI({
-        if(is.null(loaded_data())) 
-            return(NULL)
+        req(loaded_data())
+        # if(is.null(loaded_data())) 
+        #     return(NULL)
         selectInput("which_col_genename", "Select genename column", 
                     choices = c("-----------------", common_columns()))
     })
@@ -96,38 +97,6 @@ function(input, output, session) {
     
 
     
-    # if file(s) is/are uploaded, the test page shows with two tabs: heatmap-like and rug-like
-    # if example is used, the test page shows with three tabs: table, heatmap-like and rug-like
-    output$testOrExample_result <- renderUI({
-        tabsetPanel(id = "inTabset",
-                    #tabPanel("table", dataTableOutput( "example_results" )),
-                    tabPanel("table", 
-                             # these are required for button to be reactive
-                             div(id="glist", class="shiny-input-radiogroup", 
-                                 div(id="row", class="shiny-input-radiogroup", 
-                                     
-                                     # hidden buttons with value 0 
-                                     div(class="hidden",
-                                         HTML('<input type="radio" name="row" value="0" id="r0" /><label for="r0">Plot</label>'),
-                                         HTML('<input type="radio" name="glist" value="0" id="r0" /><label for="r0">Plot</label>')), 
-                                     hr(),
-                                     dataTableOutput( "example_results" ))),
-                             # plot popup panel
-                             popupWindow("plotpanelW", 
-                                         div(plotOutput("evidencePlot2"))),
-                             
-                             popupWindow("genelistW",  
-                                         div(class="glist",
-                                             p(tags$b(textOutput("genelist_title"))),
-                                             p(HTML("Genes shown in <b>bold</b> are in the main data set")),
-                                             p(uiOutput("genelist")))),
-                             popupWindow("tagcloudW",
-                                         div(plotOutput( "tagcloudPlot" ), style="width:600px;height:600px;" ))),
-                    tabPanel("heatmap-like", plotOutput("plot0", height = "1500px")),
-                    tabPanel("rug-like", plotOutput("plot01", height = "1500px")))
-        
-    })
-    
     # below will do many things:
     # 1. sort data by selected column
     # 2. abs
@@ -135,7 +104,6 @@ function(input, output, session) {
     # 4. tmod test 
     stat_test <- reactive({
         input$run
-        input$which_col_genename
         dat <- isolate(loaded_data())
         if(is.null(dat) || length(dat)==0) {
             addMsg("NO DATA! Upload file(s) or select an example.")
@@ -179,7 +147,7 @@ function(input, output, session) {
     })
     
     stat_test1 <- reactive({
-        input$run1
+        input$run
         dat <- isolate(loaded_data())
         if(is.null(dat) || length(dat)==0) {
             print("no data yet")
@@ -223,17 +191,6 @@ function(input, output, session) {
     observeEvent(input$run,{
         if((!is.null(input$files) && input$which_col_genename != "-----------------") || input$example != "exempty")
             addMsg(sprintf("Run test %s whith mset=%s.", isolate(input$test_type),isolate(input$gene_module)))
-    })
-    
-    # when we click "Plot rug-like", it shows message on the page
-    observeEvent(input$run1,{
-        if((!is.null(input$files) && input$which_col_genename != "-----------------") || input$example != "exempty")
-            addMsg(sprintf("Run test %s whith mset=%s.", isolate(input$test_type), isolate(input$gene_module)))
-    })
-    
-    # When "rug-like plot" is clicked, it will show rug-like tab
-    observeEvent(input$run1,{
-        updateTabsetPanel(session, "inTabset", selected = "rug-like")
     })
     
     # When "headmap-like plot" is clicked, it will show heatmap-like tab

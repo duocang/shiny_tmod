@@ -144,8 +144,9 @@ body <- dashboardBody(
                     column(2,
                            numericInput("pie.lfc",
                                         NULL, 1, min = 0, max = 5, step = 0.5)),
-                    column(2, actionButton("run", "Plot heatmap-like", class="tmodAct")),
-                    column(2, actionButton("run1", "Plot rug-like", class="tmodAct"))
+                    #column(2, actionButton("runTest", "Run", class="tmodAct")),
+                    column(2, actionButton("run", "Run", class="tmodAct"))
+                    #column(2, actionButton("run1", "Plot rug-like", class="tmodAct"))
                     
                 ),
                 uiOutput("testOrExample_result")

@@ -1,8 +1,38 @@
+output$testOrExample_result <- renderUI({
+    tabsetPanel(id = "inTabset",
+                #tabPanel("table", dataTableOutput( "example_results" )),
+                tabPanel("table", 
+                         # these are required for button to be reactive
+                         div(id="glist", class="shiny-input-radiogroup", 
+                             div(id="row", class="shiny-input-radiogroup", 
+                                 
+                                 # hidden buttons with value 0 
+                                 div(class="hidden",
+                                     HTML('<input type="radio" name="row" value="0" id="r0" /><label for="r0">Plot</label>'),
+                                     HTML('<input type="radio" name="glist" value="0" id="r0" /><label for="r0">Plot</label>')), 
+                                 #hr(),
+                                 dataTableOutput( "example_results" ))),
+                         # plot popup panel
+                         popupWindow("plotpanelW", 
+                                     div(plotOutput("evidencePlot2"))),
+                         
+                         popupWindow("genelistW",  
+                                     div(class="glist",
+                                         p(tags$b(textOutput("genelist_title"))),
+                                         p(HTML("Genes shown in <b>bold</b> are in the main data set")),
+                                         p(uiOutput("genelist")))),
+                         popupWindow("tagcloudW",
+                                     div(plotOutput( "tagcloudPlot" ), style="width:600px;height:600px;" ))),
+                tabPanel("heatmap-like", plotOutput("plot0", height = "1500px")),
+                tabPanel("rug-like", plotOutput("plot01", height = "1500px")))
+    
+})
+
 popupWindow <- function(varname, contents) {
     # hooks for reactive elements to show / dismiss the window
     show    <- paste0( "show_", varname)
     dismiss <- paste0( "dismiss_", varname)
-    jqui_draggabled(
+    jqui_draggabled(# enable draggable feature
         conditionalPanel(
             condition=sprintf('input.%s == 1', show),# condition is a javascript expression that will be evaluated repeatedly
             # variable to keep track of showing the overlay
@@ -20,17 +50,32 @@ popupWindow <- function(varname, contents) {
 ## side effect: modifies the input value for showplotpanel
 ## -------------------------------------------------------------------
 observe({
-    req(input$row)
-    # if(is.null(input$row) || input$row == 0)
-    #     return(NULL)
+    if(is.null(input$row) || input$row == 0)
+        return(NULL)
     no <- as.numeric(isolate(input$row))
     mset <- isolate(getMset())
     
     # first, create ghe graphics
-    output$evidencePlot2 <- renderPlot({
-        catf("making evidence plot with %d genes and ID=%s(%d)\n", length(fg), rv$results$ID[no], no)
-        evidencePlot(fg, rv$results$ID[no], mset=mset)
-    }, width=600, height=400)
+    if(!is.null(rv$results)){
+        output$evidencePlot2 <- renderPlot({
+            catf("making evidence plot with %d genes and ID=%s(%d)\n", length(fg), rv$results$ID[no], no)
+            print(head(fg))
+            print(rv$results$ID[no])
+            print(mset)
+            return(evidencePlot(fg, rv$results$ID[no], mset=mset))
+        }, width=600, height=400)
+    }
+    if(!is.null(rv$uploadResults)){
+        fg <<- read.genes(filename="www/data/test.csv", output=output)
+        output$evidencePlot2 <- renderPlot({
+            catf("making evidence plot with %d genes and ID=%s(%d)\n", length(fg), rv$uploadResults[[input$resultToTest]]$ID[no], no)
+            print(head(rv$uploadResults[[input$resultToTest]]$ID[no]))
+            print(mset)
+            print(head(fg))
+            return(evidencePlot(fg, rv$uploadResults[[input$resultToTest]]$ID[no], mset=mset))
+        }, width=600, height=400)
+        
+    }
     # second, make it visible by changing variable showplotpanel
     updateTextInput(session, "show_plotpanelW", value=1) # show_plotpanleW gets by var show
 })
@@ -50,11 +95,14 @@ observe({
 ## Creates the gene list
 ## -------------------------------------------------------------------
 observe({
+    fg <<- read.genes(filename="www/data/test.csv", output=output)
     if(is.null(input$glist) || input$glist == 0 || is.null(fg)) { return(NULL) ; }
-    no   <- as.numeric(isolate(input$glist))
+    no   <- as.numeric(input$glist)
     mset <- getMsetReal(isolate(getMset()))
-    
-    mod <- rv$results$ID[no]
+    if(!is.null(rv$results))
+        mod <- rv$results$ID[no]
+    if(!is.null(rv$uploadResults))
+        mod <- rv$uploadResults[[input$resultToTest]]$ID[no]
     catf("generating gene list for module %d\n", no)
     glist <- sort(mset$MODULES2GENES[[mod]])
     sel <- glist %in% fg
@@ -63,7 +111,6 @@ observe({
     
     output$genelist_title <- 
         renderText({ sprintf("Genes in module %s, %s", mod, mset$MODULES[mod, "Title"]) })
-    
     output$genelist <- renderUI({HTML(glist)})
     updateTextInput(session, "show_genelistW", value=1)
 })
@@ -81,29 +128,49 @@ observe({
 
 
 # create a tagcloud button if results are generated
-# depends on: reactive value rv$results
+# depends on: reactive value rv$results or rv$uploadResults
 output$cloudWordButton <- renderUI({
-    req(rv$results)
-    catf( "+ generating tagcloud button\n" )
-    actionButton( "tagcloud", label= "",icon = icon("cloud"), class="headerButton" )
+    if(!is.null(rv$results)){
+        catf( "+ generating tagcloud button\n" )
+        return(actionButton( "tagcloud", label= "",icon = icon("cloud"), class="headerButton" ))
+    }
+    if(!is.null(rv$uploadResults)){
+        catf( "+ generating tagcloud button\n" )
+        return(actionButton( "tagcloud", label= "",icon = icon("cloud"), class="headerButton" ))
+    }
 })
 
 ## -------------------------------------------------------------------
 ## Creates a tag cloud 
 ## -------------------------------------------------------------------
 observeEvent(input$tagcloud, {
-    res <- isolate(rv$results)
-    req(res)
-    print("+ generating tagcloud")
-    w <- -log10(res$P.Value)
-    if(!is.null(res$AUC)) 
-        v <- res$AUC
-    else
-        v <- res$E
-    c <- smoothPalette(v, min=0.5) # Replace A Vector Of Numbers By A Gradient Of Colors
-    tags <- strmultline(gsub("_", " ", res$Title))
-    output$tagcloudPlot <- renderPlot({ tagcloud(tags, weights=w, col=c)}, width=600, height=600)
-    updateTextInput(session, "show_tagcloudW", value=1)
+    if(input$example != "exempty"){
+        res <- isolate(rv$results)
+        req(res)
+        print("+ generating tagcloud")
+        w <- -log10(res$P.Value)
+        if(!is.null(res$AUC)) 
+            v <- res$AUC
+        else
+            v <- res$E
+        c <- smoothPalette(v, min=0.5) # Replace A Vector Of Numbers By A Gradient Of Colors
+        tags <- strmultline(gsub("_", " ", res$Title))
+        output$tagcloudPlot <- renderPlot({ tagcloud(tags, weights=w, col=c)}, width=600, height=600)
+        updateTextInput(session, "show_tagcloudW", value=1)
+    }else{
+        res <- isolate(rv$uploadResults[[input$resultToTest]])
+        req(res)
+        print("+ generating tagcloud")
+        w <- -log10(res$P.Value)
+        if(!is.null(res$AUC)) 
+            v <- res$AUC
+        else
+            v <- res$E
+        c <- smoothPalette(v, min=0.5) # Replace A Vector Of Numbers By A Gradient Of Colors
+        tags <- strmultline(gsub("_", " ", res$Title))
+        output$tagcloudPlot <- renderPlot({ tagcloud(tags, weights=w, col=c)}, width=600, height=600)
+        updateTextInput(session, "show_tagcloudW", value=1)
+    }
 })
 
 ## hide the popup window
@@ -116,22 +183,15 @@ observe({
 
 # Show the table of result
 output$example_results <- renderDataTable({
+    input$runTest
     if(!is.null(input$files)){
-        print("我是齐天大圣孙悟空")
-        print(input$resultToTest)
-        print(names(rv$uploadResults))
-        print(head(rv$uploadResults[[input$resultToTest]]))
         res <- formatResultsTable(rv$uploadResults[[input$resultToTest]])
         req(res)
-        print("我是齐天大圣孙悟空")
-        print(head(res))
         return(datatable(res, escape = FALSE))
     }
     if(isolate(input$example) != "exempty"){
         res <- formatResultsTable(rv$results)
         req(res)
-        print("我是齐天大圣孙悟空猪八戒")
-        print(head(res))
         return(datatable(res, escape = FALSE))
     }
 })
@@ -142,7 +202,7 @@ output$plot0 <- renderPlot({
     if(!is.null(isolate(input$files))){
         plo <- NULL
         withProgress(message = 'Making plot', value = 0, {
-            n <- 10
+            n <- 5
             # Number of times we'll go through the loop
             for (i in 1:n) {
                 # Each time through the loop, add another row of data. This is
@@ -194,6 +254,7 @@ output$plot01 <- renderPlot({
                 # Pause for 0.1 seconds to simulate a long computation.
                 Sys.sleep(0.1)
             }
+            #res <- isolate(rv$uploadResults)
             res <- isolate(stat_test())
             sapply(res, function(x){
                 if(nrow(x) == 0){
