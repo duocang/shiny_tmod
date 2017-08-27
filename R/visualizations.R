@@ -39,9 +39,7 @@ popupWindow <- function(varname, contents) {
             div(style="display:none;", textInput(show, "", 0)),
             div(class="overlay", draggable="true",
                 p(actionButton(dismiss, label="Dismiss [X]" )), 
-                contents)
-        )
-    )
+                contents)))
 }
 
 ## -------------------------------------------------------------------
@@ -59,9 +57,6 @@ observe({
     if(!is.null(rv$results)){
         output$evidencePlot2 <- renderPlot({
             catf("making evidence plot with %d genes and ID=%s(%d)\n", length(fg), rv$results$ID[no], no)
-            print(head(fg))
-            print(rv$results$ID[no])
-            print(mset)
             return(evidencePlot(fg, rv$results$ID[no], mset=mset))
         }, width=600, height=400)
     }
@@ -69,12 +64,8 @@ observe({
         fg <<- read.genes(filename="www/data/test.csv", output=output)
         output$evidencePlot2 <- renderPlot({
             catf("making evidence plot with %d genes and ID=%s(%d)\n", length(fg), rv$uploadResults[[input$resultToTest]]$ID[no], no)
-            print(head(rv$uploadResults[[input$resultToTest]]$ID[no]))
-            print(mset)
-            print(head(fg))
             return(evidencePlot(fg, rv$uploadResults[[input$resultToTest]]$ID[no], mset=mset))
         }, width=600, height=400)
-        
     }
     # second, make it visible by changing variable showplotpanel
     updateTextInput(session, "show_plotpanelW", value=1) # show_plotpanleW gets by var show
@@ -215,19 +206,22 @@ output$plot0 <- renderPlot({
             tryCatch({
                 plo <- isolate(stat_test())
             },warning=function(w){
-                addMsg("Wrong gene column selected!")
-                updateSelectInput(session, "which_col_genename", selected = "-----------------")
-                session$sendCustomMessage(type = "alert_message",
-                                          message = "Wrong gene column selected! Please select gene cloumn, again!")
+                if(input$which_col_genename != "-----------------"){
+                    addMsg("Wrong gene column selected!")
+                    updateSelectInput(session, "which_col_genename", selected = "-----------------")
+                    session$sendCustomMessage(type = "alert_message",
+                                              message = "Wrong gene column selected! Please select gene cloumn, again!")
+                }
             },error=function(e){
-                addMsg("Wrong gene column selected!")
-                updateSelectInput(session, "which_col_genename", selected = "-----------------")
-                session$sendCustomMessage(type = "alert_message",
-                                          message = "Wrong gene column selected! Please select gene cloumn, again!")
+                if(input$which_col_genename != "-----------------"){
+                    addMsg("Wrong gene column selected!")
+                    updateSelectInput(session, "which_col_genename", selected = "-----------------")
+                    session$sendCustomMessage(type = "alert_message",
+                                              message = "Wrong gene column selected! Please select gene cloumn, again!")
+                }
             })
             req(plo)
             tmodPanelPlot(plo, text.cex = 0.9, legend.style = "auto")
-            #print("plot done")
         })
     }
     if(isolate(input$example) != "exempty"){
@@ -236,7 +230,6 @@ output$plot0 <- renderPlot({
         names(plo) <- "Example Data"
         tmodPanelPlot(plo, text.cex = 0.9, legend.style = "auto")
     }
-
 }, bg="transparent")
 
 output$plot01 <- renderPlot({

@@ -131,8 +131,7 @@ body <- dashboardBody(
                                           choices = c("" ,
                                                       "tmodCERNOtest" = "tmodCERNOtest",
                                                       "tmodUtest" = "tmodUtest"),
-                                          selected = "tmodUtest"))
-                    ),
+                                          selected = "tmodUtest"))),
                 fluidRow(
                     column(2, "  pie.pval"),
                     column(2, "  pie.lfc" ),
@@ -179,13 +178,13 @@ dashboardPage(
                                  icon = icon("user"),
                                  headerText = "",
                                  messageItem(
+                                     from = "Dr. January Weiner 3",
+                                     message = "+49-30-28460514"
+                                     ),
+                                 messageItem(
                                      from = "王雪松(Xuesong Wang)",
                                      message = "wangxuesong29@gmail.com",
                                      href = "mailto:wangxuesong29@gmail.com"
-                                     ),
-                                 messageItem(
-                                     from = "Dr. January Weiner 3",
-                                     message = "+49-30-28460514"
                                      )),
                     titleWidth = 158),
     sidebar,

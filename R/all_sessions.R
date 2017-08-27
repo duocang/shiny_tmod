@@ -3,7 +3,6 @@
 ## Mostly plain old style R functions, nothing shiny
 ## ======================================================================
 
-
 catf   <- function( ... )   cat( sprintf( ... ) )
 printf <- function( ... ) print( sprintf( ... ) )
 
@@ -48,10 +47,8 @@ formatTablePval <- function(df, cols) {
         tmp[sel] <- round(tmp[sel], digits=i+2)
         df[,cols] <- tmp
     }
-    
     df
 }
-
 
 ## selects a category from a module set
 filterModulesByCategory <- function(mset, cat){

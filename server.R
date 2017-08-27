@@ -25,10 +25,9 @@ function(input, output, session) {
     loaded_data <- reactiveVal(value=NULL)
     
     
-    # dispaly choosebox for which file to preview
+    # dispaly selectioninput:  which file to preview
     output$choose_preview_file <- renderUI({
-        if(is.null(loaded_data()))
-            return(NULL)
+        req(loaded_data())
         selectInput("which_preview_file", "File Preview", 
                     as.list(input$files$name), selected = NULL)
     })
@@ -75,14 +74,6 @@ function(input, output, session) {
     # this function will get the number of files uploaded
     file_num <- reactive({length(input$files$size)})
     
-    # print file name on sidebar
-    output$upload_files <- renderTable({
-        filename <- c()
-        for(i in 1:file_num())
-            filename <- c(filename, input$files$name[i])
-        filename
-    }, colnames = FALSE)
-    
     # read data and  put into a list
     loadData <- observe({
         infile <- input$files$datapath
@@ -94,8 +85,6 @@ function(input, output, session) {
         }
         data
     })
-    
-
     
     # below will do many things:
     # 1. sort data by selected column
@@ -116,9 +105,9 @@ function(input, output, session) {
         
         if(geneName == "-----------------" )
             addMsg("No task running, because there no is gene column selected yet!")
-        validate(
-            need(geneName != "-----------------", "No task running, because there no is gene column selected yet!")
-        )
+        # validate(
+        #     need(geneName != "-----------------", "No task running, because there no is gene column selected yet!")
+        # )
         
         if(isolate(input$test_type) == "tmodCERNOtest"){
             res <- sapply(dat, function(x) {
@@ -267,12 +256,12 @@ function(input, output, session) {
         content = function(fname){
             req(loaded_data())
             mapply( function(x, y){
-               write.csv(x, file = paste0("干哈啊", y))
+               write.csv(x, file = paste0("Result_", y))
             },
             rv$uploadResults,
             names(rv$uploadResults))
             
-            zip(zipfile = fname, files =paste0("干哈啊", names(rv$uploadResults)))
+            zip(zipfile = fname, files =paste0("Result_", names(rv$uploadResults)))
         },
         contentType = "application/zip"
     )

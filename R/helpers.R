@@ -11,7 +11,6 @@ addMsg <- function(message, ...) {
     rv$headerMessage <- message
 }
 
-
 ## a function which updates the log only
 ## side effect: modify the log global variable
 addLog <- function(message, ...) {
@@ -21,7 +20,6 @@ addLog <- function(message, ...) {
     output$messageLog <- renderText({ paste0("<pre>", log, "</pre>") })
     catf( "MESSAGE: %s\n", message )
 }
-
 
 getMset <- reactive({
     mset <- input$gene_module
