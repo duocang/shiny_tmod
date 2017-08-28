@@ -172,7 +172,10 @@ observe({
         updateTextInput(session, "show_tagcloudW", value=0)
 })
 
-# Show the table of result
+
+## -------------------------------------------------------------------
+## Show the table of result
+## -------------------------------------------------------------------
 output$example_results <- renderDataTable({
     input$runTest
     if(!is.null(input$files)){
@@ -187,7 +190,9 @@ output$example_results <- renderDataTable({
     }
 })
 
-
+## -------------------------------------------------------------------
+## Show the heatmap plot
+## -------------------------------------------------------------------
 output$plot0 <- renderPlot({
     req(input$run)
     if(!is.null(isolate(input$files))){
@@ -232,6 +237,9 @@ output$plot0 <- renderPlot({
     }
 }, bg="transparent")
 
+## -------------------------------------------------------------------
+## Show the rug plot
+## -------------------------------------------------------------------
 output$plot01 <- renderPlot({
     input$run1
     if(!is.null(isolate(input$files)))
@@ -265,8 +273,12 @@ output$plot01 <- renderPlot({
         req(isolate(input$example))
         print(head(fg))
         pie <- tmodDecideTests(g=fg, mset = isolate(getMset()))
-        print(head(pie))
-        plot(1:1000, 1:1000)
+        res <- rv$results
+
+        
+        # tmodPanelPlot(list(res), pie=list(pie), pie.style = "r", grid = "b", filter.rows.pval = 0.001)
+        
+        qplot(1:1000, 1:1000)
     }
 }, bg="transparent")
 

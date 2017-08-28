@@ -235,6 +235,12 @@ function(input, output, session) {
         session$reload()
     })
     
+    observeEvent(input$run,{
+        if(is.null(input$files) || input$example == "exempty"){
+            addMsg("No task running, there is no data!")
+        }
+    })
+    
     # allows saving of the results in a CSV file
     # note that there is no error handling if no results 
     # have been generated

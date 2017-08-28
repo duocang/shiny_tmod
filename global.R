@@ -10,6 +10,8 @@ library(markdown)
 library(tagcloud)
 library(DT)
 library(shinyWidgets)
+library(ggplot2)
+library(plotly)
 data(tmod)
 mset <- tmod
 # It allows file bigger than 25M to be uploaded

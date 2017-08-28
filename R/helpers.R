@@ -1,4 +1,4 @@
- ## a function which updates the log as well as the status message
+## a function which updates the log as well as the status message
 ## side effect: modify the log global variable
 addMsg <- function(message, ...) {
     message <- sprintf( message, ... )
