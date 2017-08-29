@@ -10,7 +10,7 @@ output$testOrExample_result <- renderUI({
                                  div(class="hidden",
                                      HTML('<input type="radio" name="row" value="0" id="r0" /><label for="r0">Plot</label>'),
                                      HTML('<input type="radio" name="glist" value="0" id="r0" /><label for="r0">Plot</label>')), 
-                                 #hr(),
+                                 hr(),
                                  dataTableOutput( "example_results" ))),
                          # plot popup panel
                          popupWindow("plotpanelW", 

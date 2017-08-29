@@ -236,7 +236,7 @@ function(input, output, session) {
     })
     
     observeEvent(input$run,{
-        if(is.null(input$files) || input$example == "exempty"){
+        if(is.null(input$files) && input$example == "exempty"){
             addMsg("No task running, there is no data!")
         }
     })
