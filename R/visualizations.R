@@ -1,3 +1,6 @@
+tempFileName <- reactiveVal()
+
+
 output$testOrExample_result <- renderUI({
     tabsetPanel(id = "inTabset",
                 #tabPanel("table", dataTableOutput( "example_results" )),
@@ -10,8 +13,9 @@ output$testOrExample_result <- renderUI({
                                  div(class="hidden",
                                      HTML('<input type="radio" name="row" value="0" id="r0" /><label for="r0">Plot</label>'),
                                      HTML('<input type="radio" name="glist" value="0" id="r0" /><label for="r0">Plot</label>')), 
-                                 hr(),
-                                 dataTableOutput( "example_results" ))),
+                                 uiOutput("remindMessage"),
+                                 uiOutput("tableToTest"),
+                                 dataTableOutput( "example_results"))),
                          # plot popup panel
                          popupWindow("plotpanelW", 
                                      div(plotOutput("evidencePlot2"))),
@@ -86,6 +90,7 @@ observe({
 ## Creates the gene list
 ## -------------------------------------------------------------------
 observe({
+    req(input$files)
     fg <<- read.genes(filename="www/data/test.csv", output=output)
     if(is.null(input$glist) || input$glist == 0 || is.null(fg)) { return(NULL) ; }
     no   <- as.numeric(input$glist)
@@ -149,6 +154,7 @@ observeEvent(input$tagcloud, {
         output$tagcloudPlot <- renderPlot({ tagcloud(tags, weights=w, col=c)}, width=600, height=600)
         updateTextInput(session, "show_tagcloudW", value=1)
     }else{
+        print(input$resultToTest)
         res <- isolate(rv$uploadResults[[input$resultToTest]])
         req(res)
         print("+ generating tagcloud")
@@ -215,7 +221,7 @@ output$plot0 <- renderPlot({
                     addMsg("Wrong gene column selected!")
                     updateSelectInput(session, "which_col_genename", selected = "-----------------")
                     session$sendCustomMessage(type = "alert_message",
-                                              message = "Wrong gene column selected! Please select gene cloumn, again!")
+                                              message = "Wrong gene column selected! Please select gene cloumn, again猪八戒!")
                 }
             },error=function(e){
                 if(input$which_col_genename != "-----------------"){
@@ -241,7 +247,7 @@ output$plot0 <- renderPlot({
 ## Show the rug plot
 ## -------------------------------------------------------------------
 output$plot01 <- renderPlot({
-    input$run1
+    input$run
     if(!is.null(isolate(input$files)))
     {
         withProgress(message = 'Making plot', value = 0, {
@@ -282,19 +288,21 @@ output$plot01 <- renderPlot({
     }
 }, bg="transparent")
 
-
+# when example data is selected
 # create an export button if results are generated
 # depends on: reactive value rv$results
 output$exampleExportButton <- renderUI({
     req(rv$results)
     catf( "+ generating example export button\n" )
-        return(tags$a(id = "exampleExport", class = "btn shiny-download-link headerButton", href = "", target = "_blank",icon("download"), ""))
+        return(tags$a(id = "exampleExport", class = "btn shiny-download-link headerButton1", href = "", target = "_blank",icon("download"), ""))
 })
-
+# when file(s) is /are uploaded by user
+# create an export button if results are generated
+# depends on: reactive value rv$results
 output$uploadExportButton <- renderUI({
     req(rv$uploadResults)
     catf( "+ generating uploaded files export button\n" )
-    return(tags$a(id = "uploadExport", class = "btn shiny-download-link headerButton", href="", target = "_blank",icon("download"), ""))
+    return(tags$a(id = "uploadExport", class = "btn shiny-download-link headerButton1", href="", target = "_blank",icon("download"), ""))
 })
 
 
@@ -307,3 +315,44 @@ output$tableToTest <- renderUI({
         selectInput("resultToTest", label = NULL, choices = input$files$name)
     }
 })
+
+
+# # This will show a cloud icon on header, to select which wordcloud to plot
+# observeEvent(input$run,{
+#     req(input$files)
+#     output$whichCloudToPlot <- renderUI({
+#         dropdownButton(
+#             label = NULL,
+#             circle = FALSE,
+#             icon = icon("qq"),
+#             lapply(input$files$name, function(x){
+#                 actionButton(inputId = x, label = x, icon = icon("file"), class = "btn shiny-download-link headerButton1")
+#             }))
+#     })
+#     
+#     
+# })
+# 
+
+# output$developer <- renderText({
+# 
+#     val <- which(lapply(paste(input$files$name), function(i) input[[i]]) == TRUE)
+# 
+#     if(length(val)){
+#         print(val)
+#         tempFileName <- input$files$name[length(val)]
+#         return()
+#     }
+# 
+# 
+# 
+#     # " 青青子衿，悠悠我心。<br>
+#     # 纵我不往，子宁不嗣音？<br>
+#     # 青青子佩，悠悠我思。<br>
+#     # 纵我不往，子宁不来？<br>
+#     # 挑兮达兮，在城阙兮。<br>
+#     # 一日不见，如三月兮。
+#     # "
+# })
+
+

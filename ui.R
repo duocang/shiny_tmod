@@ -70,22 +70,31 @@ body <- dashboardBody(
     tabItems(
         tabItem(tabName = "file_preview",
                 fluidRow(
-                    column(3, 
-                           fileInput("files", label = "Upload file(s)", 
-                                     multiple = TRUE, 
-                                     accept = c("text/csv", ".csv"))) ,
                     column(3,
-                           selectInput("example", "Or use example",
-                                       list("------"="exempty", 
-                                            "Load example for CERNO test"="cerno", 
-                                            "Load example for U test"="utest"))),
+                           div( class="dropdownBySong",
+                                fileInput("files", label = "Upload file(s)",
+                                          multiple = TRUE, 
+                                          accept = c("text/csv", ".csv")),
+                                div(class = "dropdownBySong-content",
+                                              p("If this button is unclickable, please click Refresh button on top righ."))))
+                           ,
+                    column(3,
+                           div( class="dropdownBySong",
+                                selectInput("example", "Or use example",
+                                            list("------"="exempty",
+                                                 "Load example for CERNO test"="cerno",
+                                                 "Load example for U test"="utest")),
+                                div(class = "dropdownBySong-content",
+                                    p("If this button is unclickable, please click Refresh button on top righ."))
+                                )
+                           ),
                     column(3, uiOutput("choose_preview_file")),
                     column(3, uiOutput("genename_col"))),
                 class="params",
                 DT::dataTableOutput("table")),
         tabItem(tabName = "tests",
                 fluidRow(
-                    column(2, " Show each result"),
+                    # column(2, " Show each result"),
                     column(3, "  Gene module"),
                     column(2, "  Gene sort" ),
                     column(2, "  Trend" ),
@@ -93,7 +102,7 @@ body <- dashboardBody(
                     column(2, "  Test type" ),
                     class="paramHeader"),
                 fluidRow(
-                    column(2, uiOutput("tableToTest")),
+                    # column(2, uiOutput("tableToTest")),
                     column(3, 
                            selectInput( "gene_module", NULL,
                                         list(  "Li et al. and B. Pulendran (LI)"="LI"
@@ -170,9 +179,8 @@ dashboardPage(
                     tags$li(uiOutput("cloudWordButton"), class = "dropdown"),
                     tags$li(uiOutput("exampleExportButton"), class = "dropdown"),
                     tags$li(uiOutput("uploadExportButton"), class = "dropdown"),
-                    tags$li(
-                        actionLink("refresh", "", icon("refresh")),
-                        class = "dropdown"),
+                    tags$li(uiOutput("whichCloudToPlot"), class= "dropdown"),
+                    tags$li(actionLink("refresh", "", icon("refresh")),class = "dropdown"),
                     dropdownMenuOutput("downloadMenu"),
                     dropdownMenu(type = "messages",
                                  icon = icon("user"),

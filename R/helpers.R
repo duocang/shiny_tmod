@@ -2,7 +2,7 @@
 ## side effect: modify the log global variable
 addMsg <- function(message, ...) {
     message <- sprintf( message, ... )
-    output$messageInHeader <- renderUI({ HTML(paste0( "💡 <b>Message:</b> ", message )) })
+    output$messageInHeader <- renderUI({ HTML(paste0( "<b>Message:</b>", message )) })
     rv$headerMessage <- message
     time <- as.character(Sys.time())
     log <<- paste0( time, ": ", message, "\n", log )

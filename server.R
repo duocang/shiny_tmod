@@ -93,6 +93,7 @@ function(input, output, session) {
     # 4. tmod test 
     stat_test <- reactive({
         input$run
+        input$which_col_genename
         dat <- isolate(loaded_data())
         if(is.null(dat) || length(dat)==0) {
             addMsg("NO DATA! Upload file(s) or select an example.")
@@ -271,14 +272,4 @@ function(input, output, session) {
         },
         contentType = "application/zip"
     )
-
-    output$developer <- renderText({
-        " 青青子衿，悠悠我心。<br>
-          纵我不往，子宁不嗣音？<br>
-          青青子佩，悠悠我思。<br>
-          纵我不往，子宁不来？<br>
-          挑兮达兮，在城阙兮。<br>
-          一日不见，如三月兮。
-        "
-    })
 }
