@@ -19,13 +19,13 @@ load.example <- reactive({
     if(selection == "cerno") {
         fg <<- read.genes(filename="www/data/test.csv", output=output)
         Utest <<- "cerno"
-        updateSelectInput( session, "test_type", selected="tmodCERNOtest" )
+        updateSelectInput( session, "testType", selected="tmodCERNOtest" )
         addMsg( 'Loaded example for the CERNO test.' )
     }
     if(selection == "utest") {
         fg <<- read.genes(filename="www/data/test.csv", output=output)
         Utest <<- "utest"
-        updateSelectInput( session, "test_type", selected="tmodUtest" )
+        updateSelectInput( session, "testType", selected="tmodUtest" )
         addMsg( 'Loaded example for the U-test.' )
     }
     return(selection)

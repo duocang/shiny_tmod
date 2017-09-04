@@ -1,11 +1,9 @@
 gallery.dir <- 'www/gallery/'
 ## creates a gallery with figures found in www/gallery
 get.gallery <- function() {
-    files <- list.files(gallery.dir, pattern=".*\\.png$" )  # song: produce a character vector of the names of files or directories
-    l <- list(fixedRow( # song: Functions for creating fixed page layouts. A fixed page layout consists of rows which in turn include columns. 
-        column(10,          # song: Create a column for use within a fluidRow or fixedRow
-               includeMarkdown("md/gallery.md")
-        )))
+    files <- list.files(gallery.dir, pattern=".*\\.png$" ) 
+    l <- list(fixedRow( 
+        column(10, includeMarkdown("md/gallery.md"))))
     nf <- length(files)
     rowN <- 3
     
@@ -42,9 +40,8 @@ img.link <- function(file) {
     } else {
         desc <- tags$br()
     }
-    return(div(class="gallerypanel", img, tags$br(), tags$hr(), name, desc))  # song: div: A division of text with a uniform style
+    return(div(class="gallerypanel", img, tags$br(), tags$hr(), name, desc)) 
 } 
-
 
 sidebar <- dashboardSidebar(
     width = 200,
@@ -57,15 +54,13 @@ sidebar <- dashboardSidebar(
         menuItem("Download", tabName = "download", icon = icon("download"), startExpanded = FALSE),
         menuItem("Gallery", tabName = "gallery", icon = icon("file-picture-o"),startExpanded = FALSE),
         menuItem("Logs", tabName = "logs", icon = icon("info"), startExpanded = FALSE),
-        uiOutput("developer", class = "classicOfPoetry")
-    )
+        uiOutput("developer", class = "classicOfPoetry"))
 )
 
 body <- dashboardBody(
     useShinyjs(),
-    # This will call message-handler.js
+    # This will call message-handler.js, used for showing alert message.
     tags$head(tags$script(src = "js/alert_message.js"),
-              # tags$script(src = "//code.jquery.com/jquery-3.2.1.min.js"),
               tags$link(rel = "stylesheet", type = "text/css", href = "css/tmod.css")),
     tabItems(
         tabItem(tabName = "file_preview",
@@ -76,8 +71,7 @@ body <- dashboardBody(
                                           multiple = TRUE, 
                                           accept = c("text/csv", ".csv")),
                                 div(class = "dropdownBySong-content",
-                                              p("If this button is unclickable, please click Refresh button on top righ."))))
-                           ,
+                                              p("If this button is unclickable, please click Refresh button on top righ.")))),
                     column(3,
                            div( class="dropdownBySong",
                                 selectInput("example", "Or use example",
@@ -85,16 +79,13 @@ body <- dashboardBody(
                                                  "Load example for CERNO test"="cerno",
                                                  "Load example for U test"="utest")),
                                 div(class = "dropdownBySong-content",
-                                    p("If this button is unclickable, please click Refresh button on top righ."))
-                                )
-                           ),
-                    column(3, uiOutput("choose_preview_file")),
+                                    p("If this button is unclickable, please click Refresh button on top righ.")))),
+                    column(3, uiOutput("choosePreviewFile")),
                     column(3, uiOutput("genename_col"))),
                 class="params",
                 DT::dataTableOutput("table")),
         tabItem(tabName = "tests",
                 fluidRow(
-                    # column(2, " Show each result"),
                     column(3, "  Gene module"),
                     column(2, "  Gene sort" ),
                     column(2, "  Trend" ),
@@ -102,9 +93,8 @@ body <- dashboardBody(
                     column(2, "  Test type" ),
                     class="paramHeader"),
                 fluidRow(
-                    # column(2, uiOutput("tableToTest")),
-                    column(3, 
-                           selectInput( "gene_module", NULL,
+                    column(3,
+                           selectInput( "geneModule", NULL,
                                         list(  "Li et al. and B. Pulendran (LI)"="LI"
                                                ,"Damien Chaussabel et al. (DC)"="DC"
                                                ,"LI + DC"="all"
@@ -117,7 +107,7 @@ body <- dashboardBody(
                                                ,"MSigDB Oncogenic signatures (C6)"="msigC6"
                                                ,"MSigDB Immunologic signatures (C7)"="msigC7"),
                                         selected = "LI")),
-                    column(2, selectInput("sort_by", NULL,
+                    column(2, selectInput("sortByWhich", NULL,
                                           choices = c("",
                                                       "logFC" = "logFC",
                                                       "t" = "t",
@@ -126,17 +116,17 @@ body <- dashboardBody(
                                                       "d" = "d",
                                                       "qval" = "qval"),
                                           selected = "logFC")) ,
-                    column(2, selectInput("inc_dec", NULL,
+                    column(2, selectInput("incOrDec", NULL,
                                           choices = c("",
                                                       "Increasing" = "FALSE",
                                                       "Decreasing" = "TRUE"),
                                           selected = "FALSE")),
                     column(1, selectInput("abs", NULL,
-                                          choices = c("", 
+                                          choices = c("",
                                                       "YES",
                                                       "NO"),
                                           selected = "NO")),
-                    column(2, selectInput("test_type", NULL,
+                    column(2, selectInput("testType", NULL,
                                           choices = c("" ,
                                                       "tmodCERNOtest" = "tmodCERNOtest",
                                                       "tmodUtest" = "tmodUtest"),
@@ -146,21 +136,20 @@ body <- dashboardBody(
                     column(2, "  pie.lfc" ),
                     class="paramHeader"),
                 fluidRow(
-                    column(2,  
-                           numericInput("pie.pval", 
+                    column(2,
+                           numericInput("pie.pval",
                                         NULL, 0.05, min = 0, max = 0.1, step = 0.01)),
                     column(2,
                            numericInput("pie.lfc",
                                         NULL, 1, min = 0, max = 5, step = 0.5)),
-                    
-                    column(3,
+
+                    column(4,
                            div( class="dropdownBySong",
                                 actionButton("run", "Run", class="tmodAct"),
                                 div(class = "dropdownBySong-content",
-                                    p("If this button is unclickable, please click Refresh button on top righ."))))
-                ),
-                uiOutput("testOrExample_result")
-        ),
+                                    p("Check WordCloud of current file by button on top right."),
+                                    p("Download result(s) by button on top right. "))))),
+                uiOutput("testOrExampleResult")),# it will show the table of result 
         tabItem(tabName = "help",
                 includeMarkdown("md/help.md")),
         tabItem(tabName = "download",
@@ -168,8 +157,8 @@ body <- dashboardBody(
         tabItem(tabName = "gallery",
                 get.gallery()),
         tabItem(tabName = "logs",
-                fluidRow(column(10, htmlOutput( "messageLog"), br()) ))
-    ),class="params"
+                fluidRow(column(10, htmlOutput( "messageLog"), br())))),
+    class="params"
 )
 
 # Put them together into a dashboardPage
@@ -182,19 +171,6 @@ dashboardPage(
                     tags$li(uiOutput("exampleExportButton"), class = "dropdown"),
                     tags$li(uiOutput("uploadExportButton"), class = "dropdown"),
                     tags$li(actionLink("refresh", "", icon("refresh")),class = "dropdown"),
-                    dropdownMenuOutput("downloadMenu"),
-                    # dropdownMenu(type = "messages",
-                    #              icon = icon("user"),
-                    #              headerText = "",
-                    #              messageItem(
-                    #                  from = "Dr. January Weiner 3",
-                    #                  message = "+49-30-28460514"
-                    #                  ),
-                    #              messageItem(
-                    #                  from = "王雪松(Xuesong Wang)",
-                    #                  message = "wangxuesong29@gmail.com",
-                    #                  href = "mailto:wangxuesong29@gmail.com"
-                    #                  )),
                     titleWidth = 158),
     sidebar,
     body

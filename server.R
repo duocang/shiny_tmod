@@ -22,12 +22,12 @@ function(input, output, session) {
     source("R/helpers.R", local = TRUE)
     
     # this variable will be used for keeping file data
-    loaded_data <- reactiveVal(value=NULL)
+    loadedData <- reactiveVal(value=NULL)
     
     
     # dispaly selectioninput:  which file to preview
-    output$choose_preview_file <- renderUI({
-        req(loaded_data())
+    output$choosePreviewFile <- renderUI({
+        req(loadedData())
         selectInput("which_preview_file", "File Preview", 
                     as.list(input$files$name), selected = NULL)
     })
@@ -35,44 +35,42 @@ function(input, output, session) {
     # go through all loaded files and find the common columns
     common_columns <- reactive({
         # go through all loaded files and find the common columns
-        dat <- loaded_data()
+        dat <- loadedData()
         foo <- lapply(dat, colnames)
         Reduce(intersect, foo)# 对列表foo不断做intersect操作，进而得出共同行
     })
     
     # display selection for which column is genename
     output$genename_col <- renderUI({
-        req(loaded_data())
-        # if(is.null(loaded_data())) 
-        #     return(NULL)
-        selectInput("which_col_genename", "Select genename column", 
+        req(loadedData())
+        selectInput("whichColumnIsGenename", "Select genename column", 
                     choices = c("-----------------", common_columns()))
     })
     
     # this will show the table of file in page
-    output$table = DT::renderDataTable( preview_8_lines(),options=list(scrollX=TRUE))
+    output$table = DT::renderDataTable( preview8Lines(),options=list(scrollX=TRUE))
     
     # this function will show first 8 rows of selected file to preview
-    preview_8_lines <- reactive({
+    preview8Lines <- reactive({
         tryCatch({
             n <- 1
-            file_typein <- input$which_preview_file# which file selected for preview
+            fileSelectedForPreview <- input$which_preview_file# which file selected for preview
             infile <- input$files
             if(is.null(infile)) return(NULL)# user has not uploaded a file yet
-            for(i in 1:file_num())
-                if(infile$name[i] == file_typein)
+            for(i in 1:fileNum())
+                if(infile$name[i] == fileSelectedForPreview)
                     n <- i
-            a <- loaded_data()[[n]]
+            a <- loadedData()[[n]]
             head(a, n=8)
         },
         error = function(e){
-            print("gene_column_selection alert needs to be showed and confirmed first")
+            print("There is no selection for gene name column.")
             return(NULL)
         })
     })
     
     # this function will get the number of files uploaded
-    file_num <- reactive({length(input$files$size)})
+    fileNum <- reactive({length(input$files$size)})
     
     # read data and  put into a list
     loadData <- observe({
@@ -81,7 +79,7 @@ function(input, output, session) {
             # User has not uploaded files yet
         } else {
             data <- lapply(infile, function(x) {fread(x, header = TRUE, stringsAsFactors = FALSE) })
-            loaded_data(data) # load file data into global variable loaded_dtat, which is a reactive value
+            loadedData(data) # load file data into global variable loaded_dtat, which is a reactive value
         }
         data
     })
@@ -91,54 +89,48 @@ function(input, output, session) {
     # 2. abs
     # 3. increasing or decreasing
     # 4. tmod test 
-    stat_test <- reactive({
+    tmodTest <- reactive({
         input$run
-        input$which_col_genename
-        dat <- isolate(loaded_data())
+        input$whichColumnIsGenename
+        dat <- isolate(loadedData())
         if(is.null(dat) || length(dat)==0) {
             addMsg("NO DATA! Upload file(s) or select an example.")
             return(NULL)
         }
-        sort_col <- isolate(input$sort_by)# isolate() is used, we donot want to rerun this code block every time, 
-        sort_abs <- isolate(input$abs)    # when we change sorting column or othre choices
-        sort_decr <- isolate(input$inc_dec)
-        geneName <- isolate(input$which_col_genename)
+        sortCol <- isolate(input$sortByWhich)# isolate() is used, we donot want to rerun this code block every time, 
+        sortAbs <- isolate(input$abs)    # when we change sorting column or othre choices
+        sortDecr <- isolate(input$incOrDec)
+        geneName <- isolate(input$whichColumnIsGenename)
         
         if(geneName == "-----------------" )
             addMsg("No task running, because there no is gene column selected yet!")
-        # validate(
-        #     need(geneName != "-----------------", "No task running, because there no is gene column selected yet!")
-        # )
-        
-        if(isolate(input$test_type) == "tmodCERNOtest"){
+        if(isolate(input$testType) == "tmodCERNOtest"){
             res <- sapply(dat, function(x) {
                 x <- data.frame(x)
                 genes <- x[ , geneName ]
-                ord   <- x[ , sort_col ]
-                if(sort_abs == "YES") ord <- abs(ord)
-                ord <- order(ord, decreasing=sort_decr)
+                ord   <- x[ , sortCol ]
+                if(sortAbs == "YES") ord <- abs(ord)
+                ord <- order(ord, decreasing=sortDecr)
                 tmodCERNOtest(genes[ord], mset=isolate(getMset()), qval=1)
             }, simplify=FALSE)
         }else{
             res <- sapply(dat, function(x) {
                 x <- data.frame(x)
                 genes <- x[ , geneName ]
-                ord   <- x[ , sort_col ]
-                if(sort_abs == "YES") ord <- abs(ord)
-                ord <- order(ord, decreasing=sort_decr)
-                
+                ord   <- x[ , sortCol ]
+                if(sortAbs == "YES") ord <- abs(ord)
+                ord <- order(ord, decreasing=sortDecr)
                 tmodUtest(genes[ord], mset=isolate(getMset()), qval=1)
             }, simplify=FALSE)
         }
-        
         if(is.null(names(res))) names(res) <- input$files$name
         rv$uploadResults <- res    # it will be used for downloading
         return(res)
     })
     
-    stat_test1 <- reactive({
+    tmodTest1 <- reactive({
         input$run
-        dat <- isolate(loaded_data())
+        dat <- isolate(loadedData())
         if(is.null(dat) || length(dat)==0) {
             print("no data yet")
             return(NULL)
@@ -150,7 +142,7 @@ function(input, output, session) {
             as.matrix(x[, "qval", with=FALSE])
         })
         
-        geneName <- isolate(input$which_col_genename)
+        geneName <- isolate(input$whichColumnIsGenename)
         gene <- dat[[1]][, geneName, with=FALSE]
         
         ddd <- data.frame(dat[[1]])
@@ -168,22 +160,21 @@ function(input, output, session) {
     # This will show an allert, if the user trys to run without selecting gene column
     observeEvent(input$run,{
         req(input$run)
-        req(input$which_col_genename)
-        if(input$which_col_genename == "-----------------"){
+        req(input$whichColumnIsGenename)
+        if(input$whichColumnIsGenename == "-----------------"){
             session$sendCustomMessage(type = "alert_message", message = 'Please select gene cloumn!')
         }
     })
 
-    # "2017-08-07 10:05:28: Running tmod in version 0.31" is printed in tab "Logs"
     addLog("Run tmod in version %s", si$otherPkgs$tmod$Version)
     
-    # when we click "Plot heatmap-like", it shows message on the page
+    # when we click "Plot heatmap-like", it shows message on the header
     observeEvent(input$run,{
-        if((!is.null(input$files) && input$which_col_genename != "-----------------") || input$example != "exempty")
-            addMsg(sprintf("Run test %s whith mset=%s.", isolate(input$test_type),isolate(input$gene_module)))
+        if((!is.null(input$files) && input$whichColumnIsGenename != "-----------------") || input$example != "exempty")
+            addMsg(sprintf("Run test %s whith mset=%s.", isolate(input$testType),isolate(input$geneModule)))
     })
     
-    # When "headmap-like plot" is clicked, it will show heatmap-like tab
+    # When "Run" is clicked, it will show heatmap-like tab
     observeEvent(input$run,{
         updateTabsetPanel(session, "inTabset", selected = "heatmap-like")
     })
@@ -193,7 +184,7 @@ function(input, output, session) {
         updateTabsetPanel(session, "inTabset", selected = "table")
     })
     
-    # an example is selected, corresponding test will runn 
+    # an example is selected, corresponding test will run
     # and result will be given to rv$results
     observe({
         if(input$example == "exempty")
@@ -211,12 +202,12 @@ function(input, output, session) {
     # when example is useed, disable some selection boxes
     observeEvent(input$example,{
         if(input$example != "exempty"){
-            shinyjs::disable("sort_by")
-            disable("inc_dec")
+            shinyjs::disable("sortByWhich")
+            disable("incOrDec")
             disable("abs")
             disable("pie.pval")
             disable("pie.lfc")
-            disable("test_type")
+            disable("testType")
             disable("files")
             addMsg("Example is ready for running!   <b>Go to Test tap</b>")
             return()
@@ -242,26 +233,31 @@ function(input, output, session) {
         }
     })
     
+    # use example
     # allows saving of the results in a CSV file
     # note that there is no error handling if no results 
     # have been generated
     output$exampleExport <- downloadHandler(
         filename=function() {
-            sprintf("results_%s_%s_%s.csv", Utest, isolate(input$gene_module), Sys.Date() ) 
+            sprintf("results_%s_%s_%s.csv", Utest, isolate(input$geneModule), Sys.Date() ) 
         },
         content=function(file) {
             if(!is.null(rv$results)) {
                 foo <- rv$results
-                foo$Genes <- getGenes(rv$results$ID, fg, mset=isolate(input$gene_module))$Genes
+                foo$Genes <- getGenes(rv$results$ID, fg, mset=isolate(input$geneModule))$Genes
                 write.csv(foo, file, row.names=FALSE)
             }
         }
     )
     
+    # upload files
+    # allows saving of the results in a CSV file
+    # note that there is no error handling if no results 
+    # have been generated
     output$uploadExport <- downloadHandler(
         filename = "data.zip",
         content = function(fname){
-            req(loaded_data())
+            req(loadedData())
             mapply( function(x, y){
                write.csv(x, file = paste0("Result_", y))
             },

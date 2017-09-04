@@ -1,25 +1,20 @@
-tempFileName <- reactiveVal()
-
-
-output$testOrExample_result <- renderUI({
+# it is defined in ui.R, it will show the table of result in 'test' tab.
+output$testOrExampleResult <- renderUI({
     tabsetPanel(id = "inTabset",
-                #tabPanel("table", dataTableOutput( "example_results" )),
                 tabPanel("table", 
                          # these are required for button to be reactive
                          div(id="glist", class="shiny-input-radiogroup", 
                              div(id="row", class="shiny-input-radiogroup", 
-                                 
                                  # hidden buttons with value 0 
                                  div(class="hidden",
                                      HTML('<input type="radio" name="row" value="0" id="r0" /><label for="r0">Plot</label>'),
                                      HTML('<input type="radio" name="glist" value="0" id="r0" /><label for="r0">Plot</label>')), 
                                  uiOutput("remindMessage"),
-                                 uiOutput("tableToTest"),
-                                 dataTableOutput( "example_results"))),
+                                 uiOutput("resultOfEachFile"),
+                                 dataTableOutput( "resultTable"))),
                          # plot popup panel
                          popupWindow("plotpanelW", 
                                      div(plotOutput("evidencePlot2"))),
-                         
                          popupWindow("genelistW",  
                                      div(class="glist",
                                          p(tags$b(textOutput("genelist_title"))),
@@ -29,7 +24,6 @@ output$testOrExample_result <- renderUI({
                                      div(plotOutput( "tagcloudPlot" ), style="width:600px;height:600px;" ))),
                 tabPanel("heatmap-like", plotOutput("plot0", height = "1500px")),
                 tabPanel("rug-like", plotOutput("plot01", height = "1500px")))
-    
 })
 
 popupWindow <- function(varname, contents) {
@@ -56,7 +50,6 @@ observe({
         return(NULL)
     no <- as.numeric(isolate(input$row))
     mset <- isolate(getMset())
-    
     # first, create ghe graphics
     if(!is.null(rv$results)){
         output$evidencePlot2 <- renderPlot({
@@ -67,8 +60,8 @@ observe({
     if(!is.null(rv$uploadResults)){
         fg <<- read.genes(filename="www/data/test.csv", output=output)
         output$evidencePlot2 <- renderPlot({
-            catf("making evidence plot with %d genes and ID=%s(%d)\n", length(fg), rv$uploadResults[[input$resultToTest]]$ID[no], no)
-            return(evidencePlot(fg, rv$uploadResults[[input$resultToTest]]$ID[no], mset=mset))
+            catf("making evidence plot with %d genes and ID=%s(%d)\n", length(fg), rv$uploadResults[[input$resultOfWhichFile]]$ID[no], no)
+            return(evidencePlot(fg, rv$uploadResults[[input$resultOfWhichFile]]$ID[no], mset=mset))
         }, width=600, height=400)
     }
     # second, make it visible by changing variable showplotpanel
@@ -98,13 +91,12 @@ observe({
     if(!is.null(rv$results))
         mod <- rv$results$ID[no]
     if(!is.null(rv$uploadResults))
-        mod <- rv$uploadResults[[input$resultToTest]]$ID[no]
+        mod <- rv$uploadResults[[input$resultOfWhichFile]]$ID[no]
     catf("generating gene list for module %d\n", no)
     glist <- sort(mset$MODULES2GENES[[mod]])
     sel <- glist %in% fg
     glist[sel] <- gsub( "(.*)", "<b>\\1</b>", glist[sel])
     glist <- paste( glist, collapse=", ")
-    
     output$genelist_title <- 
         renderText({ sprintf("Genes in module %s, %s", mod, mset$MODULES[mod, "Title"]) })
     output$genelist <- renderUI({HTML(glist)})
@@ -122,15 +114,14 @@ observe({
     }
 })
 
-
 # create a tagcloud button if results are generated
 # depends on: reactive value rv$results or rv$uploadResults
 output$cloudWordButton <- renderUI({
-    if(!is.null(rv$results)){
+    if(!is.null(rv$results)){# example data
         catf( "+ generating tagcloud button\n" )
         return(actionButton( "tagcloud", label= "",icon = icon("cloud"), class="headerButton" ))
     }
-    if(!is.null(rv$uploadResults)){
+    if(!is.null(rv$uploadResults)){# upload files
         catf( "+ generating tagcloud button\n" )
         return(actionButton( "tagcloud", label= "",icon = icon("cloud"), class="headerButton" ))
     }
@@ -154,8 +145,7 @@ observeEvent(input$tagcloud, {
         output$tagcloudPlot <- renderPlot({ tagcloud(tags, weights=w, col=c)}, width=600, height=600)
         updateTextInput(session, "show_tagcloudW", value=1)
     }else{
-        print(input$resultToTest)
-        res <- isolate(rv$uploadResults[[input$resultToTest]])
+        res <- isolate(rv$uploadResults[[input$resultOfWhichFile]])
         req(res)
         print("+ generating tagcloud")
         w <- -log10(res$P.Value)
@@ -178,14 +168,14 @@ observe({
         updateTextInput(session, "show_tagcloudW", value=0)
 })
 
-
 ## -------------------------------------------------------------------
-## Show the table of result
+## display data of result in table
 ## -------------------------------------------------------------------
-output$example_results <- renderDataTable({
-    input$runTest
+output$resultTable <- renderDataTable({
+    input$run
     if(!is.null(input$files)){
-        res <- formatResultsTable(rv$uploadResults[[input$resultToTest]])
+        req(input$resultOfWhichFile)
+        res <- formatResultsTable(rv$uploadResults[[input$resultOfWhichFile]])
         req(res)
         return(datatable(res, escape = FALSE))
     }
@@ -215,18 +205,18 @@ output$plot0 <- renderPlot({
                 Sys.sleep(0.1)
             }
             tryCatch({
-                plo <- isolate(stat_test())
+                plo <- isolate(tmodTest())
             },warning=function(w){
-                if(input$which_col_genename != "-----------------"){
+                if(input$whichColumnIsGenename != "-----------------"){
                     addMsg("Wrong gene column selected!")
-                    updateSelectInput(session, "which_col_genename", selected = "-----------------")
+                    updateSelectInput(session, "whichColumnIsGenename", selected = "-----------------")
                     session$sendCustomMessage(type = "alert_message",
                                               message = "Wrong gene column selected! Please select gene cloumn, again猪八戒!")
                 }
             },error=function(e){
-                if(input$which_col_genename != "-----------------"){
+                if(input$whichColumnIsGenename != "-----------------"){
                     addMsg("Wrong gene column selected!")
-                    updateSelectInput(session, "which_col_genename", selected = "-----------------")
+                    updateSelectInput(session, "whichColumnIsGenename", selected = "-----------------")
                     session$sendCustomMessage(type = "alert_message",
                                               message = "Wrong gene column selected! Please select gene cloumn, again!")
                 }
@@ -261,15 +251,15 @@ output$plot01 <- renderPlot({
                 # Pause for 0.1 seconds to simulate a long computation.
                 Sys.sleep(0.1)
             }
-            #res <- isolate(rv$uploadResults)
-            res <- isolate(stat_test())
+            res <- isolate(rv$uploadResults)
+            #res <- isolate(tmodTest())
             sapply(res, function(x){
                 if(nrow(x) == 0){
                     addMsg(sprintf("There is no moudle named %s!", isolate(input$gene_module)))
                     return(NULL)
                 }
             })
-            pie <- isolate(stat_test1())
+            pie <- isolate(tmodTest1())
             names(pie) <- names(res)
             if(!is.null(res))
                 tmodPanelPlot(res, pie=pie, pie.style="r", grid="b", filter.rows.pval=0.001)
@@ -280,23 +270,23 @@ output$plot01 <- renderPlot({
         print(head(fg))
         pie <- tmodDecideTests(g=fg, mset = isolate(getMset()))
         res <- rv$results
-
-        
         # tmodPanelPlot(list(res), pie=list(pie), pie.style = "r", grid = "b", filter.rows.pval = 0.001)
-        
         qplot(1:1000, 1:1000)
     }
 }, bg="transparent")
 
-# when example data is selected
+## -------------------------------------------------------------------
+## export button on top right
+## -------------------------------------------------------------------
+# example data
 # create an export button if results are generated
 # depends on: reactive value rv$results
 output$exampleExportButton <- renderUI({
     req(rv$results)
     catf( "+ generating example export button\n" )
-        return(tags$a(id = "exampleExport", class = "btn shiny-download-link headerButton1", href = "", target = "_blank",icon("download"), ""))
+    return(tags$a(id = "exampleExport", class = "btn shiny-download-link headerButton1", href = "", target = "_blank",icon("download"), ""))
 })
-# when file(s) is /are uploaded by user
+# upload files
 # create an export button if results are generated
 # depends on: reactive value rv$results
 output$uploadExportButton <- renderUI({
@@ -305,55 +295,13 @@ output$uploadExportButton <- renderUI({
     return(tags$a(id = "uploadExport", class = "btn shiny-download-link headerButton1", href="", target = "_blank",icon("download"), ""))
 })
 
-
-output$tableToTest <- renderUI({
+# create a selection box, which is used to display different result of corresponding file uploaded
+output$resultOfEachFile <- renderUI({
+    req(rv$uploadResults)
     req(input$files)
-    # if(input$example != "exempty")
-    #     return(selectInput("resultToTest", NULL, choices ="Example data"))
-    if(is.null(input$files))
-        selectInput("resultToTest", NULL, NULL)
+    if(is.null(rv$uploadResults))
+        selectInput("resultOfWhichFile", NULL, NULL)
     else{
-        selectInput("resultToTest", label = NULL, choices = input$files$name)
+        selectInput("resultOfWhichFile", label = NULL, choices = input$files$name)
     }
 })
-
-
-# # This will show a cloud icon on header, to select which wordcloud to plot
-# observeEvent(input$run,{
-#     req(input$files)
-#     output$whichCloudToPlot <- renderUI({
-#         dropdownButton(
-#             label = NULL,
-#             circle = FALSE,
-#             icon = icon("qq"),
-#             lapply(input$files$name, function(x){
-#                 actionButton(inputId = x, label = x, icon = icon("file"), class = "btn shiny-download-link headerButton1")
-#             }))
-#     })
-#     
-#     
-# })
-# 
-
-# output$developer <- renderText({
-# 
-#     val <- which(lapply(paste(input$files$name), function(i) input[[i]]) == TRUE)
-# 
-#     if(length(val)){
-#         print(val)
-#         tempFileName <- input$files$name[length(val)]
-#         return()
-#     }
-# 
-# 
-# 
-#     # " 青青子衿，悠悠我心。<br>
-#     # 纵我不往，子宁不嗣音？<br>
-#     # 青青子佩，悠悠我思。<br>
-#     # 纵我不往，子宁不来？<br>
-#     # 挑兮达兮，在城阙兮。<br>
-#     # 一日不见，如三月兮。
-#     # "
-# })
-
-

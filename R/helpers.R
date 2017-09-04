@@ -22,7 +22,7 @@ addLog <- function(message, ...) {
 }
 
 getMset <- reactive({
-    mset <- input$gene_module
+    mset <- input$geneModule
     foo <- substr(mset, 1, 4)
     if(foo == "msig"){
         cat <- gsub("msig", "", mset) # gsub() function reeplaces all matches of a string..
