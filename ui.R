@@ -152,10 +152,12 @@ body <- dashboardBody(
                     column(2,
                            numericInput("pie.lfc",
                                         NULL, 1, min = 0, max = 5, step = 0.5)),
-                    #column(2, actionButton("runTest", "Run", class="tmodAct")),
-                    column(2, actionButton("run", "Run", class="tmodAct"))
-                    #column(2, actionButton("run1", "Plot rug-like", class="tmodAct"))
                     
+                    column(3,
+                           div( class="dropdownBySong",
+                                actionButton("run", "Run", class="tmodAct"),
+                                div(class = "dropdownBySong-content",
+                                    p("If this button is unclickable, please click Refresh button on top righ."))))
                 ),
                 uiOutput("testOrExample_result")
         ),
@@ -179,21 +181,20 @@ dashboardPage(
                     tags$li(uiOutput("cloudWordButton"), class = "dropdown"),
                     tags$li(uiOutput("exampleExportButton"), class = "dropdown"),
                     tags$li(uiOutput("uploadExportButton"), class = "dropdown"),
-                    tags$li(uiOutput("whichCloudToPlot"), class= "dropdown"),
                     tags$li(actionLink("refresh", "", icon("refresh")),class = "dropdown"),
                     dropdownMenuOutput("downloadMenu"),
-                    dropdownMenu(type = "messages",
-                                 icon = icon("user"),
-                                 headerText = "",
-                                 messageItem(
-                                     from = "Dr. January Weiner 3",
-                                     message = "+49-30-28460514"
-                                     ),
-                                 messageItem(
-                                     from = "王雪松(Xuesong Wang)",
-                                     message = "wangxuesong29@gmail.com",
-                                     href = "mailto:wangxuesong29@gmail.com"
-                                     )),
+                    # dropdownMenu(type = "messages",
+                    #              icon = icon("user"),
+                    #              headerText = "",
+                    #              messageItem(
+                    #                  from = "Dr. January Weiner 3",
+                    #                  message = "+49-30-28460514"
+                    #                  ),
+                    #              messageItem(
+                    #                  from = "王雪松(Xuesong Wang)",
+                    #                  message = "wangxuesong29@gmail.com",
+                    #                  href = "mailto:wangxuesong29@gmail.com"
+                    #                  )),
                     titleWidth = 158),
     sidebar,
     body

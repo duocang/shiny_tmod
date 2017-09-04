@@ -307,8 +307,9 @@ output$uploadExportButton <- renderUI({
 
 
 output$tableToTest <- renderUI({
-    if(input$example != "exempty")
-        return(selectInput("resultToTest", NULL, choices ="Example data"))
+    req(input$files)
+    # if(input$example != "exempty")
+    #     return(selectInput("resultToTest", NULL, choices ="Example data"))
     if(is.null(input$files))
         selectInput("resultToTest", NULL, NULL)
     else{
