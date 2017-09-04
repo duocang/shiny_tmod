@@ -156,6 +156,43 @@ function(input, output, session) {
         return(pie)
     })
     
+    addLog("Run tmod in version %s", si$otherPkgs$tmod$Version)
+    
+    # use example
+    # allows saving of the results in a CSV file
+    # note that there is no error handling if no results 
+    # have been generated
+    output$exampleExport <- downloadHandler(
+        filename=function() {
+            sprintf("results_%s_%s_%s.csv", Utest, isolate(input$geneModule), Sys.Date() ) 
+        },
+        content=function(file) {
+            if(!is.null(rv$results)) {
+                foo <- rv$results
+                foo$Genes <- getGenes(rv$results$ID, fg, mset=isolate(input$geneModule))$Genes
+                write.csv(foo, file, row.names=FALSE)
+            }
+        }
+    )
+    
+    # upload files
+    # allows saving of the results in a CSV file
+    # note that there is no error handling if no results 
+    # have been generated
+    output$uploadExport <- downloadHandler(
+        filename = "data.zip",
+        content = function(fname){
+            req(loadedData())
+            mapply( function(x, y){
+                write.csv(x, file = paste0("Result_", y))
+            },
+            rv$uploadResults,
+            names(rv$uploadResults))
+            
+            zip(zipfile = fname, files =paste0("Result_", names(rv$uploadResults)))
+        },
+        contentType = "application/zip"
+    )
     
     # This will show an allert, if the user trys to run without selecting gene column
     observeEvent(input$run,{
@@ -165,8 +202,6 @@ function(input, output, session) {
             session$sendCustomMessage(type = "alert_message", message = 'Please select gene cloumn!')
         }
     })
-
-    addLog("Run tmod in version %s", si$otherPkgs$tmod$Version)
     
     # when we click "Plot heatmap-like", it shows message on the header
     observeEvent(input$run,{
@@ -233,39 +268,8 @@ function(input, output, session) {
         }
     })
     
-    # use example
-    # allows saving of the results in a CSV file
-    # note that there is no error handling if no results 
-    # have been generated
-    output$exampleExport <- downloadHandler(
-        filename=function() {
-            sprintf("results_%s_%s_%s.csv", Utest, isolate(input$geneModule), Sys.Date() ) 
-        },
-        content=function(file) {
-            if(!is.null(rv$results)) {
-                foo <- rv$results
-                foo$Genes <- getGenes(rv$results$ID, fg, mset=isolate(input$geneModule))$Genes
-                write.csv(foo, file, row.names=FALSE)
-            }
-        }
-    )
-    
-    # upload files
-    # allows saving of the results in a CSV file
-    # note that there is no error handling if no results 
-    # have been generated
-    output$uploadExport <- downloadHandler(
-        filename = "data.zip",
-        content = function(fname){
-            req(loadedData())
-            mapply( function(x, y){
-               write.csv(x, file = paste0("Result_", y))
-            },
-            rv$uploadResults,
-            names(rv$uploadResults))
-            
-            zip(zipfile = fname, files =paste0("Result_", names(rv$uploadResults)))
-        },
-        contentType = "application/zip"
-    )
+    observeEvent(input$run,{
+        shinyjs::addClass(selector = "body", class = "sidebar-collapse")
+    })
+
 }
