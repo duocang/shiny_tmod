@@ -271,5 +271,13 @@ function(input, output, session) {
     observeEvent(input$run,{
         shinyjs::addClass(selector = "body", class = "sidebar-collapse")
     })
-
+    
+    
+    observeEvent(input$whichColumnIsGenename, {
+        if(input$whichColumnIsGenename != "-----------------" )
+            showNotification(
+                sprintf("You select %s as GeneName.", input$whichColumnIsGenename),
+                duration = 10,
+                type = "message")
+    })
 }
