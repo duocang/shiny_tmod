@@ -146,7 +146,7 @@ observe({
 ## -------------------------------------------------------------------
 output$resultTable <- renderDataTable({
     input$run
-    if(!is.null(input$files)){
+    if(!is.null(input$files) || isolate(input$example) != "exempty"){
         req(input$resultOfWhichFile)
         res <- formatResultsTable(rv$uploadResults[[input$resultOfWhichFile]])
         req(res)
@@ -190,7 +190,7 @@ output$plot0 <- renderPlot({
                 }
             })
             req(plo)
-            tmodPanelPlot(plo, text.cex = 0.9, legend.style = "auto")
+            tmodPanelPlot(plo, text.cex = 0.9, grid="b", legend.style = "auto")
         })
     }
 }, bg="transparent")
@@ -236,9 +236,7 @@ output$plot01 <- renderPlot({
 ## -------------------------------------------------------------------
 
 output$uploadExportButton <- renderUI({
-    print("尔来四万八千岁")
     req(rv$uploadResults)
-    print("不与秦塞通人烟")
     catf( "+ generating uploaded files export button\n" )
     return(tags$a(id = "uploadExport", class = "btn shiny-download-link headerButton1", href="", target = "_blank",icon("download"), ""))
 })
@@ -246,10 +244,8 @@ output$uploadExportButton <- renderUI({
 # create a selection box, which is used to display different result of corresponding file uploaded
 output$resultOfEachFile <- renderUI({
     req(rv$uploadResults)
-    req(input$files)
-    if(is.null(rv$uploadResults))
-        selectInput("resultOfWhichFile", NULL, NULL)
-    else{
+    if(!is.null(input$files))
         selectInput("resultOfWhichFile", label = NULL, choices = input$files$name)
-    }
+    if(input$example != "exempty")
+        selectInput("resultOfWhichFile", label = NULL, choices = exampleFileNameList)
 })

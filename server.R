@@ -152,7 +152,6 @@ function(input, output, session) {
                 tmodUtest(genes[ord], mset=isolate(getMset()), qval=1)
             }, simplify=FALSE)
         }
-        print("朝菌不知晦朔，蟪蛄不知春秋")
         if(is.null(names(res)) && !is.null(input$files)) 
             names(res) <- input$files$name
         if(is.null(names(res)) && input$example != "exempty")
@@ -176,7 +175,6 @@ function(input, output, session) {
         })
         geneName <- isolate(input$whichColumnIsGenename)
         gene <- dat[[1]][, geneName, with=FALSE]
-        
         ddd <- data.frame(dat[[1]])
         gg <- ddd[[geneName]]
         pie <- tmodDecideTests(g=gg,
@@ -272,7 +270,6 @@ function(input, output, session) {
     observeEvent(input$run,{
         shinyjs::addClass(selector = "body", class = "sidebar-collapse")
     })
-    
     
     observeEvent(input$whichColumnIsGenename, {
         if(input$whichColumnIsGenename != "-----------------" )
