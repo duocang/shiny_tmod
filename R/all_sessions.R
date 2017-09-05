@@ -90,19 +90,6 @@ read.genes <- function( filename=NULL, output=NULL){
     return(l)
 }
 
-## calls tmod and runs the apropriate statistical test
-run.stats <- function(fg, Utest="utest", ...){
-    if(Utest == "cerno"){
-        catf("running tmodCERNOtest\n")
-        res <- tmodCERNOtest(fg, ...)
-    }else{
-        catf("running tmodUtest\n")
-        res <- tmodUtest(fg, ...)
-    }
-    print("自反而缩,虽千万人,吾往矣")
-    print(res)
-    res
-}
 
 ## Prepare the result table from tmod for output in shiny
 ## Add action buttons, format URLs, remove unnecessary columns 

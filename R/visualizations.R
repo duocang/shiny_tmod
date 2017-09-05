@@ -51,14 +51,8 @@ observe({
     no <- as.numeric(isolate(input$row))
     mset <- isolate(getMset())
     # first, create ghe graphics
-    if(!is.null(rv$results)){
-        output$evidencePlot2 <- renderPlot({
-            catf("making evidence plot with %d genes and ID=%s(%d)\n", length(fg), rv$results$ID[no], no)
-            return(evidencePlot(fg, rv$results$ID[no], mset=mset))
-        }, width=600, height=400)
-    }
     if(!is.null(rv$uploadResults)){
-        fg <<- read.genes(filename="www/data/test.csv", output=output)
+        # fg <<- read.genes(filename="www/data/test.csv", output=output)
         output$evidencePlot2 <- renderPlot({
             catf("making evidence plot with %d genes and ID=%s(%d)\n", length(fg), rv$uploadResults[[input$resultOfWhichFile]]$ID[no], no)
             return(evidencePlot(fg, rv$uploadResults[[input$resultOfWhichFile]]$ID[no], mset=mset))
@@ -88,8 +82,6 @@ observe({
     if(is.null(input$glist) || input$glist == 0 || is.null(fg)) { return(NULL) ; }
     no   <- as.numeric(input$glist)
     mset <- getMsetReal(isolate(getMset()))
-    if(!is.null(rv$results))
-        mod <- rv$results$ID[no]
     if(!is.null(rv$uploadResults))
         mod <- rv$uploadResults[[input$resultOfWhichFile]]$ID[no]
     catf("generating gene list for module %d\n", no)
@@ -115,12 +107,8 @@ observe({
 })
 
 # create a tagcloud button if results are generated
-# depends on: reactive value rv$results or rv$uploadResults
+# depends on: reactive value rv$uploadResults
 output$cloudWordButton <- renderUI({
-    if(!is.null(rv$results)){# example data
-        catf( "+ generating tagcloud button\n" )
-        return(actionButton( "tagcloud", label= "",icon = icon("cloud"), class="headerButton" ))
-    }
     if(!is.null(rv$uploadResults)){# upload files
         catf( "+ generating tagcloud button\n" )
         return(actionButton( "tagcloud", label= "",icon = icon("cloud"), class="headerButton" ))
@@ -131,33 +119,18 @@ output$cloudWordButton <- renderUI({
 ## Creates a tag cloud 
 ## -------------------------------------------------------------------
 observeEvent(input$tagcloud, {
-    if(input$example != "exempty"){
-        res <- isolate(rv$results)
-        req(res)
-        print("+ generating tagcloud")
-        w <- -log10(res$P.Value)
-        if(!is.null(res$AUC)) 
-            v <- res$AUC
-        else
-            v <- res$E
-        c <- smoothPalette(v, min=0.5) # Replace A Vector Of Numbers By A Gradient Of Colors
-        tags <- strmultline(gsub("_", " ", res$Title))
-        output$tagcloudPlot <- renderPlot({ tagcloud(tags, weights=w, col=c)}, width=600, height=600)
-        updateTextInput(session, "show_tagcloudW", value=1)
-    }else{
-        res <- isolate(rv$uploadResults[[input$resultOfWhichFile]])
-        req(res)
-        print("+ generating tagcloud")
-        w <- -log10(res$P.Value)
-        if(!is.null(res$AUC)) 
-            v <- res$AUC
-        else
-            v <- res$E
-        c <- smoothPalette(v, min=0.5) # Replace A Vector Of Numbers By A Gradient Of Colors
-        tags <- strmultline(gsub("_", " ", res$Title))
-        output$tagcloudPlot <- renderPlot({ tagcloud(tags, weights=w, col=c)}, width=600, height=600)
-        updateTextInput(session, "show_tagcloudW", value=1)
-    }
+    res <- isolate(rv$uploadResults[[input$resultOfWhichFile]])
+    req(res)
+    print("+ generating tagcloud")
+    w <- -log10(res$P.Value)
+    if(!is.null(res$AUC)) 
+        v <- res$AUC
+    else
+        v <- res$E
+    c <- smoothPalette(v, min=0.5) # Replace A Vector Of Numbers By A Gradient Of Colors
+    tags <- strmultline(gsub("_", " ", res$Title))
+    output$tagcloudPlot <- renderPlot({ tagcloud(tags, weights=w, col=c)}, width=600, height=600)
+    updateTextInput(session, "show_tagcloudW", value=1)
 })
 
 ## hide the popup window
@@ -176,11 +149,6 @@ output$resultTable <- renderDataTable({
     if(!is.null(input$files)){
         req(input$resultOfWhichFile)
         res <- formatResultsTable(rv$uploadResults[[input$resultOfWhichFile]])
-        req(res)
-        return(datatable(res, escape = FALSE))
-    }
-    if(isolate(input$example) != "exempty"){
-        res <- formatResultsTable(rv$results)
         req(res)
         return(datatable(res, escape = FALSE))
     }
@@ -225,14 +193,6 @@ output$plot0 <- renderPlot({
             tmodPanelPlot(plo, text.cex = 0.9, legend.style = "auto")
         })
     }
-    if(isolate(input$example) != "exempty"){
-        req(isolate(input$example))
-        plo <- list(isolate(rv$results))
-        print("独乐乐不如众乐乐")
-        print(isolate(rv$results))
-        names(plo) <- "Example Data"
-        tmodPanelPlot(plo, text.cex = 0.9, legend.style = "auto")
-    }
 }, bg="transparent")
 
 ## -------------------------------------------------------------------
@@ -267,38 +227,14 @@ output$plot01 <- renderPlot({
                 tmodPanelPlot(res, pie=pie, pie.style="r", grid="b", filter.rows.pval=0.001)
         })
     }
-    if(isolate(input$example) != "exempty"){
-        
-        
-        
-        req(isolate(input$example))
-        print(head(fg))
-        pie <- tmodDecideTests(g=fg, lfc = NULL, pval = NULL,  mset = isolate(getMset()))
-        print("　锦城虽云乐，不如早还家。")
-        print(pie)
-        res <- rv$results
-        tmodPanelPlot(list(res), pie=list(pie), pie.style = "r", grid = "b", filter.rows.pval = 0.001)
-        #qplot(1:1000, 1:1000)
-        
-        
-        
-    }
 }, bg="transparent")
 
 ## -------------------------------------------------------------------
 ## export button on top right
+## create an export button if results are generated
+## depends on: reactive value rv$uploadResults
 ## -------------------------------------------------------------------
-# example data
-# create an export button if results are generated
-# depends on: reactive value rv$results
-output$exampleExportButton <- renderUI({
-    req(rv$results)
-    catf( "+ generating example export button\n" )
-    return(tags$a(id = "exampleExport", class = "btn shiny-download-link headerButton1", href = "", target = "_blank",icon("download"), ""))
-})
-# upload files
-# create an export button if results are generated
-# depends on: reactive value rv$results
+
 output$uploadExportButton <- renderUI({
     req(rv$uploadResults)
     catf( "+ generating uploaded files export button\n" )

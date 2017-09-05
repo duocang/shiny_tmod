@@ -10,7 +10,6 @@ function(input, output, session) {
     
     # reactive values
     rv <- reactiveValues()
-    rv$results <- NULL       # it is used for storing example data
     rv$uploadResults <- NULL # it is used for storing results after processing uploaded files
     rv$headerMessage <- NULL # this is used to show message in header
     
@@ -74,9 +73,14 @@ function(input, output, session) {
     
     # read data and  put into a list
     loadData <- observe({
+        input$example
         infile <- input$files$datapath
+        workingDirecotry <- getwd()
+        exampleFileListPath <-  paste0(workingDirecotry, "/data/", list("tt_2_S.csv", "tt_3_TBvS.csv") )
         if(is.null(infile)){
-            # User has not uploaded files yet
+            print(exampleFileListPath)
+            data <- lapply(exampleFileListPath, function(x) {fread(x, header = TRUE, stringsAsFactors = FALSE) })
+            loadedData(data)
         } else {
             data <- lapply(infile, function(x) {fread(x, header = TRUE, stringsAsFactors = FALSE) })
             loadedData(data) # load file data into global variable loaded_dtat, which is a reactive value
@@ -158,23 +162,6 @@ function(input, output, session) {
     
     addLog("Run tmod in version %s", si$otherPkgs$tmod$Version)
     
-    # use example
-    # allows saving of the results in a CSV file
-    # note that there is no error handling if no results 
-    # have been generated
-    output$exampleExport <- downloadHandler(
-        filename=function() {
-            sprintf("results_%s_%s_%s.csv", Utest, isolate(input$geneModule), Sys.Date() ) 
-        },
-        content=function(file) {
-            if(!is.null(rv$results)) {
-                foo <- rv$results
-                foo$Genes <- getGenes(rv$results$ID, fg, mset=isolate(input$geneModule))$Genes
-                write.csv(foo, file, row.names=FALSE)
-            }
-        }
-    )
-    
     # upload files
     # allows saving of the results in a CSV file
     # note that there is no error handling if no results 
@@ -219,20 +206,6 @@ function(input, output, session) {
         updateTabsetPanel(session, "inTabset", selected = "table")
     })
     
-    # an example is selected, corresponding test will run
-    # and result will be given to rv$results
-    observe({
-        if(input$example == "exempty")
-            return(NULL)
-        mset <- getMset()
-        isolate(load.example())
-        if(is.null(fg)){
-            print("no example data is uploaded")
-            addMsg("Please, select example data")
-            return(NULL)
-        }
-        rv$results <- run.stats(fg, Utest, mset=mset)
-    })
     
     # when example is useed, disable some selection boxes
     observeEvent(input$example,{
