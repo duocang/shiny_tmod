@@ -99,6 +99,8 @@ run.stats <- function(fg, Utest="utest", ...){
         catf("running tmodUtest\n")
         res <- tmodUtest(fg, ...)
     }
+    print("自反而缩,虽千万人,吾往矣")
+    print(res)
     res
 }
 

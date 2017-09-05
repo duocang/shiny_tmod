@@ -228,6 +228,8 @@ output$plot0 <- renderPlot({
     if(isolate(input$example) != "exempty"){
         req(isolate(input$example))
         plo <- list(isolate(rv$results))
+        print("独乐乐不如众乐乐")
+        print(isolate(rv$results))
         names(plo) <- "Example Data"
         tmodPanelPlot(plo, text.cex = 0.9, legend.style = "auto")
     }
@@ -266,12 +268,20 @@ output$plot01 <- renderPlot({
         })
     }
     if(isolate(input$example) != "exempty"){
+        
+        
+        
         req(isolate(input$example))
         print(head(fg))
-        pie <- tmodDecideTests(g=fg, mset = isolate(getMset()))
+        pie <- tmodDecideTests(g=fg, lfc = NULL, pval = NULL,  mset = isolate(getMset()))
+        print("　锦城虽云乐，不如早还家。")
+        print(pie)
         res <- rv$results
-        # tmodPanelPlot(list(res), pie=list(pie), pie.style = "r", grid = "b", filter.rows.pval = 0.001)
-        qplot(1:1000, 1:1000)
+        tmodPanelPlot(list(res), pie=list(pie), pie.style = "r", grid = "b", filter.rows.pval = 0.001)
+        #qplot(1:1000, 1:1000)
+        
+        
+        
     }
 }, bg="transparent")
 
