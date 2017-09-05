@@ -7,7 +7,7 @@ function(input, output, session) {
     Utest        <- "hg"
     example      <- FALSE
     log          <- ""
-    
+    exampleFileNameList <- list("tt_2_S.csv", "tt_3_TBvS.csv")
     # reactive values
     rv <- reactiveValues()
     rv$uploadResults <- NULL # it is used for storing results after processing uploaded files
@@ -26,9 +26,26 @@ function(input, output, session) {
     
     # dispaly selectioninput:  which file to preview
     output$choosePreviewFile <- renderUI({
-        req(loadedData())
-        selectInput("which_preview_file", "File Preview", 
-                    as.list(input$files$name), selected = NULL)
+        if(is.null(input$files) && input$example == "exempty")
+            return(NULL)
+        print("蜀道之难难于上青天")
+        if(!is.null(input$files))
+            return(selectInput("which_preview_file", "File Preview", as.list(input$files$name), selected = NULL))
+        if(input$example != "exempty")
+            return(selectInput("which_preview_file", "File Preview", exampleFileNameList, selected = NULL))
+    })
+    
+    # display selection for which column is genename
+    output$genename_col <- renderUI({
+        if(is.null(input$files) && input$example == "exempty")
+            return(NULL)
+         if(!is.null(input$files))
+             return(selectInput("whichColumnIsGenename", "Select genename column", 
+                                choices = c("-----------------", common_columns())))
+        if(input$example != "exempty")
+            return(selectInput("whichColumnIsGenename", "Select genename column", 
+                               choices = c("-----------------", common_columns()),
+                               selected = "GeneName"))
     })
     
     # go through all loaded files and find the common columns
@@ -39,12 +56,7 @@ function(input, output, session) {
         Reduce(intersect, foo)# 对列表foo不断做intersect操作，进而得出共同行
     })
     
-    # display selection for which column is genename
-    output$genename_col <- renderUI({
-        req(loadedData())
-        selectInput("whichColumnIsGenename", "Select genename column", 
-                    choices = c("-----------------", common_columns()))
-    })
+
     
     # this will show the table of file in page
     output$table = DT::renderDataTable( preview8Lines(),options=list(scrollX=TRUE))
@@ -52,18 +64,30 @@ function(input, output, session) {
     # this function will show first 8 rows of selected file to preview
     preview8Lines <- reactive({
         tryCatch({
-            n <- 1
-            fileSelectedForPreview <- input$which_preview_file# which file selected for preview
-            infile <- input$files
-            if(is.null(infile)) return(NULL)# user has not uploaded a file yet
-            for(i in 1:fileNum())
-                if(infile$name[i] == fileSelectedForPreview)
-                    n <- i
-            a <- loadedData()[[n]]
-            head(a, n=8)
+            if(!is.null(input$files)){
+                n <- 1
+                fileSelectedForPreview <- input$which_preview_file# which file selected for preview
+                infile <- input$files
+                for(i in 1:fileNum())
+                    if(infile$name[i] == fileSelectedForPreview)
+                        n <- i
+                a <- loadedData()[[n]]
+                return(head(a, n=8))
+            }
+            if(input$example != "exempty"){
+                print("朝菌不知晦朔，蟪蛄不知春秋")
+                no <- 1
+                fileSelectedForPreview <- input$which_preview_file# which file selected for preview
+                for(i in 1:2)
+                    if(exampleFileNameList[i] == fileSelectedForPreview)
+                        no <- i
+                a <- loadedData()[[no]]
+                return(head(a, n=6))
+  
+            }
         },
         error = function(e){
-            print("There is no selection for gene name column.")
+            #print("There is no selection for gene name column.")
             return(NULL)
         })
     })
@@ -76,16 +100,19 @@ function(input, output, session) {
         input$example
         infile <- input$files$datapath
         workingDirecotry <- getwd()
-        exampleFileListPath <-  paste0(workingDirecotry, "/data/", list("tt_2_S.csv", "tt_3_TBvS.csv") )
-        if(is.null(infile)){
+        exampleFileListPath <-  paste0(workingDirecotry, "/data/", exampleFileNameList )
+        if(is.null(infile) && input$example != "exempty"){
+            print("不与秦塞通人烟")
             print(exampleFileListPath)
             data <- lapply(exampleFileListPath, function(x) {fread(x, header = TRUE, stringsAsFactors = FALSE) })
+            print(class(data))
+            print(length(data))
+            #print(head(data, n=1))
             loadedData(data)
         } else {
             data <- lapply(infile, function(x) {fread(x, header = TRUE, stringsAsFactors = FALSE) })
             loadedData(data) # load file data into global variable loaded_dtat, which is a reactive value
         }
-        data
     })
     
     # below will do many things:
