@@ -159,7 +159,7 @@ output$resultTable <- renderDataTable({
 ## -------------------------------------------------------------------
 output$plot0 <- renderPlot({
     req(input$run)
-    if(!is.null(isolate(input$files))){
+    if(!is.null(isolate(input$files)) || input$example != "exempty"){
         plo <- NULL
         withProgress(message = 'Making plot', value = 0, {
             n <- 5
@@ -200,7 +200,7 @@ output$plot0 <- renderPlot({
 ## -------------------------------------------------------------------
 output$plot01 <- renderPlot({
     input$run
-    if(!is.null(isolate(input$files)))
+    if(!is.null(isolate(input$files)) || input$example != "exempty")
     {
         withProgress(message = 'Making plot', value = 0, {
             n <- 10
@@ -236,7 +236,9 @@ output$plot01 <- renderPlot({
 ## -------------------------------------------------------------------
 
 output$uploadExportButton <- renderUI({
+    print("尔来四万八千岁")
     req(rv$uploadResults)
+    print("不与秦塞通人烟")
     catf( "+ generating uploaded files export button\n" )
     return(tags$a(id = "uploadExport", class = "btn shiny-download-link headerButton1", href="", target = "_blank",icon("download"), ""))
 })

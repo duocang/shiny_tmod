@@ -28,7 +28,6 @@ function(input, output, session) {
     output$choosePreviewFile <- renderUI({
         if(is.null(input$files) && input$example == "exempty")
             return(NULL)
-        print("蜀道之难难于上青天")
         if(!is.null(input$files))
             return(selectInput("which_preview_file", "File Preview", as.list(input$files$name), selected = NULL))
         if(input$example != "exempty")
@@ -75,15 +74,13 @@ function(input, output, session) {
                 return(head(a, n=8))
             }
             if(input$example != "exempty"){
-                print("朝菌不知晦朔，蟪蛄不知春秋")
                 no <- 1
                 fileSelectedForPreview <- input$which_preview_file# which file selected for preview
                 for(i in 1:2)
                     if(exampleFileNameList[i] == fileSelectedForPreview)
                         no <- i
                 a <- loadedData()[[no]]
-                return(head(a, n=6))
-  
+                return(head(a, n=8))
             }
         },
         error = function(e){
@@ -102,7 +99,6 @@ function(input, output, session) {
         workingDirecotry <- getwd()
         exampleFileListPath <-  paste0(workingDirecotry, "/data/", exampleFileNameList )
         if(is.null(infile) && input$example != "exempty"){
-            print("不与秦塞通人烟")
             print(exampleFileListPath)
             data <- lapply(exampleFileListPath, function(x) {fread(x, header = TRUE, stringsAsFactors = FALSE) })
             print(class(data))
@@ -122,7 +118,9 @@ function(input, output, session) {
     # 4. tmod test 
     tmodTest <- reactive({
         input$run
+        
         input$whichColumnIsGenename
+        
         dat <- isolate(loadedData())
         if(is.null(dat) || length(dat)==0) {
             addMsg("NO DATA! Upload file(s) or select an example.")
@@ -154,7 +152,11 @@ function(input, output, session) {
                 tmodUtest(genes[ord], mset=isolate(getMset()), qval=1)
             }, simplify=FALSE)
         }
-        if(is.null(names(res))) names(res) <- input$files$name
+        print("朝菌不知晦朔，蟪蛄不知春秋")
+        if(is.null(names(res)) && !is.null(input$files)) 
+            names(res) <- input$files$name
+        if(is.null(names(res)) && input$example != "exempty")
+            names(res) <- exampleFileNameList
         rv$uploadResults <- res    # it will be used for downloading
         return(res)
     })
@@ -172,7 +174,6 @@ function(input, output, session) {
         pvals <- sapply(dat, function(x){
             as.matrix(x[, "qval", with=FALSE])
         })
-        
         geneName <- isolate(input$whichColumnIsGenename)
         gene <- dat[[1]][, geneName, with=FALSE]
         
