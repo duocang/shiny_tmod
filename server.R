@@ -271,7 +271,6 @@ function(input, output, session) {
             showNotification(
                 sprintf("You select %s as GeneName.", input$whichColumnIsGenename),
                 duration = 5
-                # type = "message"
                 )
     })
 }

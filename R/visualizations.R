@@ -32,7 +32,7 @@ popupWindow <- function(varname, contents) {
     dismiss <- paste0( "dismiss_", varname)
     jqui_draggabled(# enable draggable feature
         conditionalPanel(
-            condition=sprintf('input.%s == 1', show),# condition is a javascript expression that will be evaluated repeatedly
+            condition=sprintf('input.%s == 1', show),
             # variable to keep track of showing the overlay
             div(style="display:none;", textInput(show, "", 0)),
             div(class="overlay", draggable="true",
@@ -77,7 +77,6 @@ observe({
 ## Creates the gene list
 ## -------------------------------------------------------------------
 observe({
-    
     fg <<- read.genes(filename="www/data/test.csv", output=output)
     if(is.null(input$glist) || input$glist == 0 || is.null(fg)) { return(NULL) ; }
     no   <- as.numeric(input$glist)
@@ -112,7 +111,6 @@ output$cloudWordButton <- renderUI({
     req(input$resultOfWhichFile)
     if(!is.null(rv$uploadResults)){# upload files
         catf( "+ generating tagcloud button\n" )
-        #return(actionButton( "tagcloud", label= "",icon = icon("cloud"), class="headerButton" ))
         return(div(class="exportButton",
                actionButton( "tagcloud", label= "",icon = icon("cloud"), class="headerButton" ),
                div(class = "exportButton-content",
@@ -151,12 +149,10 @@ observe({
 ## -------------------------------------------------------------------
 output$resultTable <- renderDataTable({
     input$run
-    #if(!is.null(input$files) || isolate(input$example) != "exempty"){
-        req(input$resultOfWhichFile)
-        res <- formatResultsTable(rv$uploadResults[[input$resultOfWhichFile]])
-        req(res)
-        return(datatable(res, escape = FALSE))
-    #}
+    req(input$resultOfWhichFile)
+    res <- formatResultsTable(rv$uploadResults[[input$resultOfWhichFile]])
+    req(res)
+    return(datatable(res, escape = FALSE))
 })
 
 ## -------------------------------------------------------------------
@@ -209,17 +205,11 @@ output$plot01 <- renderPlot({
     {
         withProgress(message = 'Making plot', value = 0, {
             n <- 10
-            # Number of times we'll go through the loop
             for (i in 1:n) {
-                # Each time through the loop, add another row of data. This is
-                # a stand-in for a long-running computation.
-                # Increment the progress bar, and update the detail text.
                 incProgress(1/n, detail = paste("", ""))
-                # Pause for 0.1 seconds to simulate a long computation.
                 Sys.sleep(0.1)
             }
             res <- isolate(rv$uploadResults)
-            #res <- isolate(tmodTest())
             sapply(res, function(x){
                 if(nrow(x) == 0){
                     addMsg(sprintf("There is no moudle named %s!", isolate(input$gene_module)))
@@ -235,7 +225,6 @@ output$plot01 <- renderPlot({
 }, bg="transparent")
 
 ## -------------------------------------------------------------------
-## export button on top right
 ## create an export button if results are generated
 ## depends on: reactive value rv$uploadResults
 ## -------------------------------------------------------------------
@@ -250,7 +239,6 @@ output$uploadExportButton <- renderUI({
                       icon("download"), ""),
                div(class = "exportButton-content",
                    p("Hit me, you can download results of all files."))))
-    #return(tags$a(id = "uploadExport", class = "btn shiny-download-link headerButton", href="", target = "_blank",icon("download"), ""))
 })
 
 # create a selection box, which is used to display different result of corresponding file uploaded
@@ -261,10 +249,5 @@ output$resultOfEachFile <- renderUI({
         choicess <- input$files$name
     if(input$example != "exempty")
         choicess <- exampleFileNameList
-    return(#div(class="dropdownBySong",
-               selectInput("resultOfWhichFile", label = NULL, choices =  choicess)
-               #,
-               #div(class = "dropdownBySong-content",
-                  # p("Corresponding WordCloud to file can by seen by Cloud icon on top right.")))
-               )
+    return(selectInput("resultOfWhichFile", label = NULL, choices =  choicess))
 })

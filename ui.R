@@ -143,12 +143,6 @@ body <- dashboardBody(
                            numericInput("pie.lfc",
                                         NULL, 1, min = 0, max = 5, step = 0.5)),
                     column(3,actionButton("run", "Run", class="tmodAct"))
-                    # ,column(4,
-                    #        div( class="dropdownBySong",
-                    #             actionButton("run", "Run1", class="tmodAct"),
-                    #             span(class = "dropdownBySong-content",
-                    #                 p("Check WordCloud of current file by button on top right."),
-                    #                 p("Download result(s) by button on top right. "))))
                     ),
                 uiOutput("testOrExampleResult")),# it will show the table of result 
         tabItem(tabName = "help",
@@ -171,12 +165,6 @@ dashboardPage(
                     tags$li(uiOutput("cloudWordButton"), class = "dropdown"),
                     tags$li(uiOutput("uploadExportButton"), class = "dropdown"),
                     tags$li(actionButton("refresh", "", icon("refresh"), class="headerButton"),class = "dropdown"),
-                    # tags$li(
-                    #     div(class="dropdownRefresh",
-                    #         actionButton("refresh", "", icon("refresh"), class="headerButton"),
-                    #         div(class = "dropdownRefresh-content",
-                    #             p("Reset Page")))
-                    #     ,class = "dropdown"),
                     titleWidth = 158),
     sidebar,
     body

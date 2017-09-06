@@ -39,7 +39,6 @@ format.table <- function( df ) {
     df
 }
 
-## 
 formatTablePval <- function(df, cols) {
     for(i in 1:50) {
         tmp <- df[,cols,drop=FALSE]
@@ -57,7 +56,6 @@ filterModulesByCategory <- function(mset, cat){
     mset$GENES <- mset$GENES[ mset$GENES$ID %in% unique(unlist(mset$MODULES2GENES)),, drop=FALSE ]
     return(mset)
 }
-
 
 ## get the actual mset as list
 ## if it is the original tmod, it returns a list with tmod objects
@@ -89,7 +87,6 @@ read.genes <- function( filename=NULL, output=NULL){
     }
     return(l)
 }
-
 
 ## Prepare the result table from tmod for output in shiny
 ## Add action buttons, format URLs, remove unnecessary columns 
