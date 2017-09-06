@@ -236,11 +236,6 @@ function(input, output, session) {
     # when example is useed, disable some selection boxes
     observeEvent(input$example,{
         if(input$example != "exempty"){
-            shinyjs::disable("sortByWhich")
-            disable("incOrDec")
-            disable("abs")
-            disable("pie.pval")
-            disable("pie.lfc")
             disable("testType")
             disable("files")
             addMsg("Example is ready for running!   <b>Go to Test tap</b>")
@@ -275,7 +270,8 @@ function(input, output, session) {
         if(input$whichColumnIsGenename != "-----------------" )
             showNotification(
                 sprintf("You select %s as GeneName.", input$whichColumnIsGenename),
-                duration = 10,
-                type = "message")
+                duration = 5
+                # type = "message"
+                )
     })
 }

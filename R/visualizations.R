@@ -52,7 +52,7 @@ observe({
     mset <- isolate(getMset())
     # first, create ghe graphics
     if(!is.null(rv$uploadResults)){
-        # fg <<- read.genes(filename="www/data/test.csv", output=output)
+        fg <<- read.genes(filename="www/data/test.csv", output=output)
         output$evidencePlot2 <- renderPlot({
             catf("making evidence plot with %d genes and ID=%s(%d)\n", length(fg), rv$uploadResults[[input$resultOfWhichFile]]$ID[no], no)
             return(evidencePlot(fg, rv$uploadResults[[input$resultOfWhichFile]]$ID[no], mset=mset))
@@ -77,7 +77,7 @@ observe({
 ## Creates the gene list
 ## -------------------------------------------------------------------
 observe({
-    req(input$files)
+    
     fg <<- read.genes(filename="www/data/test.csv", output=output)
     if(is.null(input$glist) || input$glist == 0 || is.null(fg)) { return(NULL) ; }
     no   <- as.numeric(input$glist)
@@ -109,9 +109,14 @@ observe({
 # create a tagcloud button if results are generated
 # depends on: reactive value rv$uploadResults
 output$cloudWordButton <- renderUI({
+    req(input$resultOfWhichFile)
     if(!is.null(rv$uploadResults)){# upload files
         catf( "+ generating tagcloud button\n" )
-        return(actionButton( "tagcloud", label= "",icon = icon("cloud"), class="headerButton" ))
+        #return(actionButton( "tagcloud", label= "",icon = icon("cloud"), class="headerButton" ))
+        return(div(class="exportButton",
+               actionButton( "tagcloud", label= "",icon = icon("cloud"), class="headerButton" ),
+               div(class = "exportButton-content",
+                   p(sprintf("Click me, you will get cloud word of %s", input$resultOfWhichFile)))))
     }
 })
 
@@ -119,7 +124,7 @@ output$cloudWordButton <- renderUI({
 ## Creates a tag cloud 
 ## -------------------------------------------------------------------
 observeEvent(input$tagcloud, {
-    res <- isolate(rv$uploadResults[[input$resultOfWhichFile]])
+    res <- rv$uploadResults[[input$resultOfWhichFile]]
     req(res)
     print("+ generating tagcloud")
     w <- -log10(res$P.Value)
@@ -146,19 +151,19 @@ observe({
 ## -------------------------------------------------------------------
 output$resultTable <- renderDataTable({
     input$run
-    if(!is.null(input$files) || isolate(input$example) != "exempty"){
+    #if(!is.null(input$files) || isolate(input$example) != "exempty"){
         req(input$resultOfWhichFile)
         res <- formatResultsTable(rv$uploadResults[[input$resultOfWhichFile]])
         req(res)
         return(datatable(res, escape = FALSE))
-    }
+    #}
 })
 
 ## -------------------------------------------------------------------
 ## Show the heatmap plot
 ## -------------------------------------------------------------------
 output$plot0 <- renderPlot({
-    req(input$run)
+    input$run
     if(!is.null(isolate(input$files)) || input$example != "exempty"){
         plo <- NULL
         withProgress(message = 'Making plot', value = 0, {
@@ -193,7 +198,7 @@ output$plot0 <- renderPlot({
             tmodPanelPlot(plo, text.cex = 0.9, grid="b", legend.style = "auto")
         })
     }
-}, bg="transparent")
+}, bg="#EEEEEE")
 
 ## -------------------------------------------------------------------
 ## Show the rug plot
@@ -234,18 +239,32 @@ output$plot01 <- renderPlot({
 ## create an export button if results are generated
 ## depends on: reactive value rv$uploadResults
 ## -------------------------------------------------------------------
-
 output$uploadExportButton <- renderUI({
     req(rv$uploadResults)
     catf( "+ generating uploaded files export button\n" )
-    return(tags$a(id = "uploadExport", class = "btn shiny-download-link headerButton1", href="", target = "_blank",icon("download"), ""))
+    return(div(class="exportButton",
+               tags$a(id = "uploadExport", 
+                      class = "btn shiny-download-link headerButton", 
+                      href="", 
+                      target = "_blank",
+                      icon("download"), ""),
+               div(class = "exportButton-content",
+                   p("Hit me, you can download results of all files."))))
+    #return(tags$a(id = "uploadExport", class = "btn shiny-download-link headerButton", href="", target = "_blank",icon("download"), ""))
 })
 
 # create a selection box, which is used to display different result of corresponding file uploaded
 output$resultOfEachFile <- renderUI({
+    input$run
     req(rv$uploadResults)
     if(!is.null(input$files))
-        selectInput("resultOfWhichFile", label = NULL, choices = input$files$name)
+        choicess <- input$files$name
     if(input$example != "exempty")
-        selectInput("resultOfWhichFile", label = NULL, choices = exampleFileNameList)
+        choicess <- exampleFileNameList
+    return(#div(class="dropdownBySong",
+               selectInput("resultOfWhichFile", label = NULL, choices =  choicess)
+               #,
+               #div(class = "dropdownBySong-content",
+                  # p("Corresponding WordCloud to file can by seen by Cloud icon on top right.")))
+               )
 })
