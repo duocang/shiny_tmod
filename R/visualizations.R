@@ -156,49 +156,54 @@ output$resultTable <- renderDataTable({
 ## -------------------------------------------------------------------
 ## Show the heatmap plot
 ## -------------------------------------------------------------------
-observeEvent(input$run,
-             output$plot0 <- renderPlot({
-                 print("这里是output$plot0")
-                 if(!is.null(isolate(input$files)) || isolate(input$example) != "exempty"){
-                     
-                     geneCol <- isolate(input$whichColumnIsGenename)
-                     withProgress(message = 'Making plot', value = 0, {
-                         n <- 5
-                         # Number of times we'll go through the loop
-                         for (i in 1:n) {
-                             # Each time through the loop, add another row of data. This is
-                             # a stand-in for a long-running computation.
-                             # Increment the progress bar, and update the detail text.
-                             incProgress(1/n, detail = paste("", ""))
-                             # Pause for 0.1 seconds to simulate a long computation.
-                             Sys.sleep(0.1)
-                         }
-                         tryCatch({
-                             plo <- isolate(tmodTest())
-                         },warning=function(w){
-                             if (geneCol != "-----------------"){
-                                 addMsg("Wrong gene column selected!")
-                                 isolate(updateSelectInput(session, "whichColumnIsGenename", selected = "-----------------"))
-                                 #session$sendCustomMessage(type = "alert_message", message = "Wrong gene column selected! Please select gene cloumn, again猪八戒!")
-                             }
-                         },error=function(e){
-                             if(geneCol != "-----------------"){
-                                 addMsg("Wrong gene column selected!")
-                                 isolate(updateSelectInput(session, "whichColumnIsGenename", selected = "-----------------"))
-                                 #session$sendCustomMessage(type = "alert_message", message = "Wrong gene column selected! Please select gene cloumn, again!")
-                             }
-                         })
-                         req(plo)
-                         tmodPanelPlot(plo, text.cex = 0.9, grid="b", legend.style = "auto")
-                     })
-                 }
-             }, bg="#EEEEEE"))
+observeEvent(input$run,{
+    output$plot0 <- renderPlot({
+        if (input$inTabset != "heatmapTab")
+            return(NULL)
+        print("这里是output$plot0")
+        if(!is.null(isolate(input$files)) || isolate(input$example) != "exempty"){
+            
+            geneCol <- isolate(input$whichColumnIsGenename)
+            withProgress(message = 'Making plot', value = 0, {
+                n <- 5
+                # Number of times we'll go through the loop
+                for (i in 1:n) {
+                    # Each time through the loop, add another row of data. This is
+                    # a stand-in for a long-running computation.
+                    # Increment the progress bar, and update the detail text.
+                    incProgress(1/n, detail = paste("", ""))
+                    # Pause for 0.1 seconds to simulate a long computation.
+                    Sys.sleep(0.1)
+                }
+                tryCatch({
+                    plo <- isolate(tmodTest())
+                },warning=function(w){
+                    if (geneCol != "-----------------"){
+                        addMsg("Wrong gene column selected!")
+                        isolate(updateSelectInput(session, "whichColumnIsGenename", selected = "-----------------"))
+                        #session$sendCustomMessage(type = "alert_message", message = "Wrong gene column selected! Please select gene cloumn, again猪八戒!")
+                    }
+                },error=function(e){
+                    if(geneCol != "-----------------"){
+                        addMsg("Wrong gene column selected!")
+                        isolate(updateSelectInput(session, "whichColumnIsGenename", selected = "-----------------"))
+                        #session$sendCustomMessage(type = "alert_message", message = "Wrong gene column selected! Please select gene cloumn, again!")
+                    }
+                })
+                req(plo)
+                tmodPanelPlot(plo, text.cex = 0.9, grid="b", legend.style = "auto")
+            })
+        }
+    }, bg="#EEEEEE")
+})
 
 ## -------------------------------------------------------------------
 ## Show the rug plot
 ## -------------------------------------------------------------------
 observeEvent(input$run,
              output$plot01 <- renderPlot({
+                 if (input$inTabset != "rugTab")
+                     return(NULL)
                  print("这里是output$plot01")
                  if(!is.null(isolate(input$files)) || isolate(input$example) != "exempty")
                  {
@@ -209,7 +214,6 @@ observeEvent(input$run,
                              Sys.sleep(0.1)
                          }
                          res <- isolate(tmodTest())
-                         # res <- isolate(rv$uploadResults)
                          sapply(res, function(x){
                              if(nrow(x) == 0){
                                  addMsg(sprintf("There is no moudle named %s!", isolate(input$gene_module)))

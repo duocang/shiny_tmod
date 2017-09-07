@@ -122,10 +122,10 @@ function(input, output, session) {
             addMsg("NO DATA! Upload file(s) or select an example.")
             return(NULL)
         }
-        sortCol <- isolate(input$sortByWhich)
-        sortAbs <- isolate(input$abs)
-        sortDecr <- isolate(input$incOrDec)
-        geneName <- isolate(input$whichColumnIsGenename)
+        sortCol <- input$sortByWhich
+        sortAbs <- input$abs
+        sortDecr <- input$incOrDec
+        geneName <- input$whichColumnIsGenename
         if(geneName == "-----------------" )
             addMsg("No task running, because there no is gene column selected yet!")
         if(isolate(input$testType) == "tmodCERNOtest"){
@@ -135,7 +135,7 @@ function(input, output, session) {
                 ord   <- x[ , sortCol ]
                 if(sortAbs == "YES") ord <- abs(ord)
                 ord <- order(ord, decreasing=sortDecr)
-                tmodCERNOtest(genes[ord], mset=isolate(getMset()), qval=1)
+                tmodCERNOtest(genes[ord], mset = getMset(), qval=1)
             }, simplify=FALSE)
         }else{
             res <- sapply(dat, function(x) {
@@ -144,7 +144,7 @@ function(input, output, session) {
                 ord   <- x[ , sortCol ]
                 if(sortAbs == "YES") ord <- abs(ord)
                 ord <- order(ord, decreasing=sortDecr)
-                tmodUtest(genes[ord], mset=isolate(getMset()), qval=1)
+                tmodUtest(genes[ord], mset = getMset(), qval=1)
             }, simplify=FALSE)
         }
         if(is.null(names(res)) && !is.null(input$files)) 
@@ -154,10 +154,7 @@ function(input, output, session) {
         rv$uploadResults <- res    # it will be used for downloading
         return(res)
     })
-    # put the value of tmodTest() into a var, to provent run it repeatedly
-    observeEvent(input$whichColumnIsGenename,{
-        rv$tomdTestValue <- tmodTest()
-    })
+
     
     tmodTest1 <- reactive({
         print("这里是tmodTest1")
@@ -172,21 +169,17 @@ function(input, output, session) {
         pvals <- sapply(dat, function(x){
             as.matrix(x[, "qval", with=FALSE])
         })
-        geneName <- isolate(input$whichColumnIsGenename)
+        geneName <- input$whichColumnIsGenename
         gene <- dat[[1]][, geneName, with=FALSE]
         ddd <- data.frame(dat[[1]])
         gg <- ddd[[geneName]]
         pie <- tmodDecideTests(g=gg,
                                lfc=lfcs,
                                pval=pvals,
-                               lfc.thr=isolate(input$pie.lfc),
-                               pval.thr=isolate(input$pie.pval),
+                               lfc.thr=input$pie.lfc,
+                               pval.thr=input$pie.pval,
                                mset=mset)
         return(pie)
-    })
-    # put the value of tmodTest1() into a var, to provent run it repeatedly
-    observeEvent(input$whichColumnIsGenename,{
-        rv$tomdTest1Value <- tmodTest1()
     })
     
     addLog("Run tmod in version %s", si$otherPkgs$tmod$Version)
@@ -236,24 +229,24 @@ function(input, output, session) {
     })
     
     
-    # when example is useed, disable some selection boxes
-    observeEvent(input$example,{
-        if(input$example != "exempty"){
-            disable("testType")
-            disable("files")
-            addMsg("Example is ready for running!   <b>Go to Test tap</b>")
-            return()
-        }
-    })
-    
-    # when example is useed, disable some selection boxes
-    observeEvent(input$files,{
-        if(!is.null(input$files)){
-            disable("example")
-            addMsg(" Uploaded file(s) will be used for running!   <b>Go to Test tap</b>")
-        }
-    })
-    
+    # # when example is useed, disable some selection boxes
+    # observeEvent(input$example,{
+    #     if(input$example != "exempty"){
+    #         disable("testType")
+    #         disable("files")
+    #         addMsg("Example is ready for running!   <b>Go to Test tap</b>")
+    #         return()
+    #     }
+    # })
+    # 
+    # # when example is useed, disable some selection boxes
+    # observeEvent(input$files,{
+    #     if(!is.null(input$files)){
+    #         disable("example")
+    #         addMsg(" Uploaded file(s) will be used for running!   <b>Go to Test tap</b>")
+    #     }
+    # })
+    # 
     # refresh page
     observeEvent(input$refresh,{
         session$reload()
