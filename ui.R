@@ -132,11 +132,11 @@ body <- dashboardBody(
                                                       "tmodUtest" = "tmodUtest"),
                                           selected = "tmodUtest"))),
                 fluidRow(
-                    column(2, "  pie.pval"),
+                    column(3, "  pie.pval"),
                     column(2, "  pie.lfc" ),
                     class="paramHeader"),
                 fluidRow(
-                    column(2,
+                    column(3,
                            numericInput("pie.pval",
                                         NULL, 0.05, min = 0, max = 0.1, step = 0.01)),
                     column(2,

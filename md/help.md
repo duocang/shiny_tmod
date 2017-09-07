@@ -138,7 +138,7 @@ gene list. Each black vertical line denotes one gene.
 
 This is the initial release of tmod interface. If you have problems with
 the web page, please contact [January
-Weiner](mailto:january@mpiib-berlin.mpg.de).
+Weiner](mailto:january@mpiib-berlin.mpg.de) or [Xuesong Wang](mailto:wangxuesong29@gmail.com).
 
 
 

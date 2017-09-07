@@ -1,7 +1,9 @@
 # it is defined in ui.R, it will show the table of result in 'test' tab.
 output$testOrExampleResult <- renderUI({
     tabsetPanel(id = "inTabset",
-                tabPanel("table", 
+                tabPanel("heatmap-like", value = "heatmapTab", plotOutput("plot0", height = "1500px")),
+                tabPanel("rug-like",  value = "rugTab", plotOutput("plot01", height = "2000px")),
+                tabPanel("table", value = "tableTab",
                          # these are required for button to be reactive
                          div(id="glist", class="shiny-input-radiogroup", 
                              div(id="row", class="shiny-input-radiogroup", 
@@ -21,9 +23,7 @@ output$testOrExampleResult <- renderUI({
                                          p(HTML("Genes shown in <b>bold</b> are in the main data set")),
                                          p(uiOutput("genelist")))),
                          popupWindow("tagcloudW",
-                                     div(plotOutput( "tagcloudPlot" ), style="width:600px;height:600px;" ))),
-                tabPanel("heatmap-like", plotOutput("plot0", height = "1500px")),
-                tabPanel("rug-like", plotOutput("plot01", height = "1500px")))
+                                     div(plotOutput( "tagcloudPlot" ), style="width:600px;height:600px;" ))))
 })
 
 popupWindow <- function(varname, contents) {
@@ -52,7 +52,6 @@ observe({
     mset <- isolate(getMset())
     # first, create ghe graphics
     if(!is.null(rv$uploadResults)){
-        fg <<- read.genes(filename="www/data/test.csv", output=output)
         output$evidencePlot2 <- renderPlot({
             catf("making evidence plot with %d genes and ID=%s(%d)\n", length(fg), rv$uploadResults[[input$resultOfWhichFile]]$ID[no], no)
             return(evidencePlot(fg, rv$uploadResults[[input$resultOfWhichFile]]$ID[no], mset=mset))
@@ -77,7 +76,6 @@ observe({
 ## Creates the gene list
 ## -------------------------------------------------------------------
 observe({
-    fg <<- read.genes(filename="www/data/test.csv", output=output)
     if(is.null(input$glist) || input$glist == 0 || is.null(fg)) { return(NULL) ; }
     no   <- as.numeric(input$glist)
     mset <- getMsetReal(isolate(getMset()))
@@ -158,71 +156,76 @@ output$resultTable <- renderDataTable({
 ## -------------------------------------------------------------------
 ## Show the heatmap plot
 ## -------------------------------------------------------------------
-output$plot0 <- renderPlot({
-    input$run
-    if(!is.null(isolate(input$files)) || input$example != "exempty"){
-        plo <- NULL
-        withProgress(message = 'Making plot', value = 0, {
-            n <- 5
-            # Number of times we'll go through the loop
-            for (i in 1:n) {
-                # Each time through the loop, add another row of data. This is
-                # a stand-in for a long-running computation.
-                # Increment the progress bar, and update the detail text.
-                incProgress(1/n, detail = paste("", ""))
-                # Pause for 0.1 seconds to simulate a long computation.
-                Sys.sleep(0.1)
-            }
-            tryCatch({
-                plo <- isolate(tmodTest())
-            },warning=function(w){
-                if(input$whichColumnIsGenename != "-----------------"){
-                    addMsg("Wrong gene column selected!")
-                    updateSelectInput(session, "whichColumnIsGenename", selected = "-----------------")
-                    session$sendCustomMessage(type = "alert_message",
-                                              message = "Wrong gene column selected! Please select gene cloumn, again猪八戒!")
-                }
-            },error=function(e){
-                if(input$whichColumnIsGenename != "-----------------"){
-                    addMsg("Wrong gene column selected!")
-                    updateSelectInput(session, "whichColumnIsGenename", selected = "-----------------")
-                    session$sendCustomMessage(type = "alert_message",
-                                              message = "Wrong gene column selected! Please select gene cloumn, again!")
-                }
-            })
-            req(plo)
-            tmodPanelPlot(plo, text.cex = 0.9, grid="b", legend.style = "auto")
-        })
-    }
-}, bg="#EEEEEE")
+observeEvent(input$run,
+             output$plot0 <- renderPlot({
+                 print("这里是output$plot0")
+                 if(!is.null(isolate(input$files)) || isolate(input$example) != "exempty"){
+                     
+                     geneCol <- isolate(input$whichColumnIsGenename)
+                     withProgress(message = 'Making plot', value = 0, {
+                         n <- 5
+                         # Number of times we'll go through the loop
+                         for (i in 1:n) {
+                             # Each time through the loop, add another row of data. This is
+                             # a stand-in for a long-running computation.
+                             # Increment the progress bar, and update the detail text.
+                             incProgress(1/n, detail = paste("", ""))
+                             # Pause for 0.1 seconds to simulate a long computation.
+                             Sys.sleep(0.1)
+                         }
+                         tryCatch({
+                             plo <- isolate(tmodTest())
+                         },warning=function(w){
+                             if (geneCol != "-----------------"){
+                                 addMsg("Wrong gene column selected!")
+                                 isolate(updateSelectInput(session, "whichColumnIsGenename", selected = "-----------------"))
+                                 #session$sendCustomMessage(type = "alert_message", message = "Wrong gene column selected! Please select gene cloumn, again猪八戒!")
+                             }
+                         },error=function(e){
+                             if(geneCol != "-----------------"){
+                                 addMsg("Wrong gene column selected!")
+                                 isolate(updateSelectInput(session, "whichColumnIsGenename", selected = "-----------------"))
+                                 #session$sendCustomMessage(type = "alert_message", message = "Wrong gene column selected! Please select gene cloumn, again!")
+                             }
+                         })
+                         req(plo)
+                         tmodPanelPlot(plo, text.cex = 0.9, grid="b", legend.style = "auto")
+                     })
+                 }
+             }, bg="#EEEEEE"))
 
 ## -------------------------------------------------------------------
 ## Show the rug plot
 ## -------------------------------------------------------------------
-output$plot01 <- renderPlot({
-    input$run
-    if(!is.null(isolate(input$files)) || input$example != "exempty")
-    {
-        withProgress(message = 'Making plot', value = 0, {
-            n <- 10
-            for (i in 1:n) {
-                incProgress(1/n, detail = paste("", ""))
-                Sys.sleep(0.1)
-            }
-            res <- isolate(rv$uploadResults)
-            sapply(res, function(x){
-                if(nrow(x) == 0){
-                    addMsg(sprintf("There is no moudle named %s!", isolate(input$gene_module)))
-                    return(NULL)
-                }
-            })
-            pie <- isolate(tmodTest1())
-            names(pie) <- names(res)
-            if(!is.null(res))
-                tmodPanelPlot(res, pie=pie, pie.style="r", grid="b", filter.rows.pval=0.001)
-        })
-    }
-}, bg="transparent")
+observeEvent(input$run,
+             output$plot01 <- renderPlot({
+                 print("这里是output$plot01")
+                 if(!is.null(isolate(input$files)) || isolate(input$example) != "exempty")
+                 {
+                     withProgress(message = 'Making plot', value = 0, {
+                         n <- 10
+                         for (i in 1:n) {
+                             incProgress(1/n, detail = paste("", ""))
+                             Sys.sleep(0.1)
+                         }
+                         res <- isolate(tmodTest())
+                         # res <- isolate(rv$uploadResults)
+                         sapply(res, function(x){
+                             if(nrow(x) == 0){
+                                 addMsg(sprintf("There is no moudle named %s!", isolate(input$gene_module)))
+                                 return(NULL)
+                             }
+                         })
+                         pie <- isolate(tmodTest1())
+                         names(pie) <- names(res)
+                         if (is.null(res)){
+                             print("第四步")
+                         }
+                         if(!is.null(res))
+                             tmodPanelPlot(res, pie=pie, pie.style="r", grid="b", filter.rows.pval=0.001)
+                     })
+                 }
+             }, bg="#EEEEEE"))
 
 ## -------------------------------------------------------------------
 ## create an export button if results are generated
@@ -242,12 +245,12 @@ output$uploadExportButton <- renderUI({
 })
 
 # create a selection box, which is used to display different result of corresponding file uploaded
-output$resultOfEachFile <- renderUI({
-    input$run
-    req(rv$uploadResults)
-    if(!is.null(input$files))
-        choicess <- input$files$name
-    if(input$example != "exempty")
-        choicess <- exampleFileNameList
-    return(selectInput("resultOfWhichFile", label = NULL, choices =  choicess))
-})
+observeEvent(input$run,
+             output$resultOfEachFile <- renderUI({
+             req(rv$uploadResults)
+             if(!is.null(input$files))
+                 choicess <- input$files$name
+             if(input$example != "exempty")
+                 choicess <- exampleFileNameList
+             return(selectInput("resultOfWhichFile", label = NULL, choices =  choicess))
+             }))
