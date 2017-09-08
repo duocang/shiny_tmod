@@ -1,7 +1,7 @@
 # it is defined in ui.R, it will show the table of result in 'test' tab.
 output$testOrExampleResult <- renderUI({
     tabsetPanel(id = "inTabset",
-                tabPanel("heatmap-like", value = "heatmapTab", plotOutput("plot0", height = "1500px")),
+                tabPanel("heatmap-like", value = "heatmapTab", plotOutput("plot0")),
                 tabPanel("rug-like",  value = "rugTab", plotOutput("plot01", height = "2000px")),
                 tabPanel("table", value = "tableTab",
                          # these are required for button to be reactive
@@ -157,19 +157,31 @@ observe({
 # different button will be used to active different task in different tab.
 ## -------------------------------------------------------------------
 output$operation <- renderUI({
-    
+    # without following if statement, there is always red error message,
+    # when you switch into "test" tab by left side bar click.
     if(is.null(input$inTabset) || is.null(input$inTabset))
         return(actionButton("runHeatmap", "RUN", class="tmodAct"))
-
+    
     if(input$inTabset == "heatmapTab")
         return(actionButton("runHeatmap", "RUN", class="tmodAct"))
     if(input$inTabset == "rugTab")
         return(actionButton("runRug", "RUN", class="tmodAct"))
     if(input$inTabset == "tableTab")
         return(actionButton("runTable", "RUN", class="tmodAct"))
-    
-        
 })
+
+observeEvent(input$inTabset,{
+    if (input$inTabset == "rugTab"){
+        toggle("pie.lfc")
+        toggle("pie.pval")
+    }
+        
+    else {
+        toggle("pie.lfc")
+        toggle("pie.pval")
+    }
+})
+
 
 ## -------------------------------------------------------------------
 ## Show the heatmap plot
@@ -206,7 +218,7 @@ observeEvent(input$runHeatmap,{
                 })
                 rv$heatmapNum != 0
                 req(plo)
-                tmodPanelPlot(plo, text.cex = 0.9, grid="b", legend.style = "auto")
+                tmodPanelPlot(plo, text.cex = 0.9, grid="b", legend.style = "auto", text.cex=list(0.8, 0.8))
             })
         }
     }, bg="#EEEEEE")
@@ -244,6 +256,7 @@ observeEvent(input$runRug,
 ## Show the result table
 ## -------------------------------------------------------------------
 output$resultTable <- renderDataTable({
+    req(input$whichColumnIsGenename)
     input$runTable
     if (is.null(rv$uploadResults))
         tmodTest()

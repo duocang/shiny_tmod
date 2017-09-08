@@ -89,6 +89,7 @@ body <- dashboardBody(
                     column(2, "  Trend" ),
                     column(1, "  Abs" ),
                     column(2, "  Test type" ),
+                    column(1, ""),
                     class="paramHeader"),
                 fluidRow(
                     column(3,
@@ -128,20 +129,13 @@ body <- dashboardBody(
                                           choices = c("" ,
                                                       "tmodCERNOtest" = "tmodCERNOtest",
                                                       "tmodUtest" = "tmodUtest"),
-                                          selected = "tmodCERNOtest"))),
-                fluidRow(
-                    column(3, "  pie.pval"),
-                    column(2, "  pie.lfc" ),
-                    class="paramHeader"),
+                                          selected = "tmodCERNOtest")),
+                    column(1,uiOutput("operation"))),
                 fluidRow(
                     column(3,
-                           numericInput("pie.pval",
-                                        NULL, 0.05, min = 0, max = 0.1, step = 0.01)),
+                           numericInput("pie.pval", "pie.pval", 0.05, min = 0, max = 0.1, step = 0.01)),
                     column(2,
-                           numericInput("pie.lfc",
-                                        NULL, 1, min = 0, max = 5, step = 0.5)),
-                    column(3,uiOutput("operation"))
-                    ),
+                           numericInput("pie.lfc", "pie.lfc", 1, min = 0, max = 5, step = 0.5))),
                 uiOutput("testOrExampleResult")),# it will show the table of result 
         tabItem(tabName = "help",
                 includeMarkdown("md/help.md")),
