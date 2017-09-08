@@ -14,8 +14,6 @@ function(input, output, session) {
     rv$uploadResults  <- NULL # it is used for storing results after processing uploaded files
     rv$headerMessage  <- NULL # this is used to show message in header
     rv$tabNum         <- 0  # this var is used to track tab, 1: heatmap-like 2: rug-like 3: table
-    rv$tomdTestValue  <- NULL
-    rv$tmodTest1Value <- NULL
     si                <- sessionInfo()
     # load the code
     source("R/all_sessions.R")
@@ -95,6 +93,14 @@ function(input, output, session) {
     # this function will get the number of files uploaded
     fileNum <- reactive({length(input$files$size)})
     
+    
+    observeEvent(input$example,{
+        rv$fileExampleUpdate <- 0
+    })
+    observeEvent(input$files,{
+        rv$fileExampleUpdate <- 1
+    })
+    
     # read data and  put into a list
     loadData <- observe({
         input$example
@@ -102,12 +108,13 @@ function(input, output, session) {
         print("这里是loadData")
         workingDirecotry <- getwd()
         exampleFileListPath <-  paste0(workingDirecotry, "/data/", exampleFileNameList )
-        if(is.null(infile) && input$example != "exempty"){
+        if(rv$fileExampleUpdate == 0){
             data <- lapply(exampleFileListPath, function(x) {fread(x, header = TRUE, stringsAsFactors = FALSE) })
-            loadedData(data)
-        } else {
+            return(loadedData(data))
+        } 
+        if(rv$fileExampleUpdate == 1){
             data <- lapply(infile, function(x) {fread(x, header = TRUE, stringsAsFactors = FALSE) })
-            loadedData(data) # load file data into global variable loaded_dtat, which is a reactive value
+            return(loadedData(data)) # load file data into global variable loaded_dtat, which is a reactive value
         }
     })
     
@@ -229,24 +236,24 @@ function(input, output, session) {
     })
     
     
-    # # when example is useed, disable some selection boxes
-    # observeEvent(input$example,{
-    #     if(input$example != "exempty"){
-    #         disable("testType")
-    #         disable("files")
-    #         addMsg("Example is ready for running!   <b>Go to Test tap</b>")
-    #         return()
-    #     }
-    # })
-    # 
-    # # when example is useed, disable some selection boxes
-    # observeEvent(input$files,{
-    #     if(!is.null(input$files)){
-    #         disable("example")
-    #         addMsg(" Uploaded file(s) will be used for running!   <b>Go to Test tap</b>")
-    #     }
-    # })
-    # 
+    # when example is useed, disable some selection boxes
+    observeEvent(input$example,{
+        if(input$example != "exempty"){
+            disable("testType")
+            disable("files")
+            addMsg("Example is ready for running!   <b>Go to Test tap</b>")
+            return()
+        }
+    })
+
+    # when example is useed, disable some selection boxes
+    observeEvent(input$files,{
+        if(!is.null(input$files)){
+            disable("example")
+            addMsg(" Uploaded file(s) will be used for running!   <b>Go to Test tap</b>")
+        }
+    })
+
     # refresh page
     observeEvent(input$refresh,{
         session$reload()

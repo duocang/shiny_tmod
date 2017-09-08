@@ -142,7 +142,7 @@ body <- dashboardBody(
                     column(2,
                            numericInput("pie.lfc",
                                         NULL, 1, min = 0, max = 5, step = 0.5)),
-                    column(3,actionButton("run", "Run", class="tmodAct"))
+                    column(3,uiOutput("operation"))
                     ),
                 uiOutput("testOrExampleResult")),# it will show the table of result 
         tabItem(tabName = "help",

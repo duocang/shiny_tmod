@@ -153,16 +153,24 @@ output$resultTable <- renderDataTable({
     return(datatable(res, escape = FALSE))
 })
 
+# the "run" button will generated according to which tab is selected, 
+# different button will be used to active different task in different tab.
+output$operation <- renderUI({
+    if(input$inTabset == "heatmapTab")
+        return(actionButton("runHeatmap", "runHeatmap", class="tmodAct"))
+    if(input$inTabset == "rugTab")
+        return(actionButton("runRug", "runRug", class="tmodAct"))
+    if(input$inTabset == "tableTab")
+        return(actionButton("runTable", "runTable", class="tmodAct"))
+})
+
 ## -------------------------------------------------------------------
 ## Show the heatmap plot
 ## -------------------------------------------------------------------
-observeEvent(input$run,{
+observeEvent(input$runHeatmap,{
     output$plot0 <- renderPlot({
-        if (input$inTabset != "heatmapTab")
-            return(NULL)
         print("这里是output$plot0")
         if(!is.null(isolate(input$files)) || isolate(input$example) != "exempty"){
-            
             geneCol <- isolate(input$whichColumnIsGenename)
             withProgress(message = 'Making plot', value = 0, {
                 n <- 5
@@ -176,7 +184,7 @@ observeEvent(input$run,{
                     Sys.sleep(0.1)
                 }
                 tryCatch({
-                    plo <- isolate(tmodTest())
+                    plo <- tmodTest()
                 },warning=function(w){
                     if (geneCol != "-----------------"){
                         addMsg("Wrong gene column selected!")
@@ -190,6 +198,7 @@ observeEvent(input$run,{
                         #session$sendCustomMessage(type = "alert_message", message = "Wrong gene column selected! Please select gene cloumn, again!")
                     }
                 })
+                rv$heatmapNum != 0
                 req(plo)
                 tmodPanelPlot(plo, text.cex = 0.9, grid="b", legend.style = "auto")
             })
@@ -200,10 +209,8 @@ observeEvent(input$run,{
 ## -------------------------------------------------------------------
 ## Show the rug plot
 ## -------------------------------------------------------------------
-observeEvent(input$run,
+observeEvent(input$runRug,
              output$plot01 <- renderPlot({
-                 if (input$inTabset != "rugTab")
-                     return(NULL)
                  print("这里是output$plot01")
                  if(!is.null(isolate(input$files)) || isolate(input$example) != "exempty")
                  {
@@ -248,8 +255,9 @@ output$uploadExportButton <- renderUI({
                    p("Hit me, you can download results of all files."))))
 })
 
+# under heatmap-like tab
 # create a selection box, which is used to display different result of corresponding file uploaded
-observeEvent(input$run,
+observeEvent(input$runHeatmap,
              output$resultOfEachFile <- renderUI({
              req(rv$uploadResults)
              if(!is.null(input$files))
