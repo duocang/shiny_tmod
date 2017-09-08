@@ -225,34 +225,13 @@ function(input, output, session) {
             addMsg(sprintf("Run test %s whith mset=%s.", isolate(input$testType),isolate(input$geneModule)))
     })
     
-    # # When "Run" is clicked, it will show heatmap-like tab
-    # observeEvent(input$run,{
-    #     updateTabsetPanel(session, "inTabset", selected = "heatmap-like")
-    # })
-    
     # when "Tagcloud" is clicked, it will show table tab
     observeEvent(input$tagcloud,{
         updateTabsetPanel(session, "inTabset", selected = "table")
     })
     
     
-    # when example is useed, disable some selection boxes
-    observeEvent(input$example,{
-        if(input$example != "exempty"){
-            disable("testType")
-            disable("files")
-            addMsg("Example is ready for running!   <b>Go to Test tap</b>")
-            return()
-        }
-    })
 
-    # when example is useed, disable some selection boxes
-    observeEvent(input$files,{
-        if(!is.null(input$files)){
-            disable("example")
-            addMsg(" Uploaded file(s) will be used for running!   <b>Go to Test tap</b>")
-        }
-    })
 
     # refresh page
     observeEvent(input$refresh,{
@@ -264,15 +243,6 @@ function(input, output, session) {
         if(is.null(input$files) && input$example == "exempty"){
             addMsg("No task running, there is no data!")
         }
-    })
-    
-    
-    # sidebar will collapse
-    observeEvent(input$run,{
-        # when there is no file uploaded or example, not effect
-        req(input$whichColumnIsGenename)  # when no file uploaded, gene name selection box does not exit
-        if (input$whichColumnIsGenename != "-----------------" && (!is.null(input$files) || input$example == "exempty" ))
-            shinyjs::addClass(selector = "body", class = "sidebar-collapse")
     })
     
     

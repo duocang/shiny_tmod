@@ -12,7 +12,7 @@ output$testOrExampleResult <- renderUI({
                                      HTML('<input type="radio" name="row" value="0" id="r0" /><label for="r0">Plot</label>'),
                                      HTML('<input type="radio" name="glist" value="0" id="r0" /><label for="r0">Plot</label>')), 
                                  uiOutput("remindMessage"),
-                                 uiOutput("resultOfEachFile"),
+                                 uiOutput("selectionBoxOfResult"),
                                  dataTableOutput( "resultTable"))),
                          # plot popup panel
                          popupWindow("plotpanelW", 
@@ -143,18 +143,10 @@ observe({
 })
 
 ## -------------------------------------------------------------------
-## display data of result in table
-## -------------------------------------------------------------------
-output$resultTable <- renderDataTable({
-    input$run
-    req(input$resultOfWhichFile)
-    res <- formatResultsTable(rv$uploadResults[[input$resultOfWhichFile]])
-    req(res)
-    return(datatable(res, escape = FALSE))
-})
-
+# uiOut("operation") is defined in ui.R
 # the "run" button will generated according to which tab is selected, 
 # different button will be used to active different task in different tab.
+## -------------------------------------------------------------------
 output$operation <- renderUI({
     if(input$inTabset == "heatmapTab")
         return(actionButton("runHeatmap", "runHeatmap", class="tmodAct"))
@@ -184,7 +176,7 @@ observeEvent(input$runHeatmap,{
                     Sys.sleep(0.1)
                 }
                 tryCatch({
-                    plo <- tmodTest()
+                    plo <- isolate(tmodTest())
                 },warning=function(w){
                     if (geneCol != "-----------------"){
                         addMsg("Wrong gene column selected!")
@@ -239,6 +231,34 @@ observeEvent(input$runRug,
              }, bg="#EEEEEE"))
 
 ## -------------------------------------------------------------------
+## Show the result table
+## -------------------------------------------------------------------
+output$resultTable <- renderDataTable({
+    input$runTable
+    if (is.null(rv$uploadResults))
+        tmodTest()
+    req(input$resultOfWhichFile)
+    res <- formatResultsTable(rv$uploadResults[[input$resultOfWhichFile]])
+    req(res)
+    return(datatable(res, escape = FALSE))
+})
+
+## -------------------------------------------------------------------
+# under heatmap-like tab
+# create a selection box, which is used to display different result of corresponding file uploaded
+## -------------------------------------------------------------------
+observeEvent(input$runTable,
+             output$selectionBoxOfResult <- renderUI({
+                 if (is.null(rv$uploadResults))
+                     tmodTest()
+                 if(!is.null(input$files))
+                     choicess <- input$files$name
+                 if(input$example != "exempty")
+                     choicess <- exampleFileNameList
+                 return(selectInput("resultOfWhichFile", label = NULL, choices =  choicess))
+             }))
+
+## -------------------------------------------------------------------
 ## create an export button if results are generated
 ## depends on: reactive value rv$uploadResults
 ## -------------------------------------------------------------------
@@ -255,14 +275,42 @@ output$uploadExportButton <- renderUI({
                    p("Hit me, you can download results of all files."))))
 })
 
-# under heatmap-like tab
-# create a selection box, which is used to display different result of corresponding file uploaded
-observeEvent(input$runHeatmap,
-             output$resultOfEachFile <- renderUI({
-             req(rv$uploadResults)
-             if(!is.null(input$files))
-                 choicess <- input$files$name
-             if(input$example != "exempty")
-                 choicess <- exampleFileNameList
-             return(selectInput("resultOfWhichFile", label = NULL, choices =  choicess))
-             }))
+
+## -------------------------------------------------------------------
+# disable button/selection
+# when example is useed, disable some selection boxes
+## -------------------------------------------------------------------
+observeEvent(input$example,{
+    if(input$example != "exempty"){
+        disable("testType")
+        disable("files")
+        addMsg("Example is ready for running!   <b>Go to Test tap</b>")
+        return()
+    }
+})
+
+## -------------------------------------------------------------------
+# disable button/selection
+# when files are uploaded, disable some selection boxes
+## -------------------------------------------------------------------
+observeEvent(input$files,{
+    if(!is.null(input$files)){
+        disable("example")
+        addMsg(" Uploaded file(s) will be used for running!   <b>Go to Test tap</b>")
+    }
+})
+
+## -------------------------------------------------------------------
+# sidebar will collapse
+## -------------------------------------------------------------------
+observe({
+    input$runHeatmap
+    input$runRug
+    input$runTable
+    print("这里是collapse")
+    # when there is no file uploaded or example, not effect
+    req(isolate(input$whichColumnIsGenename))  # when no file uploaded, gene name selection box does not exit
+    print("这里是collapse1")
+    # if (input$whichColumnIsGenename != "-----------------" && (!is.null(input$files) || input$example == "exempty" ))
+        shinyjs::addClass(selector = "body", class = "sidebar-collapse")
+})
