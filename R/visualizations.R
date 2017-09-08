@@ -26,8 +26,7 @@ output$testOrExampleResult <- renderUI({
                                          p(HTML("Genes shown in <b>bold</b> are in the main data set")),
                                          p(uiOutput("genelist")))),
                          popupWindow("tagcloudW",
-                                     div(plotOutput( "tagcloudPlot" ), style="width:1100px;height:1000px;" ))),
-                tabPanel("wordCloud", value = "wordCloudTab", plotOutput("plotWordCloud", height = "1000px")))
+                                     div(plotOutput( "tagcloudPlot" ), style="width:1100px;height:1000px;" ))))
 })
 
 popupWindow <- function(varname, contents) {
@@ -114,7 +113,7 @@ output$cloudWordButton <- renderUI({
     if(!is.null(rv$uploadResults)){# upload files
         catf( "+ generating tagcloud button\n" )
         return(div(class="exportButton",
-               actionButton( "tagcloud", label= "",icon = icon("cloud"), class="headerButton" ),
+               actionButton( "tagcloud", label= "",icon = icon("cloud"), class="tmodAct" ),
                div(class = "exportButton-content",
                    p(sprintf("Click me, you will get cloud word of %s", input$resultOfWhichFile)))))
     }
@@ -158,16 +157,18 @@ observe({
 # different button will be used to active different task in different tab.
 ## -------------------------------------------------------------------
 output$operation <- renderUI({
-    # if there is example or uploaded files, it does not generate anything.
-    # req(input$whichColumnIsGenename)
+    
+    if(is.null(input$inTabset) || is.null(input$inTabset))
+        return(actionButton("runHeatmap", "RUN", class="tmodAct"))
+
     if(input$inTabset == "heatmapTab")
         return(actionButton("runHeatmap", "RUN", class="tmodAct"))
     if(input$inTabset == "rugTab")
         return(actionButton("runRug", "RUN", class="tmodAct"))
     if(input$inTabset == "tableTab")
         return(actionButton("runTable", "RUN", class="tmodAct"))
-    if(input$inTabset == "wordCloudTab")
-        return(actionButton("runTable", "RUN", class="tmodAct"))
+    
+        
 })
 
 ## -------------------------------------------------------------------
