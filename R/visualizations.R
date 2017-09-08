@@ -12,7 +12,10 @@ output$testOrExampleResult <- renderUI({
                                      HTML('<input type="radio" name="row" value="0" id="r0" /><label for="r0">Plot</label>'),
                                      HTML('<input type="radio" name="glist" value="0" id="r0" /><label for="r0">Plot</label>')), 
                                  uiOutput("remindMessage"),
-                                 uiOutput("selectionBoxOfResult"),
+                                 fluidRow(
+                                     column(3, uiOutput("selectionBoxOfResult")),
+                                     column(1, uiOutput("cloudWordButton"))
+                                 ),
                                  dataTableOutput( "resultTable"))),
                          # plot popup panel
                          popupWindow("plotpanelW", 
@@ -23,7 +26,8 @@ output$testOrExampleResult <- renderUI({
                                          p(HTML("Genes shown in <b>bold</b> are in the main data set")),
                                          p(uiOutput("genelist")))),
                          popupWindow("tagcloudW",
-                                     div(plotOutput( "tagcloudPlot" ), style="width:600px;height:600px;" ))))
+                                     div(plotOutput( "tagcloudPlot" ), style="width:1100px;height:1000px;" ))),
+                tabPanel("wordCloud", value = "wordCloudTab", plotOutput("plotWordCloud", height = "1000px")))
 })
 
 popupWindow <- function(varname, contents) {
@@ -120,6 +124,9 @@ output$cloudWordButton <- renderUI({
 ## Creates a tag cloud 
 ## -------------------------------------------------------------------
 observeEvent(input$tagcloud, {
+    if (is.null(rv$uploadResults))
+        tmodTest()
+        
     res <- rv$uploadResults[[input$resultOfWhichFile]]
     req(res)
     print("+ generating tagcloud")
@@ -130,9 +137,12 @@ observeEvent(input$tagcloud, {
         v <- res$E
     c <- smoothPalette(v, min=0.5) # Replace A Vector Of Numbers By A Gradient Of Colors
     tags <- strmultline(gsub("_", " ", res$Title))
-    output$tagcloudPlot <- renderPlot({ tagcloud(tags, weights=w, col=c)}, width=600, height=600)
+    output$tagcloudPlot <- renderPlot({ tagcloud(tags, weights=w, col=c)}, width=1100, height=1000)
+    output$plotWordCloud <- renderPlot({ tagcloud(tags, weights=w, col=c)},  height=1000)
     updateTextInput(session, "show_tagcloudW", value=1)
 })
+
+
 
 ## hide the popup window
 ## also, the value for the radio buttons is set to the hidden radio button
@@ -148,12 +158,16 @@ observe({
 # different button will be used to active different task in different tab.
 ## -------------------------------------------------------------------
 output$operation <- renderUI({
+    # if there is example or uploaded files, it does not generate anything.
+    # req(input$whichColumnIsGenename)
     if(input$inTabset == "heatmapTab")
-        return(actionButton("runHeatmap", "runHeatmap", class="tmodAct"))
+        return(actionButton("runHeatmap", "RUN", class="tmodAct"))
     if(input$inTabset == "rugTab")
-        return(actionButton("runRug", "runRug", class="tmodAct"))
+        return(actionButton("runRug", "RUN", class="tmodAct"))
     if(input$inTabset == "tableTab")
-        return(actionButton("runTable", "runTable", class="tmodAct"))
+        return(actionButton("runTable", "RUN", class="tmodAct"))
+    if(input$inTabset == "wordCloudTab")
+        return(actionButton("runTable", "RUN", class="tmodAct"))
 })
 
 ## -------------------------------------------------------------------
@@ -161,7 +175,6 @@ output$operation <- renderUI({
 ## -------------------------------------------------------------------
 observeEvent(input$runHeatmap,{
     output$plot0 <- renderPlot({
-        print("这里是output$plot0")
         if(!is.null(isolate(input$files)) || isolate(input$example) != "exempty"){
             geneCol <- isolate(input$whichColumnIsGenename)
             withProgress(message = 'Making plot', value = 0, {
@@ -203,7 +216,6 @@ observeEvent(input$runHeatmap,{
 ## -------------------------------------------------------------------
 observeEvent(input$runRug,
              output$plot01 <- renderPlot({
-                 print("这里是output$plot01")
                  if(!is.null(isolate(input$files)) || isolate(input$example) != "exempty")
                  {
                      withProgress(message = 'Making plot', value = 0, {
@@ -221,14 +233,11 @@ observeEvent(input$runRug,
                          })
                          pie <- isolate(tmodTest1())
                          names(pie) <- names(res)
-                         if (is.null(res)){
-                             print("第四步")
-                         }
                          if(!is.null(res))
                              tmodPanelPlot(res, pie=pie, pie.style="r", grid="b", filter.rows.pval=0.001)
                      })
                  }
-             }, bg="#EEEEEE"))
+             }, bg = "#EEEEEE"))
 
 ## -------------------------------------------------------------------
 ## Show the result table
@@ -239,7 +248,6 @@ output$resultTable <- renderDataTable({
         tmodTest()
     req(input$resultOfWhichFile)
     res <- formatResultsTable(rv$uploadResults[[input$resultOfWhichFile]])
-    req(res)
     return(datatable(res, escape = FALSE))
 })
 
@@ -284,7 +292,7 @@ observeEvent(input$example,{
     if(input$example != "exempty"){
         disable("testType")
         disable("files")
-        addMsg("Example is ready for running!   <b>Go to Test tap</b>")
+        addMsg("Example is ready for running!   <b>Go to Test tab</b>")
         return()
     }
 })
@@ -307,10 +315,10 @@ observe({
     input$runHeatmap
     input$runRug
     input$runTable
-    print("这里是collapse")
     # when there is no file uploaded or example, not effect
     req(isolate(input$whichColumnIsGenename))  # when no file uploaded, gene name selection box does not exit
-    print("这里是collapse1")
     # if (input$whichColumnIsGenename != "-----------------" && (!is.null(input$files) || input$example == "exempty" ))
-        shinyjs::addClass(selector = "body", class = "sidebar-collapse")
+    shinyjs::addClass(selector = "body", class = "sidebar-collapse")
 })
+
+

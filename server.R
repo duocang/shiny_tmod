@@ -30,9 +30,9 @@ function(input, output, session) {
         if(is.null(input$files) && input$example == "exempty")
             return(NULL)
         if(!is.null(input$files))
-            return(selectInput("which_preview_file", "File Preview", as.list(input$files$name), selected = NULL))
+            return(selectInput("which_preview_file", "Select file to preview", as.list(input$files$name), selected = NULL))
         if(input$example != "exempty")
-            return(selectInput("which_preview_file", "File Preview", exampleFileNameList, selected = NULL))
+            return(selectInput("which_preview_file", "Select file to preview", exampleFileNameList, selected = NULL))
     })
     
     # display selection for which column is genename
@@ -105,7 +105,6 @@ function(input, output, session) {
     loadData <- observe({
         input$example
         infile <- input$files$datapath
-        print("这里是loadData")
         workingDirecotry <- getwd()
         exampleFileListPath <-  paste0(workingDirecotry, "/data/", exampleFileNameList )
         if(rv$fileExampleUpdate == 0){
@@ -123,7 +122,6 @@ function(input, output, session) {
     # 3. increasing or decreasing
     # 4. tmod test 
     tmodTest <- reactive({
-        print("这里是tmodTest")
         dat <- loadedData()
         if(is.null(dat) || length(dat)==0) {
             addMsg("NO DATA! Upload file(s) or select an example.")
@@ -164,7 +162,6 @@ function(input, output, session) {
 
     
     tmodTest1 <- reactive({
-        print("这里是tmodTest1")
         dat <- loadedData()
         if(is.null(dat) || length(dat)==0) {
             print("no data yet")
@@ -204,7 +201,6 @@ function(input, output, session) {
             },
             rv$uploadResults,
             names(rv$uploadResults))
-            
             zip(zipfile = fname, files =paste0("Result_", names(rv$uploadResults)))
         },
         contentType = "application/zip"
@@ -230,9 +226,6 @@ function(input, output, session) {
         updateTabsetPanel(session, "inTabset", selected = "table")
     })
     
-    
-
-
     # refresh page
     observeEvent(input$refresh,{
         session$reload()
@@ -244,7 +237,6 @@ function(input, output, session) {
             addMsg("No task running, there is no data!")
         }
     })
-    
     
     observeEvent(input$whichColumnIsGenename, {
         if(input$whichColumnIsGenename != "-----------------" )
