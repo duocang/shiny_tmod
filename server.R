@@ -94,6 +94,7 @@ function(input, output, session) {
     fileNum <- reactive({length(input$files$size)})
     
     
+    # according to rv$fileExampleUpdate, loadData will know which file should be loaded
     observeEvent(input$example,{
         rv$fileExampleUpdate <- 0
     })
@@ -102,6 +103,12 @@ function(input, output, session) {
     })
     
     # read data and  put into a list
+    # Args:
+    #   input$example: it is a reactive trigger of this observe.
+    #   input$files$datapath: a reactive trigger and uploaded files
+    #   rv$fileExampleUpdate: 0-read example, 1-read uploaded files
+    # Returns:
+    #   a list includes data, example or uploaded files
     loadData <- observe({
         input$example
         infile <- input$files$datapath
@@ -117,10 +124,17 @@ function(input, output, session) {
         }
     })
     
-    # 1. sort data by selected column
-    # 2. abs
-    # 3. increasing or decreasing
-    # 4. tmod test 
+    # tmod test  
+    # Args:
+    #   loadedData(): example data or uploaded files data
+    #   input$sortByWhich: sort data by selected column
+    #   input$abs: abs
+    #   input$incOrDec: increasing or decreasing
+    #   input$whichColumnIsGenename: which column is Genename
+    #   input$testType: which test will be executed, cerno or utest
+    # Returns:
+    #   result after by test, cerno or utest
+    #   rv$uploadResults is used to keep the result of tmod test for later useage.
     tmodTest <- reactive({
         dat <- loadedData()
         if(is.null(dat) || length(dat)==0) {
@@ -160,7 +174,14 @@ function(input, output, session) {
         return(res)
     })
 
-    
+    # tmod test: tmodDecideTests
+    # Args:
+    #   loadedData(): example data or uploaded files data
+    #   input$whichColumnIsGenename: gene name column
+    #   input$pie.lfc: parameter of tmodDEcideTests
+    #   input$pie.pval: parameter of tmodDEcideTests
+    # Returns:
+    #   result of tmodDecideTests
     tmodTest1 <- reactive({
         dat <- loadedData()
         if(is.null(dat) || length(dat)==0) {
@@ -192,6 +213,11 @@ function(input, output, session) {
     # allows saving of the results in a CSV file
     # note that there is no error handling if no results 
     # have been generated
+    # Args: 
+    #   loadedData(): if it is null, return NULL
+    #   rv$uploadResults: pack it into csv file.
+    # Returns:
+    #   click download button, zip file is downloaded into local path.
     output$uploadExport <- downloadHandler(
         filename = "data.zip",
         content = function(fname){
@@ -207,23 +233,20 @@ function(input, output, session) {
     )
     
     # This will show an allert, if the user trys to run without selecting gene column
-    observeEvent(input$run,{
-        req(input$run)
-        req(input$whichColumnIsGenename)
-        if(input$whichColumnIsGenename == "-----------------"){
-            session$sendCustomMessage(type = "alert_message", message = 'Please select gene cloumn!')
-        }
-    })
-    
+    # observe({
+    #     input$runHeatmap
+    #     input$rugTab
+    #     input$runTable
+    #     req(input$whichColumnIsGenename)
+    #     if(input$whichColumnIsGenename == "-----------------"){
+    #         session$sendCustomMessage(type = "alert_message", message = 'Please select gene cloumn!')
+    #     }
+    # })
+    # 
     # when we click "Plot heatmap-like", it shows message on the header
-    observeEvent(input$run,{
+    observeEvent(input$runHeatmap,{
         if((!is.null(input$files) && input$whichColumnIsGenename != "-----------------") || input$example != "exempty")
             addMsg(sprintf("Run test %s whith mset=%s.", isolate(input$testType),isolate(input$geneModule)))
-    })
-    
-    # when "Tagcloud" is clicked, it will show table tab
-    observeEvent(input$tagcloud,{
-        updateTabsetPanel(session, "inTabset", selected = "table")
     })
     
     # refresh page

@@ -2,7 +2,7 @@
 output$testOrExampleResult <- renderUI({
     tabsetPanel(id = "inTabset",
                 tabPanel("heatmap-like", value = "heatmapTab", plotOutput("plot0")),
-                tabPanel("rug-like",  value = "rugTab", plotOutput("plot01", height = "2000px")),
+                tabPanel("rug-like",  value = "rugTab", plotOutput("plot01")),
                 tabPanel("table", value = "tableTab",
                          # these are required for button to be reactive
                          div(id="glist", class="shiny-input-radiogroup", 
@@ -49,12 +49,12 @@ popupWindow <- function(varname, contents) {
 ## side effect: modifies the input value for showplotpanel
 ## -------------------------------------------------------------------
 observe({
-    if(is.null(input$row) || input$row == 0)
+    if (is.null(input$row) || input$row == 0)
         return(NULL)
     no <- as.numeric(isolate(input$row))
     mset <- isolate(getMset())
     # first, create ghe graphics
-    if(!is.null(rv$uploadResults)){
+    if (!is.null(rv$uploadResults)){
         output$evidencePlot2 <- renderPlot({
             catf("making evidence plot with %d genes and ID=%s(%d)\n", length(fg), rv$uploadResults[[input$resultOfWhichFile]]$ID[no], no)
             return(evidencePlot(fg, rv$uploadResults[[input$resultOfWhichFile]]$ID[no], mset=mset))
@@ -69,7 +69,7 @@ observe({
 observe({
     # check whether input$dismiss_plotpanelW is NULL, if it is, do nothing
     req(input$dismiss_plotpanelW)
-    if(input$dismiss_plotpanelW > 0) {
+    if (input$dismiss_plotpanelW > 0) {
         updateTextInput(session, "show_plotpanelW", value=0)
         updateNumericInput(session, "row", value=0)
     }
@@ -79,10 +79,10 @@ observe({
 ## Creates the gene list
 ## -------------------------------------------------------------------
 observe({
-    if(is.null(input$glist) || input$glist == 0 || is.null(fg)) { return(NULL) ; }
+    if (is.null(input$glist) || input$glist == 0 || is.null(fg)) { return(NULL) ; }
     no   <- as.numeric(input$glist)
     mset <- getMsetReal(isolate(getMset()))
-    if(!is.null(rv$uploadResults))
+    if (!is.null(rv$uploadResults))
         mod <- rv$uploadResults[[input$resultOfWhichFile]]$ID[no]
     catf("generating gene list for module %d\n", no)
     glist <- sort(mset$MODULES2GENES[[mod]])
@@ -100,7 +100,7 @@ observe({
 observe({
     # check whether input$dismiss_genelistW is NULL, if it is, do nothing
     req(input$dismiss_genelistW)
-    if(input$dismiss_genelistW > 0) {
+    if (input$dismiss_genelistW > 0) {
         updateTextInput(session, "show_genelistW", value=0)
         updateNumericInput(session, "glist", value=0)
     }
@@ -110,7 +110,7 @@ observe({
 # depends on: reactive value rv$uploadResults
 output$cloudWordButton <- renderUI({
     req(input$resultOfWhichFile)
-    if(!is.null(rv$uploadResults)){# upload files
+    if (!is.null(rv$uploadResults)){# upload files
         catf( "+ generating tagcloud button\n" )
         return(div(class="exportButton",
                actionButton( "tagcloud", label= "",icon = icon("cloud"), class="tmodAct" ),
@@ -130,7 +130,7 @@ observeEvent(input$tagcloud, {
     req(res)
     print("+ generating tagcloud")
     w <- -log10(res$P.Value)
-    if(!is.null(res$AUC)) 
+    if (!is.null(res$AUC)) 
         v <- res$AUC
     else
         v <- res$E
@@ -147,7 +147,7 @@ observeEvent(input$tagcloud, {
 ## also, the value for the radio buttons is set to the hidden radio button
 observe({
     req(input$dismiss_tagcloudW)
-    if(input$dismiss_tagcloudW > 0)
+    if (input$dismiss_tagcloudW > 0)
         updateTextInput(session, "show_tagcloudW", value=0)
 })
 
@@ -159,14 +159,14 @@ observe({
 output$operation <- renderUI({
     # without following if statement, there is always red error message,
     # when you switch into "test" tab by left side bar click.
-    if(is.null(input$inTabset) || is.null(input$inTabset))
+    if (is.null(input$inTabset) || is.null(input$inTabset))
         return(actionButton("runHeatmap", "RUN", class="tmodAct"))
     
-    if(input$inTabset == "heatmapTab")
+    if (input$inTabset == "heatmapTab")
         return(actionButton("runHeatmap", "RUN", class="tmodAct"))
-    if(input$inTabset == "rugTab")
+    if (input$inTabset == "rugTab")
         return(actionButton("runRug", "RUN", class="tmodAct"))
-    if(input$inTabset == "tableTab")
+    if (input$inTabset == "tableTab")
         return(actionButton("runTable", "RUN", class="tmodAct"))
 })
 
@@ -186,42 +186,80 @@ observeEvent(input$inTabset,{
 ## -------------------------------------------------------------------
 ## Show the heatmap plot
 ## -------------------------------------------------------------------
+# observeEvent(input$runHeatmap,{
+#     output$plot0 <- renderPlot({
+#         if (!is.null(isolate(input$files)) || isolate(input$example) != "exempty"){
+#             geneCol <- isolate(input$whichColumnIsGenename)
+#             if (geneCol != "-----------------"){
+#                 addMsg("Please select gene name column!")
+#                 isolate(shinyjs::removeClass(selector = "body", class = "sidebar-collapse"))
+#                 session$sendCustomMessage(type = "alert_message", message = "Please select gene name column!")
+#             }else{
+#                 withProgress(message = 'Making plot', value = 0, {
+#                     n <- 5
+#                     # Number of times we'll go through the loop
+#                     for (i in 1:n) {
+#                         # Each time through the loop, add another row of data. This is
+#                         # a stand-in for a long-running computation.
+#                         # Increment the progress bar, and update the detail text.
+#                         incProgress(1/n, detail = paste("", ""))
+#                         # Pause for 0.1 seconds to simulate a long computation.
+#                         Sys.sleep(0.1)
+#                     }
+#                     plo <- NULL
+#                     tryCatch({
+#                         plo <- isolate(tmodTest())
+#                     },warning=function(w){
+#                         if (geneCol != "-----------------"){
+#                             addMsg("Wrong gene column selected!")
+#                             isolate(shinyjs::removeClass(selector = "body", class = "sidebar-collapse"))
+#                             session$sendCustomMessage(type = "alert_message", message = "Wrong gene column selected! Please select gene cloumn, again!猪八戒")
+#                         }
+#                     },error=function(w){
+#                         isolate(shinyjs::removeClass(selector = "body", class = "sidebar-collapse"))
+#                         validate(
+#                             need(!is.null(plo), "Please select a right gene name column.")
+#                         )
+#                     })
+#                     tmodPanelPlot(plo, text.cex = 0.9, grid="b",   legend.style = "auto")
+#                 })
+#             }
+#         }
+#     }, bg="#EEEEEE")
+# })
+
 observeEvent(input$runHeatmap,{
-    output$plot0 <- renderPlot({
-        if(!is.null(isolate(input$files)) || isolate(input$example) != "exempty"){
-            geneCol <- isolate(input$whichColumnIsGenename)
+    geneCol <- isolate(input$whichColumnIsGenename)
+    if (geneCol == "-----------------"){
+        addMsg("Please select gene name column!")
+        shinyjs::addClass(selector = "body", class = "sidebar-collapse")
+        #shinyjs::removeClass(selector = "body", class = "sidebar-collapse")
+        session$sendCustomMessage(type = "alert_message", message = "Please select gene name column!非得我")
+    }else{
+        output$plot0 <- renderPlot({
             withProgress(message = 'Making plot', value = 0, {
                 n <- 5
                 # Number of times we'll go through the loop
                 for (i in 1:n) {
-                    # Each time through the loop, add another row of data. This is
-                    # a stand-in for a long-running computation.
-                    # Increment the progress bar, and update the detail text.
+                # Each time through the loop, add another row of data. This is
+                # a stand-in for a long-running computation.
+                # Increment the progress bar, and update the detail text.
                     incProgress(1/n, detail = paste("", ""))
-                    # Pause for 0.1 seconds to simulate a long computation.
+                # Pause for 0.1 seconds to simulate a long computation.
                     Sys.sleep(0.1)
                 }
                 tryCatch({
                     plo <- isolate(tmodTest())
-                },warning=function(w){
-                    if (geneCol != "-----------------"){
-                        addMsg("Wrong gene column selected!")
-                        isolate(updateSelectInput(session, "whichColumnIsGenename", selected = "-----------------"))
-                        #session$sendCustomMessage(type = "alert_message", message = "Wrong gene column selected! Please select gene cloumn, again猪八戒!")
-                    }
-                },error=function(e){
-                    if(geneCol != "-----------------"){
-                        addMsg("Wrong gene column selected!")
-                        isolate(updateSelectInput(session, "whichColumnIsGenename", selected = "-----------------"))
-                        #session$sendCustomMessage(type = "alert_message", message = "Wrong gene column selected! Please select gene cloumn, again!")
-                    }
+                },warning = function(w){
+                    addMsg("Wrong gene column selected!")
+                    isolate(shinyjs::removeClass(selector = "body", class = "sidebar-collapse"))
+                    session$sendCustomMessage(type = "alert_message", message = "Wrong gene column selected! Please select gene cloumn, again!猪八戒1")
+                },error = function(e){
+                    session$sendCustomMessage(type = "alert_message", message = "Wrong gene column selected! Please select gene cloumn, again!猪八戒2")
                 })
-                rv$heatmapNum != 0
-                req(plo)
-                tmodPanelPlot(plo, text.cex = 0.9, grid="b", legend.style = "auto", text.cex=list(0.8, 0.8))
             })
-        }
-    }, bg="#EEEEEE")
+        }, bg="#EEEEEE")
+    }
 })
 
 ## -------------------------------------------------------------------
@@ -229,7 +267,7 @@ observeEvent(input$runHeatmap,{
 ## -------------------------------------------------------------------
 observeEvent(input$runRug,
              output$plot01 <- renderPlot({
-                 if(!is.null(isolate(input$files)) || isolate(input$example) != "exempty")
+                 if (!is.null(isolate(input$files)) || isolate(input$example) != "exempty")
                  {
                      withProgress(message = 'Making plot', value = 0, {
                          n <- 10
@@ -239,14 +277,14 @@ observeEvent(input$runRug,
                          }
                          res <- isolate(tmodTest())
                          sapply(res, function(x){
-                             if(nrow(x) == 0){
+                             if (nrow(x) == 0){
                                  addMsg(sprintf("There is no moudle named %s!", isolate(input$gene_module)))
                                  return(NULL)
                              }
                          })
                          pie <- isolate(tmodTest1())
                          names(pie) <- names(res)
-                         if(!is.null(res))
+                         if (!is.null(res))
                              tmodPanelPlot(res, pie=pie, pie.style="r", grid="b", filter.rows.pval=0.001)
                      })
                  }
@@ -273,9 +311,9 @@ observeEvent(input$runTable,
              output$selectionBoxOfResult <- renderUI({
                  if (is.null(rv$uploadResults))
                      tmodTest()
-                 if(!is.null(input$files))
+                 if (!is.null(input$files))
                      choicess <- input$files$name
-                 if(input$example != "exempty")
+                 if (input$example != "exempty")
                      choicess <- exampleFileNameList
                  return(selectInput("resultOfWhichFile", label = NULL, choices =  choicess))
              }))
@@ -303,7 +341,7 @@ output$uploadExportButton <- renderUI({
 # when example is useed, disable some selection boxes
 ## -------------------------------------------------------------------
 observeEvent(input$example,{
-    if(input$example != "exempty"){
+    if (input$example != "exempty"){
         disable("testType")
         disable("files")
         addMsg("Example is ready for running!   <b>Go to Test tab</b>")
@@ -316,7 +354,7 @@ observeEvent(input$example,{
 # when files are uploaded, disable some selection boxes
 ## -------------------------------------------------------------------
 observeEvent(input$files,{
-    if(!is.null(input$files)){
+    if (!is.null(input$files)){
         disable("example")
         addMsg(" Uploaded file(s) will be used for running!   <b>Go to Test tap</b>")
     }

@@ -12,7 +12,7 @@ get.gallery <- function() {
     for(r in 1:nr) {
         clist <- list()
         for(c in 1:rowN) {
-            if(i > nf) break ;
+            if (i > nf) break ;
             clist[[i]] <- column(floor(12/rowN), img.link(files[i]))
             i <- i + 1
         }
@@ -23,7 +23,7 @@ get.gallery <- function() {
 
 ## creates a div element with image thumb, description, 
 img.link <- function(file) {
-    if(file.exists(paste0(gallery.dir, "thumbs/", file))) {
+    if (file.exists(paste0(gallery.dir, "thumbs/", file))) {
         thumb.file <- paste0("gallery/thumbs/", file)
     } else {
         thumb.file <- paste0("gallery/", file)
@@ -33,7 +33,7 @@ img.link <- function(file) {
     img  <- tags$a(href=link, img)
     name <- tags$a(href=link, file)
     mdname <- paste0(gallery.dir, "md/", file, ".md")
-    if(file.exists( mdname )) {
+    if (file.exists( mdname )) {
         desc <- tagList(tags$br(), 
                         includeMarkdown(mdname), 
                         tags$br())
@@ -42,7 +42,7 @@ img.link <- function(file) {
     }
     return(div(class="gallerypanel", img, tags$br(), tags$hr(), name, desc)) 
 } 
-
+# sidebar will dispaly on the left side of web page
 sidebar <- dashboardSidebar(
     width = 200,
     sidebarMenu(
@@ -57,6 +57,7 @@ sidebar <- dashboardSidebar(
         uiOutput("developer", class = "classicOfPoetry"))
 )
 
+# tables, results and plots will displayed here, including configuration setting as well
 body <- dashboardBody(
     useShinyjs(),
     # This will call message-handler.js, used for showing alert message.
@@ -153,7 +154,6 @@ dashboardPage(
     skin = "black",
     dashboardHeader(title = "tmod tests beta", 
                     tags$li(uiOutput("messageInHeader", class ="tmodMsgHeader"),class= "dropdown"),
-                    #tags$li(uiOutput("cloudWordButton"), class = "dropdown"),
                     tags$li(uiOutput("uploadExportButton"), class = "dropdown"),
                     tags$li(actionButton("refresh", "", icon("refresh"), class="headerButton"),class = "dropdown"),
                     titleWidth = 158),
