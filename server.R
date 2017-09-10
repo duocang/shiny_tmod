@@ -14,6 +14,7 @@ function(input, output, session) {
     rv$uploadResults  <- NULL # it is used for storing results after processing uploaded files
     rv$headerMessage  <- NULL # this is used to show message in header
     rv$tabNum         <- 0  # this var is used to track tab, 1: heatmap-like 2: rug-like 3: table
+    rv$inti           <- 0
     si                <- sessionInfo()
     # load the code
     source("R/all_sessions.R")
@@ -171,6 +172,10 @@ function(input, output, session) {
         if(is.null(names(res)) && input$example != "exempty")
             names(res) <- exampleFileNameList
         rv$uploadResults <- res    # it will be used for downloading
+        if (is.null(res)){
+            rv$uploadResults <- NULL
+            return(NULL)
+        }
         return(res)
     })
 
@@ -207,6 +212,7 @@ function(input, output, session) {
         return(pie)
     })
     
+    # add Log
     addLog("Run tmod in version %s", si$otherPkgs$tmod$Version)
     
     # upload files
@@ -232,17 +238,6 @@ function(input, output, session) {
         contentType = "application/zip"
     )
     
-    # This will show an allert, if the user trys to run without selecting gene column
-    # observe({
-    #     input$runHeatmap
-    #     input$rugTab
-    #     input$runTable
-    #     req(input$whichColumnIsGenename)
-    #     if(input$whichColumnIsGenename == "-----------------"){
-    #         session$sendCustomMessage(type = "alert_message", message = 'Please select gene cloumn!')
-    #     }
-    # })
-    # 
     # when we click "Plot heatmap-like", it shows message on the header
     observeEvent(input$runHeatmap,{
         if((!is.null(input$files) && input$whichColumnIsGenename != "-----------------") || input$example != "exempty")
@@ -255,12 +250,16 @@ function(input, output, session) {
     })
     
     # no data, add message on header
-    observeEvent(input$run,{
+    observe({
+        input$runHeatmap
+        input$runRug
+        input$runTable
         if(is.null(input$files) && input$example == "exempty"){
             addMsg("No task running, there is no data!")
         }
     })
     
+    # show a meeage on bottom right, when genename is slected.
     observeEvent(input$whichColumnIsGenename, {
         if(input$whichColumnIsGenename != "-----------------" )
             showNotification(

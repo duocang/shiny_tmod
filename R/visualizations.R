@@ -1,8 +1,8 @@
 # it is defined in ui.R, it will show the table of result in 'test' tab.
 output$testOrExampleResult <- renderUI({
     tabsetPanel(id = "inTabset",
-                tabPanel("heatmap-like", value = "heatmapTab", plotOutput("plot0")),
-                tabPanel("rug-like",  value = "rugTab", plotOutput("plot01")),
+                tabPanel("heatmap-like", value = "heatmapTab", plotOutput("plot0", height = "1000px")),
+                tabPanel("rug-like",  value = "rugTab", plotOutput("plot01", height = "1000px")),
                 tabPanel("table", value = "tableTab",
                          # these are required for button to be reactive
                          div(id="glist", class="shiny-input-radiogroup", 
@@ -157,25 +157,31 @@ observe({
 # different button will be used to active different task in different tab.
 ## -------------------------------------------------------------------
 output$operation <- renderUI({
-    # without following if statement, there is always red error message,
-    # when you switch into "test" tab by left side bar click.
-    if (is.null(input$inTabset) || is.null(input$inTabset))
-        return(actionButton("runHeatmap", "RUN", class="tmodAct"))
-    
-    if (input$inTabset == "heatmapTab")
-        return(actionButton("runHeatmap", "RUN", class="tmodAct"))
-    if (input$inTabset == "rugTab")
-        return(actionButton("runRug", "RUN", class="tmodAct"))
-    if (input$inTabset == "tableTab")
-        return(actionButton("runTable", "RUN", class="tmodAct"))
+    if(!is.null(input$files) || input$example != "exempty"){
+        # without following if statement, there is always red error message,
+        # when you switch into "test" tab by left side bar click.
+        if (is.null(input$inTabset))
+            return(actionButton("runHeatmap", "RUN", class="tmodAct"))
+        
+        if (input$inTabset == "heatmapTab")
+            return(actionButton("runHeatmap", "RUN", class="tmodAct"))
+        if (input$inTabset == "rugTab")
+            return(actionButton("runRug", "RUN", class="tmodAct"))
+        if (input$inTabset == "tableTab")
+            return(actionButton("runTable", "RUN", class="tmodAct"))
+    }
 })
 
+# show or hide pie.lfc and pie.pval selection boxes
+# args:
+#   input$inTabset
+# effects:
+#   show/hide siderbar
 observeEvent(input$inTabset,{
     if (input$inTabset == "rugTab"){
         toggle("pie.lfc")
         toggle("pie.pval")
     }
-        
     else {
         toggle("pie.lfc")
         toggle("pie.pval")
@@ -184,59 +190,23 @@ observeEvent(input$inTabset,{
 
 
 ## -------------------------------------------------------------------
-## Show the heatmap plot
+# Show the heatmap plot
+# Args:
+#    input$whichColumnIsGenename:
+#    tmodTest()
+# Returns:
+#    heatmap plot
 ## -------------------------------------------------------------------
-# observeEvent(input$runHeatmap,{
-#     output$plot0 <- renderPlot({
-#         if (!is.null(isolate(input$files)) || isolate(input$example) != "exempty"){
-#             geneCol <- isolate(input$whichColumnIsGenename)
-#             if (geneCol != "-----------------"){
-#                 addMsg("Please select gene name column!")
-#                 isolate(shinyjs::removeClass(selector = "body", class = "sidebar-collapse"))
-#                 session$sendCustomMessage(type = "alert_message", message = "Please select gene name column!")
-#             }else{
-#                 withProgress(message = 'Making plot', value = 0, {
-#                     n <- 5
-#                     # Number of times we'll go through the loop
-#                     for (i in 1:n) {
-#                         # Each time through the loop, add another row of data. This is
-#                         # a stand-in for a long-running computation.
-#                         # Increment the progress bar, and update the detail text.
-#                         incProgress(1/n, detail = paste("", ""))
-#                         # Pause for 0.1 seconds to simulate a long computation.
-#                         Sys.sleep(0.1)
-#                     }
-#                     plo <- NULL
-#                     tryCatch({
-#                         plo <- isolate(tmodTest())
-#                     },warning=function(w){
-#                         if (geneCol != "-----------------"){
-#                             addMsg("Wrong gene column selected!")
-#                             isolate(shinyjs::removeClass(selector = "body", class = "sidebar-collapse"))
-#                             session$sendCustomMessage(type = "alert_message", message = "Wrong gene column selected! Please select gene cloumn, again!猪八戒")
-#                         }
-#                     },error=function(w){
-#                         isolate(shinyjs::removeClass(selector = "body", class = "sidebar-collapse"))
-#                         validate(
-#                             need(!is.null(plo), "Please select a right gene name column.")
-#                         )
-#                     })
-#                     tmodPanelPlot(plo, text.cex = 0.9, grid="b",   legend.style = "auto")
-#                 })
-#             }
-#         }
-#     }, bg="#EEEEEE")
-# })
-
 observeEvent(input$runHeatmap,{
+    req(isolate(input$whichColumnIsGenename))
     geneCol <- isolate(input$whichColumnIsGenename)
     if (geneCol == "-----------------"){
         addMsg("Please select gene name column!")
-        shinyjs::addClass(selector = "body", class = "sidebar-collapse")
-        #shinyjs::removeClass(selector = "body", class = "sidebar-collapse")
-        session$sendCustomMessage(type = "alert_message", message = "Please select gene name column!非得我")
+        shinyjs::addClass(selector = "body", class = "sidebar-collapse")  # show sidebar
+        session$sendCustomMessage(type = "alert_message", message = "Please select gene name column!")  # alert message via JS
     }else{
         output$plot0 <- renderPlot({
+            # following code chunk is a progress bar
             withProgress(message = 'Making plot', value = 0, {
                 n <- 5
                 # Number of times we'll go through the loop
@@ -249,58 +219,99 @@ observeEvent(input$runHeatmap,{
                     Sys.sleep(0.1)
                 }
                 tryCatch({
+                    plo <- NULL
                     plo <- isolate(tmodTest())
                 },warning = function(w){
                     addMsg("Wrong gene column selected!")
                     isolate(shinyjs::removeClass(selector = "body", class = "sidebar-collapse"))
-                    session$sendCustomMessage(type = "alert_message", message = "Wrong gene column selected! Please select gene cloumn, again!猪八戒1")
-                },error = function(e){
-                    session$sendCustomMessage(type = "alert_message", message = "Wrong gene column selected! Please select gene cloumn, again!猪八戒2")
+                    session$sendCustomMessage(type = "alert_message", message = "Wrong gene column selected! Please select gene cloumn, again!")
+                },error = function(w){
                 })
+                if(is.null(plo))
+                    return(NULL)
+                tmodPanelPlot(plo, text.cex = 0.9, grid="b",   legend.style = "auto")
             })
         }, bg="#EEEEEE")
     }
 })
 
 ## -------------------------------------------------------------------
-## Show the rug plot
+# Show the rug plot
+# Args: 
+#   input$whichColumnIsGenename: 
+#   tmodTest():
+# Returns:
+#   rug plot
 ## -------------------------------------------------------------------
-observeEvent(input$runRug,
-             output$plot01 <- renderPlot({
-                 if (!is.null(isolate(input$files)) || isolate(input$example) != "exempty")
-                 {
-                     withProgress(message = 'Making plot', value = 0, {
-                         n <- 10
-                         for (i in 1:n) {
-                             incProgress(1/n, detail = paste("", ""))
-                             Sys.sleep(0.1)
-                         }
-                         res <- isolate(tmodTest())
-                         sapply(res, function(x){
-                             if (nrow(x) == 0){
-                                 addMsg(sprintf("There is no moudle named %s!", isolate(input$gene_module)))
-                                 return(NULL)
-                             }
-                         })
-                         pie <- isolate(tmodTest1())
-                         names(pie) <- names(res)
-                         if (!is.null(res))
-                             tmodPanelPlot(res, pie=pie, pie.style="r", grid="b", filter.rows.pval=0.001)
-                     })
-                 }
-             }, bg = "#EEEEEE"))
+observeEvent(input$runRug,{
+    req(isolate(input$whichColumnIsGenename))
+    geneCol <- isolate(input$whichColumnIsGenename)
+    if (geneCol == "-----------------"){
+        addMsg("Please select gene name column!")
+        shinyjs::addClass(selector = "body", class = "sidebar-collapse")
+        session$sendCustomMessage(type = "alert_message", message = "Please select gene name column!")
+    }else{
+        output$plot01 <- renderPlot({
+            # no file or no example, no running
+            if (!is.null(isolate(input$files)) || isolate(input$example) != "exempty"){
+                # progress bar
+                withProgress(message = 'Making plot', value = 0, {
+                    n <- 10
+                    for (i in 1:n) {
+                        incProgress(1/n, detail = paste("", ""))
+                        Sys.sleep(0.1)
+                    }
+                    tryCatch({
+                        res <- NULL
+                        res <- isolate(tmodTest())
+                    },warning = function(w){
+                        addMsg("Wrong gene column selected!")
+                        isolate(shinyjs::removeClass(selector = "body", class = "sidebar-collapse"))
+                        session$sendCustomMessage(type = "alert_message", message = "Wrong gene column selected! Please select gene cloumn, again!")
+                    },error = function(w){
+                    })
+                    
+                    sapply(res, function(x){
+                        if (nrow(x) == 0){
+                            addMsg(sprintf("There is no moudle named %s!", isolate(input$gene_module)))
+                            return(NULL)
+                        }
+                    })
+                    pie <- isolate(tmodTest1())
+                    names(pie) <- names(res)
+                    if (!is.null(res))
+                        tmodPanelPlot(res, pie=pie, pie.style="r", grid="b", filter.rows.pval=0.001)
+                })
+            }
+        }, bg = "#EEEEEE")
+    }
+})
 
 ## -------------------------------------------------------------------
 ## Show the result table
 ## -------------------------------------------------------------------
-output$resultTable <- renderDataTable({
-    req(input$whichColumnIsGenename)
-    input$runTable
-    if (is.null(rv$uploadResults))
-        tmodTest()
-    req(input$resultOfWhichFile)
-    res <- formatResultsTable(rv$uploadResults[[input$resultOfWhichFile]])
-    return(datatable(res, escape = FALSE))
+observeEvent(input$runTable,{
+    output$resultTable <- renderDataTable({
+        req(isolate(input$whichColumnIsGenename))
+        req(input$resultOfWhichFile)
+        withProgress(message = 'Not ready for RUN', value = 0, {
+            n <- 10
+            for (i in 1:n) {
+                incProgress(1/n, detail = paste("", ""))
+                Sys.sleep(0.1)
+            }
+            tryCatch({
+                tmodTest()
+            },warning = function(w){
+                addMsg("Wrong gene column selected!")
+                isolate(shinyjs::removeClass(selector = "body", class = "sidebar-collapse"))
+                session$sendCustomMessage(type = "alert_message", message = "Wrong gene column selected! Please select gene cloumn, again!")
+            },error = function(w){
+            })
+        })
+        res <- formatResultsTable(rv$uploadResults[[input$resultOfWhichFile]])
+        return(datatable(res, escape = FALSE))
+    })
 })
 
 ## -------------------------------------------------------------------
