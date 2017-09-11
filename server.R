@@ -2,9 +2,15 @@ load("data/annotObject.RData")
 load("data/msig.rda")
 
 function(input, output, session) {
+    # load the code
+    source("R/all_sessions.R")
+    source("R/data_loading.R", local=TRUE)
+    source("R/visualizations.R", local=TRUE)
+    source("R/helpers.R", local = TRUE)
+    
     # global variables holding the state of the statistical tests
-    # fg           <- NULL
-    fg           <<- read.genes(filename="www/data/test.csv", output=output)
+    fg           <- NULL
+    
     Utest        <- "hg"
     example      <- FALSE
     log          <- ""
@@ -16,15 +22,9 @@ function(input, output, session) {
     rv$tabNum         <- 0  # this var is used to track tab, 1: heatmap-like 2: rug-like 3: table
     rv$inti           <- 0
     si                <- sessionInfo()
-    # load the code
-    source("R/all_sessions.R")
-    source("R/data_loading.R", local=TRUE)
-    source("R/visualizations.R", local=TRUE)
-    source("R/helpers.R", local = TRUE)
-    
+
     # this variable will be used for keeping file data
     loadedData <- reactiveVal(value=NULL)
-    
     
     # dispaly selectioninput:  which file to preview
     output$choosePreviewFile <- renderUI({
@@ -38,6 +38,8 @@ function(input, output, session) {
     
     # display selection for which column is genename
     output$genename_col <- renderUI({
+        # read.gene() is put here, just to make sure fg has a avlue form begining.
+        fg           <<- read.genes(filename="www/data/test.csv", output=output)
         if(is.null(input$files) && input$example == "exempty")
             return(NULL)
          if(!is.null(input$files))

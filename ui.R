@@ -45,16 +45,13 @@ img.link <- function(file) {
 # sidebar will dispaly on the left side of web page
 sidebar <- dashboardSidebar(
     width = 200,
-    sidebarMenu(
-        menuItem("COME and GO", tabName = "file", icon = icon("file-o"),
-                 menuSubItem("Upload File(s)", tabName = "file_preview", icon = shiny::icon("upload")),
-                 menuSubItem("Test", tabName = "tests", icon = shiny::icon("area-chart")),
-                 startExpanded = TRUE),
+    sidebarMenu(collapsed=TRUE,
+        menuItem("Upload File(s)", tabName = "file_preview", icon = shiny::icon("upload"), badgeLabel =" Hit me", badgeColor = "blue"),
+        menuItem("Test", tabName = "tests", icon = shiny::icon("area-chart"), badgeLabel =" Hit me", badgeColor = "blue"),
         menuItem("Help", tabName = "help", icon = icon("question")),
-        menuItem("Download", tabName = "download", icon = icon("download"), startExpanded = FALSE),
-        menuItem("Gallery", tabName = "gallery", icon = icon("file-picture-o"),startExpanded = FALSE),
-        menuItem("Logs", tabName = "logs", icon = icon("info"), startExpanded = FALSE),
-        uiOutput("developer", class = "classicOfPoetry"))
+        menuItem("Download", tabName = "download", icon = icon("download")),
+        menuItem("Gallery", tabName = "gallery", icon = icon("file-picture-o")),
+        menuItem("Logs", tabName = "logs", icon = icon("info")))
 )
 
 # tables, results and plots will displayed here, including configuration setting as well

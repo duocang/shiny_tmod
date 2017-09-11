@@ -1,7 +1,7 @@
 # it is defined in ui.R, it will show the table of result in 'test' tab.
 output$testOrExampleResult <- renderUI({
     tabsetPanel(id = "inTabset",
-                tabPanel("heatmap-like", value = "heatmapTab", plotOutput("plot0", height = "1000px")),
+                tabPanel("heatmap-like", value = "heatmapTab", plotOutput("plot0",height = "1000px")),
                 tabPanel("rug-like",  value = "rugTab", plotOutput("plot01", height = "1000px")),
                 tabPanel("table", value = "tableTab",
                          # these are required for button to be reactive
@@ -53,6 +53,7 @@ observe({
         return(NULL)
     no <- as.numeric(isolate(input$row))
     mset <- isolate(getMset())
+    #fg           <<- read.genes(filename="www/data/test.csv", output=output)
     # first, create ghe graphics
     if (!is.null(rv$uploadResults)){
         output$evidencePlot2 <- renderPlot({
@@ -79,9 +80,11 @@ observe({
 ## Creates the gene list
 ## -------------------------------------------------------------------
 observe({
-    if (is.null(input$glist) || input$glist == 0 || is.null(fg)) { return(NULL) ; }
+    if (is.null(input$glist) || input$glist == 0) 
+        return(NULL) 
     no   <- as.numeric(input$glist)
     mset <- getMsetReal(isolate(getMset()))
+    #fg           <<- read.genes(filename="www/data/test.csv", output=output)
     if (!is.null(rv$uploadResults))
         mod <- rv$uploadResults[[input$resultOfWhichFile]]$ID[no]
     catf("generating gene list for module %d\n", no)
@@ -309,7 +312,7 @@ observeEvent(input$runTable,{
             },error = function(w){
             })
         })
-        res <- formatResultsTable(rv$uploadResults[[input$resultOfWhichFile]])
+        res <- formatResultsTable(isolate(rv$uploadResults[[input$resultOfWhichFile]]))
         return(datatable(res, escape = FALSE))
     })
 })
