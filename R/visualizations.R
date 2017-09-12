@@ -370,7 +370,7 @@ observeEvent(input$example,{
 observeEvent(input$files,{
     if (!is.null(input$files)){
         disable("example")
-        addMsg(" Uploaded file(s) will be used for running!   <b>Go to Test tap</b>")
+        addMsg(" Uploaded file(s) will be used for running!   <b>Go to Test tab</b>")
     }
 })
 

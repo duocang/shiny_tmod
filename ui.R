@@ -46,7 +46,7 @@ img.link <- function(file) {
 sidebar <- dashboardSidebar(
     width = 200,
     sidebarMenu(collapsed=TRUE,
-        menuItem("Upload File(s)", tabName = "file_preview", icon = shiny::icon("upload"), badgeLabel =" Hit me", badgeColor = "blue"),
+        menuItem("Upload File(s)", tabName = "file_preview", icon = shiny::icon("upload")),
         menuItem("Test", tabName = "tests", icon = shiny::icon("area-chart"), badgeLabel =" Hit me", badgeColor = "blue"),
         menuItem("Help", tabName = "help", icon = icon("question")),
         menuItem("Download", tabName = "download", icon = icon("download")),
@@ -80,7 +80,7 @@ body <- dashboardBody(
                     column(3, uiOutput("genename_col"))),
                 class="params",
                 DT::dataTableOutput("table")),
-        tabItem(tabName = "tests",
+        tabItem(tabName = "tests",  # elements under "tests"
                 fluidRow(
                     column(3, "  Gene module"),
                     column(2, "  Gene sort" ),

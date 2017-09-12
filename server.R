@@ -56,7 +56,7 @@ function(input, output, session) {
         # go through all loaded files and find the common columns
         dat <- loadedData()
         foo <- lapply(dat, colnames)
-        Reduce(intersect, foo)# 对列表foo不断做intersect操作，进而得出共同行
+        Reduce(intersect, foo)
     })
     
 
