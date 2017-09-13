@@ -129,11 +129,6 @@ body <- dashboardBody(
                                                       "tmodUtest" = "tmodUtest"),
                                           selected = "tmodCERNOtest")),
                     column(1,uiOutput("operation"))),
-                fluidRow(
-                    column(3,
-                           numericInput("pie.pval", "pie.pval", 0.05, min = 0, max = 0.1, step = 0.01)),
-                    column(2,
-                           numericInput("pie.lfc", "pie.lfc", 1, min = 0, max = 5, step = 0.5))),
                 uiOutput("testOrExampleResult")),# it will show the table of result 
         tabItem(tabName = "help",
                 includeMarkdown("md/help.md")),

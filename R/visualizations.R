@@ -2,7 +2,13 @@
 output$testOrExampleResult <- renderUI({
     tabsetPanel(id = "inTabset",
                 tabPanel("heatmap-like", value = "heatmapTab", plotOutput("plot0",height = "1000px")),
-                tabPanel("rug-like",  value = "rugTab", plotOutput("plot01", height = "1000px")),
+                tabPanel("rug-like",  value = "rugTab", 
+                         fluidRow(
+                             column(3,
+                                    numericInput("pie.pval", "pie.pval", 0.05, min = 0, max = 0.1, step = 0.01)),
+                             column(2,
+                                    numericInput("pie.lfc", "pie.lfc", 1, min = 0, max = 5, step = 0.5))),
+                         plotOutput("plot01", height = "1000px")),
                 tabPanel("table", value = "tableTab",
                          # these are required for button to be reactive
                          div(id="glist", class="shiny-input-radiogroup", 
@@ -175,23 +181,6 @@ output$operation <- renderUI({
     }
 })
 
-# show or hide pie.lfc and pie.pval selection boxes
-# args:
-#   input$inTabset
-# effects:
-#   show/hide siderbar
-observeEvent(input$inTabset,{
-    if (input$inTabset == "rugTab"){
-        toggle("pie.lfc")
-        toggle("pie.pval")
-    }
-    else {
-        toggle("pie.lfc")
-        toggle("pie.pval")
-    }
-})
-
-
 ## -------------------------------------------------------------------
 # Show the heatmap plot
 # Args:
@@ -266,7 +255,10 @@ observeEvent(input$runRug,{
                     }
                     tryCatch({
                         res <- NULL
-                        res <- isolate(tmodTest())
+                        # if(is.null(rv$uploadResults))
+                             res <- isolate(tmodTest())
+                        # else
+                        #     res <- rv$uploadResults
                     },warning = function(w){
                         addMsg("Wrong gene column selected!")
                         isolate(shinyjs::removeClass(selector = "body", class = "sidebar-collapse"))
@@ -304,7 +296,10 @@ observeEvent(input$runTable,{
                 Sys.sleep(0.1)
             }
             tryCatch({
-                tmodTest()
+                # if(is.null(rv$uploadResults))
+                     res <- tmodTest()
+                # else
+                #     res <- rv$uploadResults
             },warning = function(w){
                 addMsg("Wrong gene column selected!")
                 isolate(shinyjs::removeClass(selector = "body", class = "sidebar-collapse"))
