@@ -20,7 +20,8 @@ output$testOrExampleResult <- renderUI({
                                  uiOutput("remindMessage"),
                                  fluidRow(
                                      column(3, uiOutput("selectionBoxOfResult")),
-                                     column(1, uiOutput("cloudWordButton"))
+                                     column(2, uiOutput("cloudWordButton")),
+                                     column(2, uiOutput("exportButton"))
                                  ),
                                  dataTableOutput( "resultTable"))),
                          # plot popup panel
@@ -117,16 +118,16 @@ observe({
 
 # create a tagcloud button if results are generated
 # depends on: reactive value rv$uploadResults
-output$cloudWordButton <- renderUI({
-    req(input$resultOfWhichFile)
-    if (!is.null(rv$uploadResults)){# upload files
-        catf( "+ generating tagcloud button\n" )
-        return(div(class="exportButton",
-               actionButton( "tagcloud", label= "",icon = icon("cloud"), class="tmodAct" ),
-               div(class = "exportButton-content",
-                   p(sprintf("Click me, you will get cloud word of %s", input$resultOfWhichFile)))))
-    }
-})
+observeEvent(input$runTable,
+             output$cloudWordButton <- renderUI({
+                 #if (!is.null(rv$uploadResults)){# upload files
+                     catf( "+ generating tagcloud button\n" )
+                     return(div(class="exportButton",
+                                actionButton( "tagcloud", label= "☁️Word Cloud", class="tmodAct" ),
+                                div(class = "exportButton-content",
+                                    p(sprintf("Click me, you will get cloud word of %s", input$resultOfWhichFile)))))
+                 #}
+             }))
 
 ## -------------------------------------------------------------------
 ## Creates a tag cloud 
@@ -313,8 +314,8 @@ observeEvent(input$runTable,{
 })
 
 ## -------------------------------------------------------------------
-# under heatmap-like tab
-# create a selection box, which is used to display different result of corresponding file uploaded
+# under talbe tab
+# create a selection box, select the file you want to check.
 ## -------------------------------------------------------------------
 observeEvent(input$runTable,
              output$selectionBoxOfResult <- renderUI({
@@ -331,18 +332,16 @@ observeEvent(input$runTable,
 ## create an export button if results are generated
 ## depends on: reactive value rv$uploadResults
 ## -------------------------------------------------------------------
-output$uploadExportButton <- renderUI({
-    req(rv$uploadResults)
-    catf( "+ generating uploaded files export button\n" )
-    return(div(class="exportButton",
-               tags$a(id = "uploadExport", 
-                      class = "btn shiny-download-link headerButton", 
-                      href="", 
-                      target = "_blank",
-                      icon("download"), ""),
-               div(class = "exportButton-content",
-                   p("Hit me, you can download results of all files."))))
-})
+observeEvent(input$runTable, 
+             output$exportButton <- renderUI({
+                 req(rv$uploadResults)
+                 catf( "+ generating uploaded files export button\n" )
+                 return(div(class="exportButton",
+                            #tags$a(id = "uploadExport", class = "btn shiny-download-link headerButton", href="", target = "_blank",icon("download"), ""),
+                            downloadButton("uploadExport", "Download", class="tmodAct "),
+                            div(class = "exportButton-content",
+                                p("Hit me, you can download results of all files."))))
+             }))
 
 
 ## -------------------------------------------------------------------

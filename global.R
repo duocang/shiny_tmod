@@ -10,6 +10,7 @@ library(markdown)
 library(tagcloud)
 library(DT)
 library(shinyWidgets)
+library(devtools)
 data(tmod)
 mset <- tmod
 # It allows file bigger than 25M to be uploaded

@@ -1,4 +1,3 @@
-load("data/annotObject.RData")
 load("data/msig.rda")
 
 function(input, output, session) {
@@ -227,7 +226,7 @@ function(input, output, session) {
     # Returns:
     #   click download button, zip file is downloaded into local path.
     output$uploadExport <- downloadHandler(
-        filename = "data.zip",
+        filename = "result_data.zip",
         content = function(fname){
             req(loadedData())
             mapply( function(x, y){

@@ -146,7 +146,7 @@ dashboardPage(
     skin = "black",
     dashboardHeader(title = "tmod tests beta", 
                     tags$li(uiOutput("messageInHeader", class ="tmodMsgHeader"),class= "dropdown"),
-                    tags$li(uiOutput("uploadExportButton"), class = "dropdown"),
+                    #tags$li(uiOutput("uploadExportButton"), class = "dropdown"),
                     tags$li(actionButton("refresh", "", icon("refresh"), class="headerButton"),class = "dropdown"),
                     titleWidth = 158),
     sidebar,
